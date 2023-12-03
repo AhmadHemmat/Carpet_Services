@@ -5,7 +5,6 @@ import { breakPointsStore } from "@/stores/breakPoints";
 
 import { RouterView } from "vue-router";
 import DefaultLayout from "./layouts/DefaultLayout.vue";
-import DayFoods from "./layouts/DayFoods.vue";
 
 const store = { loginStore: loginStore(), breakPointsStore: breakPointsStore() };
 onMounted(() => {

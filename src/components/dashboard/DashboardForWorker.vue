@@ -3,23 +3,24 @@
     <v-card rounded="lg" elevation="12">
       <v-card class="cart" :style="{ height: windowHeight + 'px', overflow: 'auto' }">
         <v-container>
-          <v-row align="center" justify="center">
+          <v-row dense align="center" justify="center">
             <v-col v-for="(obj, i) in variants" :key="i" cols="12" md="6">
               <v-card
-                class="mx-auto"
+                class="mx-auto pb-2"
+                align="center"
+                justify="center"
                 width="100%"
-                height="100%"
+                height="105"
                 :variant="obj.variant"
                 dir="rtl"
+                :color="i % 2 === 0 ? '#b5e7a0' : '#f7cac9'"
               >
                 <v-card-item>
-                  <div>
-                    <div class="text-h6 mb-1">{{ obj.type }}</div>
-                  </div>
+                  <div class="text-h6 mb-1">{{ obj.type }}</div>
                 </v-card-item>
-                <v-card-actions>
-                  <v-btn :color="obj.color" @click="openModal(obj.type)"> انتخاب </v-btn>
-                </v-card-actions>
+                <v-btn class="mb-2" :color="obj.color" @click="openModal(obj.type)">
+                  انتخاب
+                </v-btn>
               </v-card>
             </v-col>
           </v-row>
@@ -27,101 +28,98 @@
       </v-card>
     </v-card>
   </v-col>
-  <v-dialog
-    v-model="inputExcelDialog"
-    persistent
-    :width="device === 'mobile' ? '100%' : '50%'"
-  >
-    <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
-      <v-responsive>
-        <v-chip outline @click="inputExcelDialog = false">
-          <v-icon color="red" size="small">mdi-close</v-icon>
-        </v-chip>
+  <v-col cols="12" xs="12" sm="12" md="8" lg="8">
+    <v-dialog v-model="inputExcelDialog" persistent transition="dialog-bottom-transition">
+      <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
+        <v-responsive>
+          <v-chip outline @click="inputExcelDialog = false">
+            <v-icon color="red" size="small">mdi-close</v-icon>
+          </v-chip>
 
-        <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
-          <span class="text-h6"> وارد کردن فایل اکسل قالی ها </span>
-        </v-card>
+          <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
+            <span class="text-h6"> وارد کردن فایل اکسل قالی ها </span>
+          </v-card>
 
-        <v-file-input
-          v-model="metaDataFile"
-          class="justify-center mt-12 mx-4"
-          label="انتخاب فایل اکسل"
-          variant="filled"
-          prepend-icon="mdi-file-excel"
-          @change="convert"
-        ></v-file-input>
+          <v-file-input
+            v-model="metaDataFile"
+            class="justify-center mt-12 mx-4"
+            label="انتخاب فایل اکسل"
+            variant="filled"
+            prepend-icon="mdi-file-excel"
+            @change="convert"
+          ></v-file-input>
 
-        <v-container class="text-center">
-          <v-row align="center" justify="center">
-            <v-col>
-              <v-btn
-                class="flex-grow-1"
-                height="48"
-                variant="tonal"
-                @click="sendCarpetsToAPI"
-              >
-                ثبت
-              </v-btn>
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-responsive>
-    </v-card>
-  </v-dialog>
+          <v-container class="text-center">
+            <v-row align="center" justify="center">
+              <v-col>
+                <v-btn
+                  class="flex-grow-1"
+                  height="48"
+                  variant="tonal"
+                  @click="sendCarpetsToAPI"
+                >
+                  ثبت
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-responsive>
+      </v-card>
+    </v-dialog>
 
-  <v-dialog
-    v-model="selectOperatorDialog"
-    persistent
-    :width="device === 'mobile' ? '100%' : '50%'"
-  >
-    <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
-      <v-responsive>
-        <v-chip outline @click="selectOperatorDialog = false">
-          <v-icon color="red" size="small">mdi-close</v-icon>
-        </v-chip>
+    <v-dialog
+      v-model="selectOperatorDialog"
+      persistent
+      transition="dialog-bottom-transition"
+    >
+      <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
+        <v-responsive>
+          <v-chip outline @click="selectOperatorDialog = false">
+            <v-icon color="red" size="small">mdi-close</v-icon>
+          </v-chip>
 
-        <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
-          <!-- <v-icon class="mx-2" color="white">mdi-export</v-icon> -->
-          <span class="text-h6">
-            مرحله ۱ خروج قالی
-            <br />
-            انتخاب سرویس کار
-          </span>
-        </v-card>
-        <!-- <v-img
+          <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
+            <!-- <v-icon class="mx-2" color="white">mdi-export</v-icon> -->
+            <span class="text-h6">
+              مرحله ۱ خروج قالی
+              <br />
+              انتخاب سرویس کار
+            </span>
+          </v-card>
+          <!-- <v-img
           class="mx-auto mt-12 mb-16"
           max-height="140"
           max-width="240"
           :src="carpetLogo"
         ></v-img> -->
-        {{ serviceProviders }}
-        <v-autocomplete
-          class="mt-12"
-          v-model="selectedOperator"
-          :items="serviceProviders"
-          color="blue-grey-lighten-2"
-          :item-title="
-            (item) => (item?.first_name ? item?.first_name + ' ' + item?.last_name : null)
-          "
-          label="انتخاب سرویس کار"
-          clearable
-          return-object
-          dir="rtl"
-        >
-        </v-autocomplete>
+          <v-autocomplete
+            class="mt-12"
+            v-model="selectedOperator"
+            :items="serviceProviders"
+            color="blue-grey-lighten-2"
+            :item-title="
+              (item) =>
+                item?.first_name ? item?.first_name + ' ' + item?.last_name : null
+            "
+            label="انتخاب سرویس کار"
+            clearable
+            return-object
+            dir="rtl"
+          >
+          </v-autocomplete>
 
-        <v-container class="text-center">
-          <v-row align="center" justify="center">
-            <v-col>
-              <v-btn
-                class="flex-grow-1"
-                height="48"
-                variant="tonal"
-                @click="getServicesOfSelectedServiceProvider"
-              >
-                بعدی
-              </v-btn>
-              <!-- <v-card flat class="pa-4" @click="dialog = true">
+          <v-container class="text-center">
+            <v-row align="center" justify="center">
+              <v-col>
+                <v-btn
+                  class="flex-grow-1"
+                  height="48"
+                  variant="tonal"
+                  @click="getServicesOfSelectedServiceProvider"
+                >
+                  بعدی
+                </v-btn>
+                <!-- <v-card flat class="pa-4" @click="dialog = true">
                 <v-avatar
                   icon="mdi-plus"
                   color="white"
@@ -131,185 +129,250 @@
 
                 <div class="text-caption text-truncate">Add shortcut</div>
               </v-card> -->
-            </v-col>
-          </v-row>
+              </v-col>
+            </v-row>
 
-          <v-dialog v-model="dialog" :width="device === 'mobile' ? '100%' : '50%'">
-            <v-card title="Add shortcut" rounded="lg">
-              <template v-slot:text>
-                <v-label class="text-caption">Name</v-label>
+            <v-dialog v-model="dialog" :width="device === 'mobile' ? '100%' : '50%'">
+              <v-card title="Add shortcut" rounded="lg">
+                <template v-slot:text>
+                  <v-label class="text-caption">Name</v-label>
 
-                <v-text-field density="compact" variant="solo-filled" flat></v-text-field>
+                  <v-text-field
+                    density="compact"
+                    variant="solo-filled"
+                    flat
+                  ></v-text-field>
 
-                <v-text-field density="compact" variant="solo-filled" flat></v-text-field>
-              </template>
+                  <v-text-field
+                    density="compact"
+                    variant="solo-filled"
+                    flat
+                  ></v-text-field>
+                </template>
 
-              <div class="py-4 px-5 text-end">
+                <div class="py-4 px-5 text-end">
+                  <v-btn
+                    border
+                    class="text-none me-2"
+                    color="blue"
+                    text="Cancel"
+                    variant="text"
+                    @click="dialog = false"
+                  ></v-btn>
+
+                  <v-btn
+                    class="text-none"
+                    color="blue"
+                    text="Done"
+                    variant="flat"
+                    @click="dialog = false"
+                  ></v-btn>
+                </div>
+              </v-card>
+            </v-dialog>
+          </v-container>
+        </v-responsive>
+      </v-card>
+    </v-dialog>
+    <v-dialog
+      v-model="selectServicesDialog"
+      persistent
+      transition="dialog-bottom-transition"
+    >
+      <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
+        <v-responsive>
+          <v-chip outline @click="selectServicesDialog = false">
+            <v-icon color="red" size="small">mdi-close</v-icon>
+          </v-chip>
+
+          <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
+            <span class="text-h6">
+              مرحله ۲ خروج قالی
+              <br />
+              انتخاب سرویس ها
+            </span>
+          </v-card>
+          <v-autocomplete
+            class="mt-12"
+            v-model="selectedServices"
+            :items="services"
+            color="blue-grey-lighten-2"
+            item-title="title"
+            item-value="id"
+            label="انتخاب سرویس ها"
+            clearable
+            dir="rtl"
+            chips
+            closable-chips
+            multiple
+          >
+          </v-autocomplete>
+
+          <v-container class="text-center">
+            <v-row align="center" justify="center">
+              <v-col cols="6">
                 <v-btn
-                  border
-                  class="text-none me-2"
-                  color="blue"
-                  text="Cancel"
-                  variant="text"
-                  @click="dialog = false"
-                ></v-btn>
-
+                  class="flex-grow-1"
+                  height="48"
+                  variant="tonal"
+                  @click="stepperNext"
+                >
+                  بعدی
+                </v-btn>
+              </v-col>
+              <v-col cols="6">
                 <v-btn
-                  class="text-none"
-                  color="blue"
-                  text="Done"
-                  variant="flat"
-                  @click="dialog = false"
-                ></v-btn>
-              </div>
-            </v-card>
-          </v-dialog>
-        </v-container>
-      </v-responsive>
-    </v-card>
-  </v-dialog>
-  <v-dialog
-    v-model="selectServicesDialog"
-    persistent
-    :width="device === 'mobile' ? '100%' : '50%'"
-  >
-    <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
-      <v-responsive>
-        <v-chip outline @click="selectServicesDialog = false">
-          <v-icon color="red" size="small">mdi-close</v-icon>
-        </v-chip>
+                  class="flex-grow-1"
+                  height="48"
+                  variant="tonal"
+                  @click="stepperPrevious"
+                >
+                  قبلی
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-responsive>
+      </v-card>
+    </v-dialog>
 
-        <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
-          <span class="text-h6">
-            مرحله ۲ خروج قالی
-            <br />
-            انتخاب سرویس ها
-          </span>
-        </v-card>
-        <v-autocomplete
-          class="mt-12"
-          v-model="selectedServices"
-          :items="services"
-          color="blue-grey-lighten-2"
-          item-title="title"
-          item-value="id"
-          label="انتخاب سرویس ها"
-          clearable
-          dir="rtl"
-          chips
-          closable-chips
-          multiple
-        >
-        </v-autocomplete>
+    <v-dialog
+      v-model="selectCarpetDialog"
+      persistent
+      transition="dialog-bottom-transition"
+    >
+      <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
+        <v-responsive>
+          <v-chip outline @click="selectCarpetDialog = false">
+            <v-icon color="red" size="small">mdi-close</v-icon>
+          </v-chip>
 
-        <v-container class="text-center">
-          <v-row align="center" justify="center">
-            <v-col cols="6">
-              <v-btn class="flex-grow-1" height="48" variant="tonal" @click="stepperNext">
-                بعدی
-              </v-btn>
-            </v-col>
-            <v-col cols="6">
-              <v-btn
-                class="flex-grow-1"
-                height="48"
-                variant="tonal"
-                @click="stepperPrevious"
-              >
-                قبلی
-              </v-btn>
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-responsive>
-    </v-card>
-  </v-dialog>
+          <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
+            <span class="text-h6">
+              مرحله ۳ خروج قالی
+              <br />
+              انتخاب قالی
+            </span>
+          </v-card>
+          <v-autocomplete
+            class="mt-12"
+            v-model="selectedCarpet"
+            :items="carpetList"
+            color="blue-grey-lighten-2"
+            :item-title="(item) => (item?.barcode ? item?.barcode : null)"
+            label="انتخاب قالی"
+            clearable
+            dir="rtl"
+            return-object
+          >
+          </v-autocomplete>
 
-  <v-dialog
-    v-model="selectCarpetDialog"
-    persistent
-    :width="device === 'mobile' ? '100%' : '50%'"
-  >
-    <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
-      <v-responsive>
-        <v-chip outline @click="selectCarpetDialog = false">
-          <v-icon color="red" size="small">mdi-close</v-icon>
-        </v-chip>
+          <v-container class="text-center">
+            <v-row align="center" justify="center">
+              <v-col cols="6">
+                <v-btn
+                  class="flex-grow-1"
+                  height="48"
+                  variant="tonal"
+                  @click="sendTransfer"
+                >
+                  بعدی
+                </v-btn>
+              </v-col>
+              <v-col cols="6">
+                <v-btn
+                  class="flex-grow-1"
+                  height="48"
+                  variant="tonal"
+                  @click="stepperPrevious"
+                >
+                  قبلی
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-container>
+          <v-container class="text-center">
+            <v-row align="center" justify="center">
+              <v-col cols="12">
+                <v-btn
+                  class="flex-grow-1"
+                  height="48"
+                  variant="tonal"
+                  width="100%"
+                  @click="updateIsFinishedTransfer"
+                >
+                  ثبت نهایی
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-responsive>
+      </v-card>
+    </v-dialog>
 
-        <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
-          <span class="text-h6">
-            مرحله ۳ خروج قالی
-            <br />
-            انتخاب قالی
-          </span>
-        </v-card>
-        <v-autocomplete
-          class="mt-12"
-          v-model="selectedCarpet"
-          :items="carpetList"
-          color="blue-grey-lighten-2"
-          item-title="barcode"
-          item-value="id"
-          label="انتخاب قالی"
-          clearable
-          dir="rtl"
-        >
-        </v-autocomplete>
+    <v-dialog v-model="openTaskDialog" persistent transition="dialog-bottom-transition">
+      <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
+        <v-responsive>
+          <v-chip outline @click="openTaskDialog = false">
+            <v-icon color="red" size="small">mdi-close</v-icon>
+          </v-chip>
+          <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
+            <span class="text-h6"> شما یک انتقال قالی ناتمام دارید </span>
+          </v-card>
+          <v-container class="text-center">
+            <v-row align="center" justify="center">
+              <v-col cols="6">
+                <v-btn
+                  class="flex-grow-1"
+                  height="48"
+                  variant="tonal"
+                  @click="showOpenTask"
+                >
+                  ادامه
+                </v-btn>
+              </v-col>
+              <v-col cols="6">
+                <v-btn
+                  class="flex-grow-1"
+                  height="48"
+                  variant="tonal"
+                  @click="stepperPrevious"
+                >
+                  لغو
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-responsive>
+      </v-card>
+    </v-dialog>
 
-        <v-container class="text-center">
-          <v-row align="center" justify="center">
-            <v-col cols="6">
-              <v-btn
-                class="flex-grow-1"
-                height="48"
-                variant="tonal"
-                @click="updateCarpetStatusToService(selectedCarpet)"
-              >
-                ثبت
-              </v-btn>
-            </v-col>
-            <v-col cols="6">
-              <v-btn
-                class="flex-grow-1"
-                height="48"
-                variant="tonal"
-                @click="stepperPrevious"
-              >
-                قبلی
-              </v-btn>
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-responsive>
-    </v-card>
-  </v-dialog>
-
-  <v-dialog
-    v-model="openTaskDialog"
-    persistent
-    :width="device === 'mobile' ? '100%' : '50%'"
-  >
-    <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
-      <v-responsive>
-        <v-chip outline @click="openTaskDialog = false">
-          <v-icon color="red" size="small">mdi-close</v-icon>
-        </v-chip>
-        <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
-          <span class="text-h6"> شما یک انتقال قالی ناتمام دارید </span>
-        </v-card>
-        <v-container class="text-center">
-          <v-row align="center" justify="center">
-            <v-col cols="6">
-              <v-btn
-                class="flex-grow-1"
-                height="48"
-                variant="tonal"
-                @click="showOpenTask"
-              >
-                ادامه
-              </v-btn>
-            </v-col>
-            <v-col cols="6">
+    <v-dialog
+      v-model="continueOpenTaskDialog"
+      persistent
+      transition="dialog-bottom-transition"
+    >
+      <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
+        <v-responsive>
+          <v-chip outline @click="continueOpenTaskDialog = false">
+            <v-icon color="red" size="small">mdi-close</v-icon>
+          </v-chip>
+          <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
+            <span class="text-h6"> شما یک انتقال قالی ناتمام دارید </span>
+          </v-card>
+          <v-container class="text-center">
+            <v-row align="center" justify="center">
+              <v-col cols="6">
+                <v-btn
+                  class="flex-grow-1"
+                  height="48"
+                  variant="tonal"
+                  @click="continueOpenTransfer"
+                >
+                  ادامه
+                </v-btn>
+              </v-col>
+              <!-- <v-col cols="6">
               <v-btn
                 class="flex-grow-1"
                 height="48"
@@ -318,24 +381,27 @@
               >
                 لغو
               </v-btn>
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-responsive>
-    </v-card>
-  </v-dialog>
+            </v-col> -->
+            </v-row>
+          </v-container>
+        </v-responsive>
+      </v-card>
+    </v-dialog>
+  </v-col>
 </template>
 
 <script setup>
 import { ref, watch, computed, onMounted } from "vue";
 import axios from "axios";
 import { breakPointsStore } from "@/stores/breakPoints";
-import carpet from "../../assets/carpet_logo.png";
+// import carpet from "../../assets/carpet_logo.png";
 import * as XLSX from "xlsx";
 onMounted(() => {
   getServiceProviders();
   getCarpetList();
   checkOpenTask();
+  getUserProfile();
+  getOpenTransfer();
 });
 const metaDataFile = ref(null);
 const inputExcelDialog = ref(false);
@@ -374,14 +440,19 @@ function sendCarpetsToAPI() {
       });
   }
 }
-const carpetLogo = carpet;
+// const carpetLogo = carpet;
 const store = breakPointsStore();
 
 const device = ref(store.device);
 
 const variants = [
   {
-    type: "ورود اولیه قالی",
+    type: "ورود اکسل قالی ها",
+    color: "success",
+    variant: "elevated",
+  },
+  {
+    type: "ورود قالی از کارخانه",
     color: "success",
     variant: "elevated",
   },
@@ -391,12 +462,12 @@ const variants = [
     variant: "elevated",
   },
   {
-    type: "ورود قالی",
+    type: "ورود قالی از سرویس",
     color: "success",
     variant: "elevated",
   },
   {
-    type: "خروج قالی",
+    type: "خروج قالی به سرویس",
     color: "error",
     variant: "elevated",
   },
@@ -404,11 +475,14 @@ const variants = [
 const selectOperatorDialog = ref(false);
 const selectCarpetDialog = ref(false);
 const selectServicesDialog = ref(false);
+const openTransfer = ref(false);
 
 function openModal(type) {
-  if (type === "خروج قالی") {
+  if (openTransfer.value && type === "خروج قالی به سرویس") {
+    selectCarpetDialog.value = true;
+  } else if (!openTransfer.value && type === "خروج قالی به سرویس") {
     selectOperatorDialog.value = true;
-  } else if (type === "ورود اولیه قالی") {
+  } else if (type === "ورود اکسل قالی ها") {
     inputExcelDialog.value = true;
   }
 }
@@ -439,6 +513,8 @@ function stepperNext() {
     selectServicesDialog.value = true;
     selectCarpetDialog.value = false;
   } else if (selectServicesDialog.value) {
+    localStorage.setItem("openTask", true);
+    sendTransfer();
     selectOperatorDialog.value = false;
     selectServicesDialog.value = false;
     selectCarpetDialog.value = true;
@@ -458,54 +534,172 @@ function stepperPrevious() {
 }
 function getServicesOfSelectedServiceProvider() {
   stepperNext();
-
-  openTask.value = true;
-  localStorage.setItem("openTask", openTask.value);
   services.value = selectedOperator.value.services;
 }
+const userProfile = ref(null);
+function getUserProfile() {
+  axios.get("http://localhost:8000/api/account/user/").then((response) => {
+    console.log("UUUUUUUUUser", response);
+    userProfile.value = response.data;
+  });
+}
+const carpetList = ref([]);
+const selectedCarpet = ref(null);
+const notIsFinishedTransfer = ref({});
 
-const carpetList = ref(null);
-const selectedCarpet = null;
-const statuses = ref(null);
-const onServiceStatusId = ref(null);
-async function updateCarpetStatusToService(carpetId) {
-  await axios.get("http://localhost:8000/getstatus/").then((response) => {
-    console.log("sssssssss", response);
-    statuses.value = response.data;
-    for (const status of response.data) {
-      if (status.title === "در دست سرویس") {
-        onServiceStatusId.value = status.id;
+async function getOpenTransfer() {
+  notIsFinishedTransfer.value.date = "";
+  await axios.get("http://localhost:8000/transfer/all-transfer-list").then((response) => {
+    for (let i = 0; i < response.data.length; i++) {
+      if (
+        response.data[i].worker === userProfile.value.pk &&
+        response.data[i].is_finished === false
+      ) {
+        openTransfer.value = true;
+
+        notIsFinishedTransfer.value.id = response.data[i].id;
+        notIsFinishedTransfer.value.serviceProviders = response.data[i].service_provider;
+        notIsFinishedTransfer.value.services = response.data[i].services;
+
+        for (let j = 0; j < response?.data[i]?.date?.length; j++) {
+          if (response.data[i].date[j] === "T") notIsFinishedTransfer.value.date += " ";
+          else if (response.data[i].date[j] === "Z")
+            notIsFinishedTransfer.value.date += "";
+          else notIsFinishedTransfer.value.date += response.data[i].date[j];
+        }
       }
     }
   });
-  console.log("id", carpetId);
-  axios
-    .post("http://localhost:8000/updatecarpet/", {
-      carpet_id: carpetId,
-      status_id: onServiceStatusId.value,
-    })
-    .then((response) => {
-      console.log("ssssssssssssssssssssssstttttt", response);
-    });
 }
-function getCarpetList() {
-  axios.get("http://localhost:8000/carpet/all-carpets-list/").then((response) => {
+async function getCarpetList() {
+  carpetList.value = [];
+  await axios.get("http://localhost:8000/carpet/all-carpets-list/").then((response) => {
     console.log("carpet", response);
-    carpetList.value = response.data;
+    for (const carpet of response.data) {
+      if (carpet.id !== selectedCarpet?.value?.id) {
+        carpetList.value.push(carpet);
+      }
+    }
   });
 }
 
-const openTask = ref(false);
+const openTask = ref({});
 const openTaskDialog = ref(false);
+const continueOpenTaskDialog = ref(false);
 function checkOpenTask() {
-  openTaskDialog.value = localStorage.getItem("openTask");
+  continueOpenTaskDialog.value = localStorage.getItem("openTask");
+}
+function continueOpenTask() {
+  openTaskDialog.value = false;
+  continueOpenTaskDialog.value = true;
+}
 
-  console.log("$$$$$$$$$$$$$", localStorage.getItem("openTask"));
+function getDateAndTime() {
+  let currentdate = new Date();
+  let datetime =
+    "Last Sync: " +
+    currentdate.getFullYear() +
+    "/" +
+    (currentdate.getMonth() + 1) +
+    "/" +
+    currentdate.getDate() +
+    " @ " +
+    currentdate.getHours() +
+    ":" +
+    currentdate.getMinutes() +
+    ":" +
+    currentdate.getSeconds();
+  return datetime.replace("@", "").substring(11);
+}
+const statuses = ref(null);
+
+async function getStatuses() {
+  await axios.get("http://localhost:8000/status/all-status-list/").then((response) => {
+    statuses.value = response.data;
+  });
+}
+async function sendTransfer() {
+  getCarpetList();
+  await getOpenTransfer();
+  let status = null;
+  await getStatuses();
+  for (const s of statuses.value) {
+    if (s.title === "خروج") {
+      status = s.id;
+    }
+  }
+  const body = {};
+  if (!openTransfer.value) {
+    body.carpet = [];
+    body.id = notIsFinishedTransfer.value.id;
+    body.worker = userProfile.value.pk;
+
+    body.status = status;
+    body.service_provider = selectedOperator?.value?.id;
+    body.services = selectedServices.value;
+    body.date = getDateAndTime();
+    body.is_finished = false;
+    body.admin_verify = false;
+    axios
+      .post("http://localhost:8000/transfer/create-transfer/", body)
+      .then((response) => {
+        console.log("transfer", response);
+        openTransfer.value = true;
+      });
+  } else {
+    body.carpet = [selectedCarpet.value.barcode];
+    body.id = notIsFinishedTransfer.value.id;
+    body.worker = userProfile.value.pk;
+    body.status = status;
+    body.service_provider = notIsFinishedTransfer.value.serviceProviders;
+    body.services = [];
+    body.date = notIsFinishedTransfer.value.date;
+    body.is_finished = false;
+    body.admin_verify = false;
+    axios
+      .post("http://localhost:8000/transfer/update-transfer/", body)
+      .then((response) => {
+        console.log("transfer", response);
+        // openTransfer.value = true
+      });
+  }
+}
+
+async function updateIsFinishedTransfer() {
+  // getCarpetList()
+  await getOpenTransfer();
+  let status = null;
+  await getStatuses();
+  for (const s of statuses.value) {
+    if (s.title === "خروج") {
+      status = s.id;
+    }
+  }
+  const body = {};
+  body.carpet = [];
+  body.id = notIsFinishedTransfer.value.id;
+  body.worker = userProfile.value.pk;
+  body.status = status;
+  body.service_provider = notIsFinishedTransfer.value.serviceProviders;
+  body.services = [];
+  body.date = notIsFinishedTransfer.value.date;
+  body.is_finished = true;
+  body.admin_verify = false;
+  axios.post("http://localhost:8000/transfer/update-transfer/", body).then((response) => {
+    console.log("transfer", response);
+    openTransfer.value = false;
+    localStorage.removeItem("openTask");
+  });
+}
+
+function continueOpenTransfer() {
+  continueOpenTaskDialog.value = false;
+  selectCarpetDialog.value = true;
 }
 </script>
 <style>
 .cart {
-  border: 1px solid rgb(155, 225, 253);
+  border: 1px solid rgb(237, 74, 74);
 }
 /* width */
 ::-webkit-scrollbar {

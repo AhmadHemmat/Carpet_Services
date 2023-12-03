@@ -1,10 +1,9 @@
 <template>
-  <div class="d-flex flex-row-reverse bg-surface-variant">
-    <Profile @company="(id) => (company = id)" @userRole="(role) => (userRole = role)" />
-    <DashboardForCustomer v-if="userRole === 'مشتری'" />
-    <DashboardForChef />
+  <v-container align="center" justify="center">
+    <!-- <Profile @company="(id) => (company = id)" @userRole="(role) => (userRole = role)" /> -->
+    <DashboardForWorker />
     <DashboardForAdmin v-if="userRole === 'مدیر'" :company="company" />
-  </div>
+  </v-container>
   <Alert
     :msg="alertMsg"
     :activate="alertActivator"
@@ -19,9 +18,8 @@ import { loginStore } from "@/stores/index";
 
 // Childs
 import Alert from "@/components/Alert.vue";
-import Profile from "@/components/dashboard/Profile.vue";
-import DashboardForCustomer from "@/components/dashboard/DashboardForCustomer.vue";
-import DashboardForChef from "@/components/dashboard/DashboardForChef.vue";
+// import Profile from "@/components/dashboard/Profile.vue";
+import DashboardForWorker from "@/components/dashboard/DashboardForWorker.vue";
 import DashboardForAdmin from "@/components/dashboard/DashboardForAdmin.vue";
 
 const store = loginStore();

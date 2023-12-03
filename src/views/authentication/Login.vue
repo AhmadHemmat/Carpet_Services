@@ -80,7 +80,7 @@ const alertColor = ref("error");
 const radios = ref("شماره تلفن همراه");
 
 function onSubmit() {
-  const apiUrl = "http://localhost:8000/api/authentication/login/";
+  const apiUrl = "http://localhost:8000/api/account/login/";
   let param = {
     username: userName.value,
     password: password.value,

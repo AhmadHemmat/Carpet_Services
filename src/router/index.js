@@ -7,11 +7,12 @@ import { loginStore } from '@/stores/index'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    // {
-    //   path: '/',
-    //   name: 'home',
-    //   component: HomeView
-    // },
+    {
+      path: '/profile',
+      name: 'home',
+      component: () => import('../views/Profile.vue'),
+      meta: { requiresAuth: true }
+    },
     {
       path: '/dashboard',
       name: 'dashboard',
