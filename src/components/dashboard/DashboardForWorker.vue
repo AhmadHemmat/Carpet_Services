@@ -1,4 +1,18 @@
 <template>
+  <v-app-bar v-if="device === 'mobile'" color="#C51162" app dir="rtl">
+    <v-btn stacked>
+      <v-badge v-if="openTransfer" color="warning" dot>
+        <v-icon
+          icon="mdi-comment-question-outline"
+          color="error"
+          @click="continueOpenTaskDialog = true"
+        ></v-icon>
+      </v-badge>
+      <v-icon v-else icon="mdi-comment-check" color="white"></v-icon>
+      <span v-if="openTransfer"> انتقال ناتمام </span>
+      <span v-else> خوش آمدید </span>
+    </v-btn>
+  </v-app-bar>
   <v-col cols="12" xs="12" sm="12" md="8" lg="8">
     <v-card rounded="lg" elevation="12">
       <v-card class="cart" :style="{ height: windowHeight + 'px', overflow: 'auto' }">
@@ -13,11 +27,16 @@
                 height="105"
                 :variant="obj.variant"
                 dir="rtl"
-                :color="i % 2 === 0 ? '#b5e7a0' : '#f7cac9'"
+                style="border: 1px solid #3200e6"
               >
+                <!-- :color="i % 2 === 0 ? '#b5e7a0' : '#f7cac9'" -->
+
                 <v-card-item>
-                  <div class="text-h6 mb-1">{{ obj.type }}</div>
+                  <div class="mb-1">
+                    {{ obj.type }}
+                  </div>
                 </v-card-item>
+                <v-icon :color="obj.color" size="x-large">{{ obj.icon }}</v-icon>
                 <v-btn class="mb-2" :color="obj.color" @click="openModal(obj.type)">
                   انتخاب
                 </v-btn>
@@ -267,6 +286,14 @@
           >
           </v-autocomplete>
 
+          <!-- <div class="hello">
+            <StreamBarcodeReader
+              @decode="(a, b, c) => onDecode(a, b, c)"
+              @loaded="() => onLoaded()"
+            ></StreamBarcodeReader>
+            Input Value: {{ text || "Nothing" }}
+          </div> -->
+
           <v-container class="text-center">
             <v-row align="center" justify="center">
               <v-col cols="6">
@@ -394,6 +421,8 @@
 import { ref, watch, computed, onMounted } from "vue";
 import axios from "axios";
 import { breakPointsStore } from "@/stores/breakPoints";
+import { StreamBarcodeReader } from "vue-barcode-reader";
+
 // import carpet from "../../assets/carpet_logo.png";
 import * as XLSX from "xlsx";
 onMounted(() => {
@@ -403,6 +432,26 @@ onMounted(() => {
   getUserProfile();
   getOpenTransfer();
 });
+const APIUrl = "https://carpet.iran.liara.run/";
+// const APIUrl = "http://localhost:8000/";
+
+const text = ref("");
+const id = ref(null);
+function onDecode(a, b, c) {
+  text.value = a;
+  console.log(text.value);
+
+  // if (id.value) clearTimeout(id.value);
+  // id.value = setTimeout(() => {
+  //   if (text.value === a) {
+  //     text.value = "";
+  //   }
+  // }, 5000);
+}
+function onLoaded() {
+  console.log("load");
+}
+
 const metaDataFile = ref(null);
 const inputExcelDialog = ref(false);
 const carpets = ref([]);
@@ -433,11 +482,9 @@ function sendCarpetsToAPI() {
       color: carpets.value[i].color,
       costumer_name: carpets.value[i].costumer_name,
     };
-    axios
-      .post("http://localhost:8000/carpet/register-from-excel/", body)
-      .then((response) => {
-        console.log(response);
-      });
+    axios.post(APIUrl + "carpet/register-from-excel/", body).then((response) => {
+      console.log(response);
+    });
   }
 }
 // const carpetLogo = carpet;
@@ -448,28 +495,33 @@ const device = ref(store.device);
 const variants = [
   {
     type: "ورود اکسل قالی ها",
-    color: "success",
+    color: "warning",
     variant: "elevated",
+    icon: "mdi-file-excel",
   },
   {
     type: "ورود قالی از کارخانه",
     color: "success",
     variant: "elevated",
+    icon: "mdi-clipboard-arrow-down",
   },
   {
     type: "خروج به کارخانه",
-    color: "warning",
+    color: "error",
     variant: "elevated",
+    icon: "mdi-file-export",
   },
   {
     type: "ورود قالی از سرویس",
     color: "success",
     variant: "elevated",
+    icon: "mdi-clipboard-arrow-down",
   },
   {
     type: "خروج قالی به سرویس",
     color: "error",
     variant: "elevated",
+    icon: "mdi-file-export",
   },
 ];
 const selectOperatorDialog = ref(false);
@@ -500,12 +552,10 @@ const services = ref([]);
 const selectedServices = ref([]);
 
 function getServiceProviders() {
-  axios
-    .get("http://localhost:8000/serviceprovider/all-serviceproviders-list/")
-    .then((response) => {
-      console.log(response);
-      serviceProviders.value = response.data;
-    });
+  axios.get(APIUrl + "serviceprovider/all-serviceproviders-list/").then((response) => {
+    console.log(response);
+    serviceProviders.value = response.data;
+  });
 }
 function stepperNext() {
   if (selectOperatorDialog.value) {
@@ -538,7 +588,7 @@ function getServicesOfSelectedServiceProvider() {
 }
 const userProfile = ref(null);
 function getUserProfile() {
-  axios.get("http://localhost:8000/api/account/user/").then((response) => {
+  axios.get(APIUrl + "api/account/user/").then((response) => {
     console.log("UUUUUUUUUser", response);
     userProfile.value = response.data;
   });
@@ -549,23 +599,25 @@ const notIsFinishedTransfer = ref({});
 
 async function getOpenTransfer() {
   notIsFinishedTransfer.value.date = "";
-  await axios.get("http://localhost:8000/transfer/all-transfer-list").then((response) => {
-    for (let i = 0; i < response.data.length; i++) {
+  await axios.get(APIUrl + "transfer/all-transfer-list").then((response) => {
+    for (let i = 0; i < response.data.results.length; i++) {
       if (
-        response.data[i].worker === userProfile.value.pk &&
-        response.data[i].is_finished === false
+        response.data.results[i].worker === userProfile.value.pk &&
+        response.data.results[i].is_finished === false
       ) {
         openTransfer.value = true;
 
-        notIsFinishedTransfer.value.id = response.data[i].id;
-        notIsFinishedTransfer.value.serviceProviders = response.data[i].service_provider;
-        notIsFinishedTransfer.value.services = response.data[i].services;
+        notIsFinishedTransfer.value.id = response.data.results[i].id;
+        notIsFinishedTransfer.value.serviceProviders =
+          response.data.results[i].service_provider;
+        notIsFinishedTransfer.value.services = response.data.results[i].services;
 
-        for (let j = 0; j < response?.data[i]?.date?.length; j++) {
-          if (response.data[i].date[j] === "T") notIsFinishedTransfer.value.date += " ";
-          else if (response.data[i].date[j] === "Z")
+        for (let j = 0; j < response?.data.results[i]?.date?.length; j++) {
+          if (response.data.results[i].date[j] === "T")
+            notIsFinishedTransfer.value.date += " ";
+          else if (response.data.results[i].date[j] === "Z")
             notIsFinishedTransfer.value.date += "";
-          else notIsFinishedTransfer.value.date += response.data[i].date[j];
+          else notIsFinishedTransfer.value.date += response.data.results[i].date[j];
         }
       }
     }
@@ -573,7 +625,7 @@ async function getOpenTransfer() {
 }
 async function getCarpetList() {
   carpetList.value = [];
-  await axios.get("http://localhost:8000/carpet/all-carpets-list/").then((response) => {
+  await axios.get(APIUrl + "carpet/all-carpets-list/").then((response) => {
     console.log("carpet", response);
     for (const carpet of response.data) {
       if (carpet.id !== selectedCarpet?.value?.id) {
@@ -614,7 +666,7 @@ function getDateAndTime() {
 const statuses = ref(null);
 
 async function getStatuses() {
-  await axios.get("http://localhost:8000/status/all-status-list/").then((response) => {
+  await axios.get(APIUrl + "status/all-status-list/").then((response) => {
     statuses.value = response.data;
   });
 }
@@ -640,12 +692,10 @@ async function sendTransfer() {
     body.date = getDateAndTime();
     body.is_finished = false;
     body.admin_verify = false;
-    axios
-      .post("http://localhost:8000/transfer/create-transfer/", body)
-      .then((response) => {
-        console.log("transfer", response);
-        openTransfer.value = true;
-      });
+    axios.post(APIUrl + "transfer/create-transfer/", body).then((response) => {
+      console.log("transfer", response);
+      openTransfer.value = true;
+    });
   } else {
     body.carpet = [selectedCarpet.value.barcode];
     body.id = notIsFinishedTransfer.value.id;
@@ -656,12 +706,10 @@ async function sendTransfer() {
     body.date = notIsFinishedTransfer.value.date;
     body.is_finished = false;
     body.admin_verify = false;
-    axios
-      .post("http://localhost:8000/transfer/update-transfer/", body)
-      .then((response) => {
-        console.log("transfer", response);
-        // openTransfer.value = true
-      });
+    axios.post(APIUrl + "transfer/update-transfer/", body).then((response) => {
+      console.log("transfer", response);
+      // openTransfer.value = true
+    });
   }
 }
 
@@ -685,8 +733,9 @@ async function updateIsFinishedTransfer() {
   body.date = notIsFinishedTransfer.value.date;
   body.is_finished = true;
   body.admin_verify = false;
-  axios.post("http://localhost:8000/transfer/update-transfer/", body).then((response) => {
+  axios.post(APIUrl + "transfer/update-transfer/", body).then((response) => {
     console.log("transfer", response);
+    selectCarpetDialog.value = false;
     openTransfer.value = false;
     localStorage.removeItem("openTask");
   });

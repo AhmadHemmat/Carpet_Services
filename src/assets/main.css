@@ -1,9 +1,7 @@
- /* Media Query for Mobile Devices */
- /* @media (max-width: 480px) {
-  body {
-      background-color: red;
+  #app {
+    font-family: yekan;
   }
-} */
+
 
 /* Media Query for low resolution  Tablets, Ipads */
 /* @media (min-width: 481px) and (max-width: 767px) {

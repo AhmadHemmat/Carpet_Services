@@ -20,3 +20,9 @@ const icons = ref(["mdi-facebook", "mdi-twitter", "mdi-linkedin", "mdi-instagram
     <DefaultLayout></DefaultLayout>
   </v-app>
 </template>
+<style>
+@font-face {
+  font-family: yekan;
+  src: url("@/assets/fonts/yekan-font/yekan-regular.ttf");
+}
+</style>

@@ -58,7 +58,8 @@ import { breakPointsStore } from "@/stores/breakPoints";
 onMounted(function () {
   getUserProfile();
 });
-
+const APIUrl = "https://carpet.iran.liara.run/";
+// const APIUrl = "http://localhost:8000/";
 const breakPointsStoreVar = breakPointsStore();
 
 const device = ref(breakPointsStoreVar.device);
@@ -79,7 +80,7 @@ const alertColor2 = ref("#E65100");
 
 const userProfile = ref(null);
 function getUserProfile() {
-  axios.get("http://localhost:8000/api/account/user/").then((response) => {
+  axios.get(APIUrl + "api/account/user/").then((response) => {
     console.log("UUUUUUUUUser", response);
     userProfile.value = response.data;
   });

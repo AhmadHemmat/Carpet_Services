@@ -2,12 +2,16 @@
   <v-app-bar
     v-if="breakPointsStoreVar.device !== 'mobile'"
     height="60"
-    dir="rtl"
-    color="#B388FF"
+    color="#C51162"
     rounded="lg"
     app
   >
-    <v-btn v-if="store.isAuthenticated" to="/dashboard" color="white">
+    <v-spacer></v-spacer>
+    <v-btn v-if="store.isAuthenticated" to="/profile" color="white">
+      <v-icon color="#FFFF00" size="large">mdi-account</v-icon>
+      پروفایل
+    </v-btn>
+    <v-btn v-if="store.isAuthenticated" to="/" color="white">
       <v-icon color="#FFFF00" size="large">mdi-view-dashboard</v-icon>
       پنل اصلی
     </v-btn>
@@ -20,24 +24,21 @@
       <v-icon color="#FFFF00" size="large">mdi-login</v-icon>
       ورود
     </v-btn>
+  </v-app-bar>
 
-    <v-btn v-if="store.isAuthenticated" to="/profile" color="white">
-      <v-icon color="#FFFF00" size="large">mdi-account</v-icon>
-      پروفایل
-    </v-btn>
-  </v-app-bar>
-  <v-app-bar v-if="breakPointsStoreVar.device === 'mobile'" color="#B388FF" app dir="rtl">
-    <v-row class="pa-6" align="center" justify="center"> </v-row>
-  </v-app-bar>
   <v-main>
     <router-view />
   </v-main>
   <v-bottom-navigation
     v-if="windowWidth < 500"
     :active="active"
-    style="background-color: #b388ff"
+    style="background-color: #c51162"
   >
-    <v-btn v-if="store.isAuthenticated" to="/dashboard" color="white">
+    <v-btn v-if="store.isAuthenticated" to="/profile" color="white">
+      <v-icon color="#FFFF00" size="large">mdi-account</v-icon>
+      پروفایل
+    </v-btn>
+    <v-btn v-if="store.isAuthenticated" to="/" color="white">
       <v-icon color="#FFFF00" size="large">mdi-view-dashboard</v-icon>
       پنل اصلی
     </v-btn>
@@ -49,11 +50,6 @@
     <v-btn v-if="!store.isAuthenticated" to="/login" color="white">
       <v-icon color="#FFFF00" size="large">mdi-login</v-icon>
       ورود
-    </v-btn>
-
-    <v-btn v-if="store.isAuthenticated" to="/profile" color="white">
-      <v-icon color="#FFFF00" size="large">mdi-account</v-icon>
-      پروفایل
     </v-btn>
   </v-bottom-navigation>
 </template>

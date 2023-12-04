@@ -67,6 +67,8 @@ import axios from "axios";
 // Childs
 import Alert from "@/components/Alert.vue";
 
+const APIUrl = "https://carpet.iran.liara.run/";
+
 // Variables
 const store = loginStore();
 const router = useRouter();
@@ -80,7 +82,7 @@ const alertColor = ref("error");
 const radios = ref("شماره تلفن همراه");
 
 function onSubmit() {
-  const apiUrl = "http://localhost:8000/api/account/login/";
+  const apiUrl = APIUrl + "api/account/login/";
   let param = {
     username: userName.value,
     password: password.value,
@@ -92,7 +94,7 @@ function onSubmit() {
     .then((response) => {
       console.log("llllllll", response);
       store.login(response.data.key);
-      router.push("/dashboard");
+      router.push("/");
     })
     .catch((error) => {
       console.log("error from api", error);
