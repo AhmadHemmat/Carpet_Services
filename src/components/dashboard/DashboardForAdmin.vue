@@ -1,350 +1,707 @@
 <template>
+  <v-app-bar v-if="device === 'mobile'" color="#C51162" app dir="rtl">
+    <v-btn stacked>
+      <v-icon  icon="mdi-comment-check" color="white"></v-icon>
+      <span > خوش آمدید </span>
+    </v-btn>
+<v-spacer></v-spacer>
+    <v-btn>
+      <v-icon  icon="mdi-apps" color="#FFFF00" size="large"></v-icon>
+    </v-btn>
+  </v-app-bar>
   <v-col cols="12" xs="12" sm="12" md="8" lg="8">
-    <v-sheet class="my-4 mx-2 pa-4 h-100" rounded="lg" elevation="12" height="100%">
-      <v-btn
-        class="text-none text-white"
-        color="#E65100"
-        rounded="0"
-        variant="flat"
-        @click="addMenuDialog = true"
-      >
-        <v-icon> mdi-plus </v-icon>
-        اضافه کردن منو شرکت
-      </v-btn>
-      <v-chip class="mt-4 mx-16 d-flex justify-center" color="success">
-        <span class="text-h5">منو شرکت</span>
-      </v-chip>
-
-      <div class="text-center mt-2" dir="rtl">
-        <v-table density="compact">
-          <thead>
-            <tr style="background-color: indigo">
-              <th class="text-center" style="color: white">روز و تاریخ</th>
-              <th class="text-center" style="color: white">غذا نوع ۱</th>
-              <th class="text-center" style="color: white">غذا نوع ۲</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="(item, i) in desserts"
-              :key="i"
-              :style="{ 'background-color': i % 2 === 0 ? '#FFF3E0' : '#E1F5FE' }"
-            >
-              <td>
-                {{ weekDaysDict(item.week_day) }}
-                <br />
-                {{ persianDateFrameDict(item.date) }}
-              </td>
-              <td>{{ item.first_type?.kitchen_food?.food?.title }}</td>
-              <td>{{ item.second_type?.kitchen_food?.food?.title }}</td>
-            </tr>
-          </tbody>
-        </v-table>
-      </div>
-    </v-sheet>
-  </v-col>
-  <v-dialog
-    v-model="addMenuDialog"
-    persistent
-    :width="device === 'mobile' ? '100%' : '50%'"
-  >
-    <v-card dir="rtl">
-      <v-card-title>
-        <v-chip class="mt-4 mx-16 d-flex justify-center" color="success">
-          <span class="text-h5">افزودن منو </span>
-        </v-chip>
-      </v-card-title>
-
-      <v-card-text>
+    <v-card rounded="lg" elevation="12">
+      <v-card class="cart" :style="{ height: windowHeight + 'px', overflow: 'auto' }">
         <v-container>
-          <v-row align="center" justify="center">
-            <v-col cols="12">
-              انتخاب تاریخ:
-              <br />
-              <date-picker
-                class="ma-2"
-                v-model="menuDate"
-                format="YYYY-MM-DD"
-                display-format="jYYYY-jMM-jDD"
-              />
-            </v-col>
-            <v-col v-if="menuDate" cols="12">
-              انتخاب منو :
-              <br />
-              <span v-if="kitchenFoods.length < 1">
-                در این تاریخ از جانب آشپزخانه ها هنوز منو تعریف نشده است.
-              </span>
-              <v-chip
-                class="ma-2 d-flex justify-center"
-                v-for="(item, i) in kitchenFoods"
-                :key="i"
-                :color="item.isSelected ? 'success' : 'error'"
-                @click="updateMenu(item)"
+          <v-row dense align="center" justify="center">
+            <v-col v-for="(obj, i) in variants" :key="i" cols="12" md="6">
+              <v-card
+                class="mx-auto pb-2"
+                align="center"
+                justify="center"
+                width="100%"
+                :variant="obj.variant"
+                dir="rtl"
+                style="border: 1px solid #3200e6"
               >
-                {{ item.kitchen_food.food.title }}
-                {{ item.isSelected ? "(انتخاب شده)" : "(انتخاب نشده)" }}
-              </v-chip>
+                <v-card-item>
+                  <v-icon :color="obj.color" size="x-large">{{ obj.icon }}</v-icon>
+                <br/>
+                <v-btn class="my-2" :color="obj.color" rounded @click="openModal(obj)">
+                  {{ obj.type }}
+                </v-btn>
+                </v-card-item>
+                
+              </v-card>
             </v-col>
-            <span v-else class="text-center">لطفا ابتدا تاریخ را مشخص کنید.</span>
-
-            <!-- <v-col cols="12">
-              <v-select
-                v-model="menuFirstTypeFood"
-                :items="kitchenFoods"
-                item-title="kitchen_food.food.title"
-                item-value="id"
-                label="غذا نوع ۱"
-                chips
-                clearable
-                color="blue"
-              ></v-select>
-            </v-col>
-            <v-col cols="12">
-              <v-select
-                v-model="menuSecondTypeFood"
-                :items="kitchenFoods"
-                item-title="kitchen_food.food.title"
-                item-value="id"
-                label="غذا نوع ۲"
-                chips
-                clearable
-                color="blue"
-              ></v-select>
-            </v-col> -->
           </v-row>
         </v-container>
-        <!-- <small style="color: red">موارد الزامی با * مشخص شده است</small> -->
-      </v-card-text>
+      </v-card>
+    </v-card>
+  </v-col>
+  <v-dialog
+    v-model="inputExcelDialog"
+    persistent
+    transition="dialog-bottom-transition"
+    :fullscreen="device !== 'desktop' && device !== 'large'"
+    :width="device === 'desktop' || device === 'large' ? '50%' : '100%'"
+  >
+    <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
+      <v-responsive>
+        <v-chip outline @click="inputExcelDialog = false">
+          <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
+        </v-chip>
 
-      <v-card-actions>
-        <v-spacer></v-spacer>
+        <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
+          <span> وارد کردن فایل اکسل قالی ها </span>
+        </v-card>
 
-        <v-btn
-          variant="text"
-          style="margin: 10px; color: rgb(0, 0, 0); background-color: rgb(255, 60, 0)"
-          @click="addMenuDialog = false"
+        <v-file-input
+          v-model="metaDataFile"
+          class="justify-center mt-12 mx-4"
+          label="انتخاب فایل اکسل"
+          variant="filled"
+          prepend-icon="mdi-file-excel"
+          @change="convert"
+        ></v-file-input>
+
+        <v-container class="text-center">
+          <v-row align="center" justify="center">
+            <v-col>
+              <v-btn
+                class="flex-grow-1"
+                height="48"
+                width="100%"
+                variant="tonal"
+                @click="sendCarpetsToAPI"
+              >
+                ثبت
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-responsive>
+    </v-card>
+  </v-dialog>
+
+  <v-dialog
+    v-model="selectOperatorDialog"
+    persistent
+    transition="dialog-bottom-transition"
+    :fullscreen="device !== 'desktop' && device !== 'large'"
+    :width="device === 'desktop' || device === 'large' ? '50%' : '100%'"
+  >
+    <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
+      <v-responsive>
+        <v-chip outline @click="selectOperatorDialog = false">
+          <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
+        </v-chip>
+
+        <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
+          <span>
+            مرحله ۱ خروج قالی
+            <br />
+            انتخاب سرویس کار
+          </span>
+        </v-card>
+        <div class="text-center my-4">
+          <v-row align="center" justify="center">
+            <v-col>
+              <v-btn
+                class="flex-grow-1"
+                height="48"
+                width="100%"
+                color="#76FF03"
+                variant="tonal"
+                :disabled="!selectedOperator"
+                @click="getServicesOfSelectedServiceProvider"
+              >
+                بعدی
+              </v-btn>
+            </v-col>
+          </v-row>
+        </div>
+        <v-autocomplete
+          class="mt-12"
+          v-model="selectedOperator"
+          :items="serviceProviders"
+          color="blue-grey-lighten-2"
+          :item-title="
+            (item) => (item?.first_name ? item?.first_name + ' ' + item?.last_name : null)
+          "
+          label="انتخاب سرویس کار"
+          clearable
+          return-object
+          dir="rtl"
         >
-          لغو
-        </v-btn>
+        </v-autocomplete>
+      </v-responsive>
+    </v-card>
+  </v-dialog>
 
-        <v-btn
-          variant="text"
-          style="margin: 10px; color: rgb(3, 3, 3); background-color: rgb(0, 255, 0)"
-          @click="createMenuForCompany"
+  <v-dialog
+    v-model="selectServicesDialog"
+    persistent
+    transition="dialog-bottom-transition"
+    :fullscreen="device !== 'desktop' && device !== 'large'"
+    :width="device === 'desktop' || device === 'large' ? '50%' : '100%'"
+  >
+    <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
+      <v-responsive>
+        <v-chip outline @click="selectServicesDialog = false">
+          <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
+        </v-chip>
+
+        <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
+          <span>
+            مرحله ۲ خروج قالی
+            <br />
+            انتخاب سرویس ها
+          </span>
+        </v-card>
+        <div class="text-center my-4">
+          <v-row align="center" justify="center">
+            <v-col cols="6">
+              <v-btn
+                class="flex-grow-1"
+                height="48"
+                width="100%"
+                color="#76FF03"
+                variant="tonal"
+                :disabled="selectedServices.length === 0"
+                @click="stepperNext"
+              >
+                بعدی
+              </v-btn>
+            </v-col>
+            <v-col cols="6">
+              <v-btn
+                class="flex-grow-1"
+                height="48"
+                width="100%"
+                color="#FF1744"
+                variant="tonal"
+                @click="stepperPrevious"
+              >
+                قبلی
+              </v-btn>
+            </v-col>
+          </v-row>
+        </div>
+        <v-autocomplete
+          class="mt-12"
+          v-model="selectedServices"
+          :items="services"
+          color="blue-grey-lighten-2"
+          item-title="title"
+          item-value="id"
+          label="انتخاب سرویس ها"
+          clearable
+          dir="rtl"
+          chips
+          closable-chips
+          multiple
         >
-          ثبت
-        </v-btn>
-      </v-card-actions>
+        </v-autocomplete>
+      </v-responsive>
+    </v-card>
+  </v-dialog>
+
+  <v-dialog
+    v-model="selectCarpetDialog"
+    persistent
+    transition="dialog-bottom-transition"
+    :fullscreen="device !== 'desktop' && device !== 'large'"
+    :width="device === 'desktop' || device === 'large' ? '50%' : '100%'"
+  >
+    <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
+      <v-responsive>
+        <v-chip outline @click="selectCarpetDialog = false">
+          <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
+        </v-chip>
+
+        <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
+          <span>
+            مرحله ۳ خروج قالی
+            <br />
+            اسکن قالی
+          </span>
+        </v-card>
+        <div class="text-center my-4">
+          <v-row align="center" justify="center">
+            <v-col cols="12">
+              <v-btn
+                class="flex-grow-1"
+                height="48"
+                width="100%"
+                color="#76FF03"
+                variant="tonal"
+                :disabled="!selectedCarpet"
+                @click="sendTransfer"
+              >
+                بعدی
+              </v-btn>
+            </v-col>
+            <!-- <v-col cols="6">
+                <v-btn
+                  class="flex-grow-1"
+                  height="48"
+                  width="100%"
+                  color="#FF1744"
+                  variant="tonal"
+                  @click="stepperPrevious"
+                >
+                  قبلی
+                </v-btn>
+              </v-col> -->
+          </v-row>
+        </div>
+        <!-- <v-autocomplete
+            class="mt-12"
+            v-model="selectedCarpet"
+            :items="carpetList"
+            color="blue-grey-lighten-2"
+            :item-title="(item) => (item?.barcode ? item?.barcode : null)"
+            label="انتخاب قالی"
+            clearable
+            dir="rtl"
+            return-object
+          >
+          </v-autocomplete> -->
+        <v-responsive class="mx-auto" max-width="344">
+          <v-text-field
+            v-model="selectedCarpet"
+            label="اسکن قالی"
+            hide-details="auto"
+            autofocus
+          ></v-text-field>
+        </v-responsive>
+
+        <!-- <div class="hello">
+            <StreamBarcodeReader
+              @decode="(a, b, c) => onDecode(a, b, c)"
+              @loaded="() => onLoaded()"
+            ></StreamBarcodeReader>
+            Input Value: {{ text || "Nothing" }}
+          </div> -->
+
+        <div class="text-center mt-16">
+          <v-row align="center" justify="center">
+            <v-col cols="12">
+              <v-btn
+                class="flex-grow-1"
+                height="48"
+                color="#FFFF00"
+                variant="tonal"
+                width="100%"
+                @click="updateIsFinishedTransfer"
+              >
+                ثبت نهایی
+              </v-btn>
+            </v-col>
+          </v-row>
+        </div>
+      </v-responsive>
+    </v-card>
+  </v-dialog>
+
+  <v-dialog
+    v-model="continueOpenTaskDialog"
+    persistent
+    transition="dialog-bottom-transition"
+    :fullscreen="device !== 'desktop' && device !== 'large'"
+    :width="device === 'desktop' || device === 'large' ? '50%' : '100%'"
+  >
+    <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
+      <v-responsive>
+        <v-chip outline @click="continueOpenTaskDialog = false">
+          <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
+        </v-chip>
+        <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
+          <span> شما یک انتقال قالی ناتمام دارید </span>
+        </v-card>
+        <div class="text-center my-4">
+          <v-row align="center" justify="center">
+            <v-col cols="6">
+              <v-btn
+                class="flex-grow-1"
+                height="48"
+                width="100%"
+                variant="tonal"
+                @click="continueOpenTransfer"
+              >
+                ادامه
+              </v-btn>
+            </v-col>
+            <!-- <v-col cols="6">
+              <v-btn
+                class="flex-grow-1"
+                height="48"
+                variant="tonal"
+                @click="stepperPrevious"
+              >
+                لغو
+              </v-btn>
+            </v-col> -->
+          </v-row>
+        </div>
+      </v-responsive>
     </v-card>
   </v-dialog>
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, watch, computed, onMounted } from "vue";
 import axios from "axios";
 import { breakPointsStore } from "@/stores/breakPoints";
+import { StreamBarcodeReader } from "vue-barcode-reader";
+// import carpet from "../../assets/carpet_logo.png";
+import * as XLSX from "xlsx";
+import { useRouter } from "vue-router";
 
+
+
+
+onMounted(async () => {
+  getServiceProviders();
+  getCarpetList();
+  checkOpenTask();
+  getUserProfile();
+  await getOpenTransfer();
+});
+const APIUrl = "https://carpet.iran.liara.run/";
+// const APIUrl = "http://localhost:8000/";
+const router = useRouter();
+const text = ref("");
+const id = ref(null);
+function onDecode(a, b, c) {
+  text.value = a;
+  console.log(text.value);
+
+  // if (id.value) clearTimeout(id.value);
+  // id.value = setTimeout(() => {
+  //   if (text.value === a) {
+  //     text.value = "";
+  //   }
+  // }, 5000);
+}
+function onLoaded() {
+  console.log("load");
+}
+
+const metaDataFile = ref(null);
+const inputExcelDialog = ref(false);
+const carpets = ref([]);
+function convert(e) {
+  var files = e.target.files,
+    f = files[0];
+  var reader = new FileReader();
+  reader.onload = function (e) {
+    var data = new Uint8Array(e.target.result);
+    var workbook = XLSX.read(data, { type: "array" });
+    let sheetName = workbook.SheetNames[0];
+    /* DO SOMETHING WITH workbook HERE */
+    console.log(workbook);
+    let worksheet = workbook.Sheets[sheetName];
+    console.log(XLSX.utils.sheet_to_json(worksheet));
+    carpets.value = XLSX.utils.sheet_to_json(worksheet);
+  };
+  reader.readAsArrayBuffer(f);
+}
+
+function sendCarpetsToAPI() {
+  for (let i = 0; i < carpets.value.length; i++) {
+    const body = {
+      factory: carpets.value[i].factory,
+      barcode: carpets.value[i].barcode,
+      map_code: carpets.value[i].map_code,
+      size: carpets.value[i].size,
+      color: carpets.value[i].color,
+      costumer_name: carpets.value[i].costumer_name,
+    };
+    axios.post(APIUrl + "carpet/register-from-excel/", body).then((response) => {
+      console.log(response);
+      inputExcelDialog.value = false;
+    });
+  }
+}
+// const carpetLogo = carpet;
 const store = breakPointsStore();
 
 const device = ref(store.device);
 
-const props = defineProps({
-  company: {
-    type: Number,
-    // default: false,
-  },
-});
-// Variables
-const tab = ref(null);
-const desserts = ref([]);
-const menuDate = ref(null);
-const addMenuDialog = ref(false);
-const kitchenFoods = ref([
+const variants = [
   {
-    kitchen_food: { food: { title: "ابتدا تاریخ را وارد کنید" } },
+    type: "ورود قالی ها",
+    color: "#1B5E20",
+    variant: "elevated",
+    icon: "mdi-file-excel",
   },
-]);
-const menuFirstTypeFood = ref(null);
-const menuSecondTypeFood = ref(null);
-const JalaliDate = {
-  g_days_in_month: [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
-  j_days_in_month: [31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29],
-};
-function jalaliToGregorian(j_y, j_m, j_d) {
-  j_y = parseInt(j_y);
-  j_m = parseInt(j_m);
-  j_d = parseInt(j_d);
-  var jy = j_y - 979;
-  var jm = j_m - 1;
-  var jd = j_d - 1;
+  {
+    type: "نقل و انتقالات",
+    color: "#3F51B5",
+    variant: "elevated",
+    icon: "mdi-transit-transfer",
+  },
+  {
+    type: "منابع انسانی",
+    color: "#2196F3",
+    variant: "elevated",
+    icon: "mdi-human-male",
+  },
+  {
+    type: "قالی ها",
+    color: "#FF1744",
+    variant: "elevated",
+    icon: "mdi-google-nearby",
+  },
+  {
+    type: "گزارش گیری",
+    color: "#F57C00",
+    variant: "elevated",
+    icon: "mdi-newspaper",
+  },
+];
+const selectOperatorDialog = ref(false);
+const selectCarpetDialog = ref(false);
+const selectServicesDialog = ref(false);
+const openTransfer = ref(false);
+const selectedCarpet = ref(null);
 
-  var j_day_no = 365 * jy + parseInt(jy / 33) * 8 + parseInt(((jy % 33) + 3) / 4);
-  for (var i = 0; i < jm; ++i) j_day_no += JalaliDate.j_days_in_month[i];
-
-  j_day_no += jd;
-
-  var g_day_no = j_day_no + 79;
-
-  var gy =
-    1600 +
-    400 * parseInt(g_day_no / 146097); /* 146097 = 365*400 + 400/4 - 400/100 + 400/400 */
-  g_day_no = g_day_no % 146097;
-
-  var leap = true;
-  if (g_day_no >= 36525) {
-    /* 36525 = 365*100 + 100/4 */ g_day_no--;
-    gy += 100 * parseInt(g_day_no / 36524); /* 36524 = 365*100 + 100/4 - 100/100 */
-    g_day_no = g_day_no % 36524;
-
-    if (g_day_no >= 365) g_day_no++;
-    else leap = false;
+function openModal(obj) {
+  if (obj.type === "منابع انسانی") {
+    router.push("/hr");
   }
-
-  gy += 4 * parseInt(g_day_no / 1461); /* 1461 = 365*4 + 4/4 */
-  g_day_no %= 1461;
-
-  if (g_day_no >= 366) {
-    leap = false;
-
-    g_day_no--;
-    gy += parseInt(g_day_no / 365);
-    g_day_no = g_day_no % 365;
-  }
-
-  for (var i = 0; g_day_no >= JalaliDate.g_days_in_month[i] + (i == 1 && leap); i++)
-    g_day_no -= JalaliDate.g_days_in_month[i] + (i == 1 && leap);
-  var gm = i + 1;
-  var gd = g_day_no + 1;
-
-  gm = gm < 10 ? "0" + gm : gm;
-  gd = gd < 10 ? "0" + gd : gd;
-
-  return [gy, gm, gd];
 }
-function getListOfFoods(date, kitchen) {
-  // بک اند باید کترینگ طرف قرارداد شرکت را در user_companies بدهد
-  axios
-    .get(
-      "https://makacenter.ir/company/active-foods/?date=" + date + "&kitchen=" + kitchen
-    )
-    .then((response) => {
-      kitchenFoods.value = [];
-      for (let i = 0; i < response.data.results.length; i++) {
-        console.log(response.data.results[i].date);
-
-        const dateSplitted = response.data.results[i].date.split("-");
-        console.log(response.data.results[i].date);
-        const jD = jalaliToGregorian(dateSplitted[0], dateSplitted[1], dateSplitted[2]);
-        const jResult = jD[0] + "-" + jD[1] + "-" + jD[2];
-
-        if (jResult === date) {
-          response.data.results[i].isSelected = false;
-          kitchenFoods.value.push(response.data.results[i]);
-        }
-      }
-      // if (kitchenFoods.value.length < 1) {
-      //   kitchenFoods.value.push({
-      //     kitchen_food: {
-      //       food: { title: "در این تاریخ از جانب آشپزخانه ها هنوز منو تعریف نشده است." },
-      //     },
-      //   });
-      // }
-
-      for (let i = 0; i < kitchenFoods.value.length; i++) {
-        kitchenFoods.value[i].isSelected = false;
-      }
-      console.log("kitchenFoods.value", kitchenFoods.value);
-    });
-}
+const dialog = ref(false);
+const serviceProviders = ref(null);
+const selectedOperator = ref(null);
 watch(
-  () => menuDate.value,
+  () => selectedOperator.value,
   () => {
-    if (menuDate.value) {
-      getListOfFoods(menuDate.value, 1);
-    }
+    selectedServices.value = [];
   }
 );
-function readMenuOfCompany() {
-  console.log("GGGGGGGGGGGGGG");
-  axios
-    .get("https://makacenter.ir/company/" + props.company + "/company-menu-for-member/")
-    .then((response) => {
-      console.log(response.data);
-      desserts.value = response.data.results;
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+
+const services = ref([]);
+const selectedServices = ref([]);
+
+function getServiceProviders() {
+  axios.get(APIUrl + "serviceprovider/all-serviceproviders-list/").then((response) => {
+    console.log(response);
+    serviceProviders.value = response.data;
+  });
 }
-const selectedMenus = ref([]);
-function updateMenu(item) {
-  selectedMenus.value = [];
-  for (let i = 0; i < kitchenFoods.value.length; i++) {
-    if (kitchenFoods.value[i].id === item.id) {
-      kitchenFoods.value[i].isSelected = !kitchenFoods.value[i].isSelected;
-    }
-
-    if (kitchenFoods.value[i].isSelected) {
-      selectedMenus.value.push(kitchenFoods.value[i]);
-    }
-
-    console.log(selectedMenus.value, "5555555555555555");
+function stepperNext() {
+  if (selectOperatorDialog.value) {
+    selectOperatorDialog.value = false;
+    selectServicesDialog.value = true;
+    selectCarpetDialog.value = false;
+  } else if (selectServicesDialog.value) {
+    localStorage.setItem("openTask", true);
+    sendTransfer();
+    selectOperatorDialog.value = false;
+    selectServicesDialog.value = false;
+    selectedCarpet.value = null;
+    selectCarpetDialog.value = true;
   }
 }
-function createMenuForCompany() {
-  const body = {
-    date: menuDate.value,
-    company: props.company,
-    first_type: selectedMenus?.value[0]?.id,
-    second_type: selectedMenus?.value[1]?.id,
-    third_type: null,
-  };
-  axios
-    .post("https://makacenter.ir/company/menu/", body)
+
+function stepperPrevious() {
+  if (selectServicesDialog.value) {
+    selectOperatorDialog.value = true;
+    selectServicesDialog.value = false;
+    selectCarpetDialog.value = false;
+  } else if (selectCarpetDialog.value) {
+    selectOperatorDialog.value = false;
+    selectServicesDialog.value = true;
+    selectCarpetDialog.value = false;
+  }
+}
+function getServicesOfSelectedServiceProvider() {
+  stepperNext();
+  services.value = selectedOperator.value.services;
+}
+const userProfile = ref(null);
+function getUserProfile() {
+  axios.get(APIUrl + "api/account/user/").then((response) => {
+    console.log("UUUUUUUUUser", response);
+    userProfile.value = response.data;
+  });
+}
+const carpetList = ref([]);
+const notIsFinishedTransfer = ref({});
+
+async function getOpenTransfer() {
+  notIsFinishedTransfer.value.date = "";
+  await axios
+    .get(APIUrl + "transfer/all-transfer-list/?page_size=1000")
     .then((response) => {
-      console.log(response);
-      menuDate.value = null;
-      menuFirstTypeFood.value = null;
-      menuSecondTypeFood.value = null;
-      addMenuDialog.value = false;
-      readMenuOfCompany();
-    })
-    .catch((error) => {
-      console.log(error);
+      for (let i = 0; i < response.data.results.length; i++) {
+        if (
+          response.data.results[i].worker === userProfile.value.pk &&
+          response.data.results[i].is_finished === false
+        ) {
+          openTransfer.value = true;
+
+          notIsFinishedTransfer.value.id = response.data.results[i].id;
+          notIsFinishedTransfer.value.serviceProviders =
+            response.data.results[i].service_provider;
+          notIsFinishedTransfer.value.services = response.data.results[i].services;
+
+          for (let j = 0; j < response?.data.results[i]?.date?.length; j++) {
+            if (response.data.results[i].date[j] === "T")
+              notIsFinishedTransfer.value.date += " ";
+            else if (response.data.results[i].date[j] === "Z")
+              notIsFinishedTransfer.value.date += "";
+            else notIsFinishedTransfer.value.date += response.data.results[i].date[j];
+          }
+        }
+      }
     });
 }
-function weekDaysDict(day) {
-  if (day === "Saturday") return "شنبه";
-  else if (day === "Sunday") return "یکشنبه";
-  else if (day === "Monday") return "دوشنبه";
-  else if (day === "Tuesday") return "سه شنبه";
-  else if (day === "Wednesday") return "چهارشنبه";
-  else if (day === "Thursday") return "پنج شنبه";
-  else if (day === "Friday") return "جمعه";
+async function getCarpetList() {
+  carpetList.value = [];
+  await axios.get(APIUrl + "carpet/all-carpets-list/").then((response) => {
+    console.log("carpet", response);
+    for (const carpet of response.data) {
+      if (carpet.id !== selectedCarpet?.value?.id) {
+        carpetList.value.push(carpet);
+      }
+    }
+  });
 }
-function persianDateFrameDict(enNumber = "") {
-  let n = "";
-  for (let i = 0; i < enNumber.length; i++) {
-    if (enNumber[i] === "0") n += "۰";
-    else if (enNumber[i] === "1") n += "۱";
-    else if (enNumber[i] === "2") n += "۲";
-    else if (enNumber[i] === "3") n += "۳";
-    else if (enNumber[i] === "4") n += "۴";
-    else if (enNumber[i] === "5") n += "۵";
-    else if (enNumber[i] === "6") n += "۶";
-    else if (enNumber[i] === "7") n += "۷";
-    else if (enNumber[i] === "8") n += "۸";
-    else if (enNumber[i] === "9") n += "۹";
-    else n += enNumber[i];
-  }
-  const y = n.substring(0, 4);
-  const m = n.substring(5, 7);
-  const d = n.substring(8, 10);
 
-  return y + "/" + m + "/" + d;
+const openTask = ref({});
+const continueOpenTaskDialog = ref(false);
+function checkOpenTask() {
+  continueOpenTaskDialog.value = localStorage.getItem("openTask");
 }
-onMounted(() => {
-  readMenuOfCompany();
-  // getListOfFoods();
-});
+
+function getDateAndTime() {
+  let currentdate = new Date();
+  let datetime =
+    "Last Sync: " +
+    currentdate.getFullYear() +
+    "/" +
+    (currentdate.getMonth() + 1) +
+    "/" +
+    currentdate.getDate() +
+    " @ " +
+    currentdate.getHours() +
+    ":" +
+    currentdate.getMinutes() +
+    ":" +
+    currentdate.getSeconds();
+  return datetime.replace("@", "").substring(11);
+}
+const statuses = ref(null);
+
+async function getStatuses() {
+  await axios.get(APIUrl + "status/all-status-list/").then((response) => {
+    statuses.value = response.data;
+  });
+}
+async function sendTransfer() {
+  getCarpetList();
+  await getOpenTransfer();
+  let status = null;
+  await getStatuses();
+  for (const s of statuses.value) {
+    if (s.title === "خروج") {
+      status = s.id;
+    }
+  }
+  const body = {};
+  if (!openTransfer.value) {
+    body.carpet = [];
+    body.id = notIsFinishedTransfer.value.id;
+    body.worker = userProfile.value.pk;
+
+    body.status = status;
+    body.service_provider = selectedOperator?.value?.id;
+    body.services = selectedServices.value;
+    body.date = getDateAndTime();
+    body.is_finished = false;
+    body.admin_verify = false;
+    axios.post(APIUrl + "transfer/create-transfer/", body).then((response) => {
+      console.log("transfer", response);
+      openTransfer.value = true;
+    });
+  } else {
+    body.carpet = [selectedCarpet.value];
+    body.id = notIsFinishedTransfer.value.id;
+    body.worker = userProfile.value.pk;
+    body.status = status;
+    body.service_provider = notIsFinishedTransfer.value.serviceProviders;
+    body.services = [];
+    body.date = notIsFinishedTransfer.value.date;
+    body.is_finished = false;
+    body.admin_verify = false;
+    axios.post(APIUrl + "transfer/update-transfer/", body).then((response) => {
+      console.log("transfer", response);
+      // openTransfer.value = true
+    });
+  }
+}
+
+async function updateIsFinishedTransfer() {
+  // getCarpetList()
+  await getOpenTransfer();
+  let status = null;
+  await getStatuses();
+  for (const s of statuses.value) {
+    if (s.title === "خروج") {
+      status = s.id;
+    }
+  }
+  const body = {};
+  body.carpet = [];
+  body.id = notIsFinishedTransfer.value.id;
+  body.worker = userProfile.value.pk;
+  body.status = status;
+  body.service_provider = notIsFinishedTransfer.value.serviceProviders;
+  body.services = [];
+  body.date = notIsFinishedTransfer.value.date;
+  body.is_finished = true;
+  body.admin_verify = false;
+  axios.post(APIUrl + "transfer/update-transfer/", body).then((response) => {
+    console.log("transfer", response);
+    selectCarpetDialog.value = false;
+    openTransfer.value = false;
+    localStorage.removeItem("openTask");
+  });
+}
+
+function continueOpenTransfer() {
+  selectedCarpet.value = null;
+  continueOpenTaskDialog.value = false;
+  selectCarpetDialog.value = true;
+}
 </script>
+<style>
+.cart {
+  border: 1px solid rgb(237, 74, 74);
+}
+/* width */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey;
+  border-radius: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #e65100;
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #b30000;
+}
+</style>

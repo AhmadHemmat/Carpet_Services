@@ -14,7 +14,7 @@
             :rules="[required]"
             class="mb-4"
             clearable
-            label="شماره همراه"
+            label="نام کاربری"
             type="text"
             dir="ltr"
           ></v-text-field>

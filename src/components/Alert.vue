@@ -1,9 +1,16 @@
 <template>
   <v-snackbar v-model="snackbar" :timeout="timeout" :color="color" multi-line>
-    {{ text }}
-    <template v-slot:actions>
-      <v-btn color="black" variant="text" @click="snackbar = false"> بستن </v-btn>
-    </template>
+    <!-- <v-card width> -->
+    <v-row align="center" justify="center">
+      <v-col cols="3">
+        <v-btn color="black" @click="snackbar = false">
+          <v-icon color="error"> mdi-close </v-icon>
+        </v-btn>
+      </v-col>
+      <v-spacer></v-spacer>
+      <v-col cols="4">{{ text }}</v-col>
+    </v-row>
+    <!-- </v-card> -->
   </v-snackbar>
 </template>
 

@@ -1,4 +1,7 @@
 <template>
+  <v-overlay :model-value="loader" class="align-center justify-center" persistent>
+    <v-progress-circular color="primary" indeterminate size="64"></v-progress-circular>
+  </v-overlay>
   <v-app-bar v-if="device === 'mobile'" color="#C51162" app dir="rtl">
     <v-btn stacked>
       <v-badge v-if="openTransfer" color="warning" dot>
@@ -37,7 +40,7 @@
                   </div>
                 </v-card-item>
                 <v-icon :color="obj.color" size="x-large">{{ obj.icon }}</v-icon>
-                <v-btn class="mb-2" :color="obj.color" @click="openModal(obj.type)">
+                <v-btn class="mb-2" :color="obj.color" @click="openModal(obj)">
                   انتخاب
                 </v-btn>
               </v-card>
@@ -47,57 +50,13 @@
       </v-card>
     </v-card>
   </v-col>
-  <v-dialog
-    v-model="inputExcelDialog"
-    persistent
-    transition="dialog-bottom-transition"
-    :fullscreen="device === 'mobile'"
-    :width="device !== 'mobile' ? '50%' : '100%'"
-  >
-    <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
-      <v-responsive>
-        <v-chip outline @click="inputExcelDialog = false">
-          <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
-        </v-chip>
-
-        <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
-          <span> وارد کردن فایل اکسل قالی ها </span>
-        </v-card>
-
-        <v-file-input
-          v-model="metaDataFile"
-          class="justify-center mt-12 mx-4"
-          label="انتخاب فایل اکسل"
-          variant="filled"
-          prepend-icon="mdi-file-excel"
-          @change="convert"
-        ></v-file-input>
-
-        <v-container class="text-center">
-          <v-row align="center" justify="center">
-            <v-col>
-              <v-btn
-                class="flex-grow-1"
-                height="48"
-                width="100%"
-                variant="tonal"
-                @click="sendCarpetsToAPI"
-              >
-                ثبت
-              </v-btn>
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-responsive>
-    </v-card>
-  </v-dialog>
 
   <v-dialog
     v-model="selectOperatorDialog"
     persistent
     transition="dialog-bottom-transition"
-    :fullscreen="device === 'mobile'"
-    :width="device !== 'mobile' ? '50%' : '100%'"
+    :fullscreen="device !== 'desktop' && device !== 'large'"
+    :width="device === 'desktop' || device === 'large' ? '50%' : '100%'"
   >
     <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
       <v-responsive>
@@ -129,7 +88,7 @@
             </v-col>
           </v-row>
         </div>
-        <v-autocomplete
+        <!-- <v-autocomplete
           class="mt-12"
           v-model="selectedOperator"
           :items="serviceProviders"
@@ -142,7 +101,43 @@
           return-object
           dir="rtl"
         >
-        </v-autocomplete>
+        </v-autocomplete> -->
+        <v-row>
+          <v-col cols="12">
+            <div class="text-center">انتخاب سرویس کار</div>
+
+            <v-table>
+              <thead>
+                <tr>
+                  <th class="text-center">نام</th>
+                  <th class="text-center">نام خانوادگی</th>
+                  <th class="text-center">انتخاب</th>
+                </tr>
+              </thead>
+            </v-table>
+          </v-col>
+          <v-col cols="12">
+            <v-card class="cart mx-2" :style="{ height: 400 + 'px', overflow: 'auto' }">
+              <v-table>
+                <tbody>
+                  <tr v-for="(item, i) in serviceProviders" :key="i" class="text-center">
+                    <td>
+                      <span>{{ item?.first_name ? item?.first_name : null }}</span>
+                    </td>
+                    <td>
+                      <span>{{ item?.last_name ? item?.last_name : null }}</span>
+                    </td>
+                    <td>
+                      <v-radio-group v-model="selectedOperator" column>
+                        <v-radio label="انتخاب" color="indigo" :value="item"></v-radio>
+                      </v-radio-group>
+                    </td>
+                  </tr>
+                </tbody>
+              </v-table>
+            </v-card>
+          </v-col>
+        </v-row>
       </v-responsive>
     </v-card>
   </v-dialog>
@@ -151,8 +146,8 @@
     v-model="selectServicesDialog"
     persistent
     transition="dialog-bottom-transition"
-    :fullscreen="device === 'mobile'"
-    :width="device !== 'mobile' ? '50%' : '100%'"
+    :fullscreen="device !== 'desktop' && device !== 'large'"
+    :width="device === 'desktop' || device === 'large' ? '50%' : '100%'"
   >
     <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
       <v-responsive>
@@ -196,7 +191,7 @@
             </v-col>
           </v-row>
         </div>
-        <v-autocomplete
+        <!-- <v-autocomplete
           class="mt-12"
           v-model="selectedServices"
           :items="services"
@@ -210,7 +205,44 @@
           closable-chips
           multiple
         >
-        </v-autocomplete>
+        </v-autocomplete> -->
+
+        <v-row>
+          <v-col cols="12">
+            <div class="text-center">انتخاب سرویس ها</div>
+
+            <v-table>
+              <thead>
+                <tr>
+                  <th class="text-center">سرویس</th>
+                  <th class="text-center">انتخاب</th>
+                </tr>
+              </thead>
+            </v-table>
+          </v-col>
+          <v-col cols="12">
+            <v-card class="cart mx-2" :style="{ height: 400 + 'px', overflow: 'auto' }">
+              <v-table>
+                <tbody>
+                  <tr v-for="(item, i) in services" :key="i" class="text-center">
+                   
+                    <td>
+                      <span>{{ item?.title ? item?.title : null }}</span>
+                    </td>
+                    <td>
+                      {{ selectedServices }}
+                      <v-checkbox
+                        v-model="selectedServices"
+                        label="انتخاب"
+                        :value="item.id"
+                      ></v-checkbox>
+                    </td>
+                  </tr>
+                </tbody>
+              </v-table>
+            </v-card>
+          </v-col>
+        </v-row>
       </v-responsive>
     </v-card>
   </v-dialog>
@@ -219,8 +251,8 @@
     v-model="selectCarpetDialog"
     persistent
     transition="dialog-bottom-transition"
-    :fullscreen="device === 'mobile'"
-    :width="device !== 'mobile' ? '50%' : '100%'"
+    :fullscreen="device !== 'desktop' && device !== 'large'"
+    :width="device === 'desktop' || device === 'large' ? '50%' : '100%'"
   >
     <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
       <v-responsive>
@@ -317,8 +349,8 @@
     v-model="continueOpenTaskDialog"
     persistent
     transition="dialog-bottom-transition"
-    :fullscreen="device === 'mobile'"
-    :width="device !== 'mobile' ? '50%' : '100%'"
+    :fullscreen="device !== 'desktop' && device !== 'large'"
+    :width="device === 'desktop' || device === 'large' ? '50%' : '100%'"
   >
     <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
       <v-responsive>
@@ -356,13 +388,70 @@
       </v-responsive>
     </v-card>
   </v-dialog>
+
+  <v-dialog
+    v-model="inputCarpetFromFactoryDialog"
+    persistent
+    transition="dialog-bottom-transition"
+    :fullscreen="device !== 'desktop' && device !== 'large'"
+    :width="device === 'desktop' || device === 'large' ? '50%' : '100%'"
+  >
+    <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
+      <v-responsive>
+        <v-chip outline @click="inputCarpetFromFactoryDialog = false">
+          <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
+        </v-chip>
+        <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
+          <span>
+            {{ dialogTitle }}
+            <br />
+            اسکن قالی
+          </span>
+        </v-card>
+        <div class="text-center my-4">
+          <v-row align="center" justify="center">
+            <v-col cols="12">
+              <v-btn
+                class="flex-grow-1"
+                height="48"
+                width="100%"
+                color="#76FF03"
+                variant="tonal"
+                :disabled="!selectedCarpet"
+                @click="inputCarpetFromFactoryTransfer(selectedCarpet)"
+              >
+                بعدی
+              </v-btn>
+            </v-col>
+          </v-row>
+        </div>
+        <v-responsive class="mx-auto" max-width="344">
+          <v-text-field
+            v-model="selectedCarpet"
+            label="اسکن قالی"
+            hide-details="auto"
+            autofocus
+            rounded
+          ></v-text-field>
+        </v-responsive>
+      </v-responsive>
+    </v-card>
+  </v-dialog>
+
+  <Alert
+    :msg="alertMsg"
+    :activate="alertActivator"
+    :timeout="alertTimeout"
+    :color="alertColor"
+  />
 </template>
 
 <script setup>
 import { ref, watch, computed, onMounted } from "vue";
 import axios from "axios";
 import { breakPointsStore } from "@/stores/breakPoints";
-import { StreamBarcodeReader } from "vue-barcode-reader";
+// import { StreamBarcodeReader } from "vue-barcode-reader";
+import Alert from "@/components/Alert.vue";
 
 // import carpet from "../../assets/carpet_logo.png";
 import * as XLSX from "xlsx";
@@ -371,10 +460,15 @@ onMounted(async () => {
   getCarpetList();
   checkOpenTask();
   getUserProfile();
+  getStatuses();
   await getOpenTransfer();
 });
 const APIUrl = "https://carpet.iran.liara.run/";
 // const APIUrl = "http://localhost:8000/";
+const alertMsg = ref("");
+const alertActivator = ref(false);
+const alertTimeout = ref(5000);
+const alertColor = ref("error");
 
 const text = ref("");
 const id = ref(null);
@@ -435,12 +529,12 @@ const store = breakPointsStore();
 const device = ref(store.device);
 
 const variants = [
-  {
-    type: "ورود اکسل قالی ها",
-    color: "warning",
-    variant: "elevated",
-    icon: "mdi-file-excel",
-  },
+  // {
+  //   type: "ورود اکسل قالی ها",
+  //   color: "warning",
+  //   variant: "elevated",
+  //   icon: "mdi-file-excel",
+  // },
   {
     type: "ورود قالی از کارخانه",
     color: "success",
@@ -448,7 +542,7 @@ const variants = [
     icon: "mdi-clipboard-arrow-down",
   },
   {
-    type: "خروج به کارخانه",
+    type: "خروج قالی به کارخانه",
     color: "error",
     variant: "elevated",
     icon: "mdi-file-export",
@@ -471,15 +565,41 @@ const selectCarpetDialog = ref(false);
 const selectServicesDialog = ref(false);
 const openTransfer = ref(false);
 const selectedCarpet = ref(null);
+const inputCarpetFromFactoryDialog = ref(false);
+const status = ref(null);
+const dialogTitle = ref("");
+const inputStatus = ref(null);
+const outputStatus = ref(null);
 
-function openModal(type) {
+async function getStatuses() {
+  await axios.get(APIUrl + "status/all-status-list/").then((response) => {
+    for (const s of response.data) {
+      if (s.title === "خروج") {
+        outputStatus.value = s.id;
+      } else {
+        inputStatus.value = s.id;
+      }
+    }
+  });
+}
+function openModal(obj) {
   selectedCarpet.value = null;
-  if (openTransfer.value && type === "خروج قالی به سرویس") {
+  if (openTransfer.value && obj.type === "خروج قالی به سرویس") {
     selectCarpetDialog.value = true;
-  } else if (!openTransfer.value && type === "خروج قالی به سرویس") {
+  } else if (!openTransfer.value && obj.type === "خروج قالی به سرویس") {
     selectOperatorDialog.value = true;
-  } else if (type === "ورود اکسل قالی ها") {
-    inputExcelDialog.value = true;
+  } else if (obj.type === "ورود قالی از کارخانه") {
+    inputCarpetFromFactoryDialog.value = true;
+    dialogTitle.value = obj.type;
+    status.value = inputStatus.value;
+  } else if (obj.type === "خروج قالی به کارخانه") {
+    inputCarpetFromFactoryDialog.value = true;
+    dialogTitle.value = obj.type;
+    status.value = outputStatus.value;
+  } else if (obj.type === "ورود قالی از سرویس") {
+    inputCarpetFromFactoryDialog.value = true;
+    dialogTitle.value = obj.type;
+    status.value = inputStatus.value;
   }
 }
 const dialog = ref(false);
@@ -604,30 +724,45 @@ function getDateAndTime() {
     currentdate.getSeconds();
   return datetime.replace("@", "").substring(11);
 }
-const statuses = ref(null);
 
-async function getStatuses() {
-  await axios.get(APIUrl + "status/all-status-list/").then((response) => {
-    statuses.value = response.data;
+const loader = ref(false);
+async function inputCarpetFromFactoryTransfer(carpet) {
+  alertActivator.value = false;
+  inputCarpetFromFactoryDialog.value = false;
+  loader.value = true;
+
+  const body = {};
+  body.carpet = [carpet];
+  body.worker = userProfile.value.pk;
+  body.status = status.value;
+  body.service_provider = 1;
+  body.services = [];
+  body.date = getDateAndTime();
+  body.is_finished = true;
+  body.admin_verify = false;
+  await axios.post(APIUrl + "transfer/create-transfer/", body).then((response) => {
+    console.log(response);
+    selectedCarpet.value = null;
+    alertMsg.value = "ثبت شد";
+    alertActivator.value = true;
+    alertTimeout.value = 2000;
+    alertColor.value = "success";
+    setTimeout(() => {
+      loader.value = false;
+      inputCarpetFromFactoryDialog.value = true;
+    }, 2000);
   });
 }
 async function sendTransfer() {
   getCarpetList();
   await getOpenTransfer();
-  let status = null;
-  await getStatuses();
-  for (const s of statuses.value) {
-    if (s.title === "خروج") {
-      status = s.id;
-    }
-  }
   const body = {};
   if (!openTransfer.value) {
     body.carpet = [];
-    body.id = notIsFinishedTransfer.value.id;
+    // body.id = notIsFinishedTransfer.value.id;
     body.worker = userProfile.value.pk;
 
-    body.status = status;
+    body.status = outputStatus.value;
     body.service_provider = selectedOperator?.value?.id;
     body.services = selectedServices.value;
     body.date = getDateAndTime();
@@ -641,7 +776,7 @@ async function sendTransfer() {
     body.carpet = [selectedCarpet.value];
     body.id = notIsFinishedTransfer.value.id;
     body.worker = userProfile.value.pk;
-    body.status = status;
+    body.status = outputStatus.value;
     body.service_provider = notIsFinishedTransfer.value.serviceProviders;
     body.services = [];
     body.date = notIsFinishedTransfer.value.date;
@@ -658,17 +793,11 @@ async function updateIsFinishedTransfer() {
   // getCarpetList()
   await getOpenTransfer();
   let status = null;
-  await getStatuses();
-  for (const s of statuses.value) {
-    if (s.title === "خروج") {
-      status = s.id;
-    }
-  }
   const body = {};
   body.carpet = [];
   body.id = notIsFinishedTransfer.value.id;
   body.worker = userProfile.value.pk;
-  body.status = status;
+  body.status = outputStatus.value;
   body.service_provider = notIsFinishedTransfer.value.serviceProviders;
   body.services = [];
   body.date = notIsFinishedTransfer.value.date;
@@ -691,7 +820,9 @@ function continueOpenTransfer() {
 <style>
 .cart {
   border: 1px solid rgb(237, 74, 74);
+  overflow: scroll;
 }
+
 /* width */
 ::-webkit-scrollbar {
   width: 5px;
@@ -707,6 +838,24 @@ function continueOpenTransfer() {
 ::-webkit-scrollbar-thumb {
   background: #e65100;
   border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #b30000;
+}
+
+.centered-input input {
+  text-align: center;
+}
+
+.flexcard {
+  display: flex;
+  flex-direction: column;
+}
+
+.flexcard .v-toolbar {
+  flex: 0;
 }
 
 /* Handle on hover */

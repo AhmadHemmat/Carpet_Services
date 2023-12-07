@@ -9,7 +9,7 @@ const router = createRouter({
   routes: [
     {
       path: '/profile',
-      name: 'home',
+      name: 'profile',
       component: () => import('../views/Profile.vue'),
       meta: { requiresAuth: true }
     },
@@ -34,6 +34,11 @@ const router = createRouter({
       path: '/register',
       name: 'register',
       component: () => import('../views/authentication/Register.vue')
+    },
+    {
+      path: '/hr',
+      name: 'hr',
+      component: () => import('../views/HumanResources.vue')
     },
   ]
 })
