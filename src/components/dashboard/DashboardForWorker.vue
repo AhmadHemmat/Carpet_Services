@@ -230,7 +230,6 @@
                       <span>{{ item?.title ? item?.title : null }}</span>
                     </td>
                     <td>
-                      {{ selectedServices }}
                       <v-checkbox
                         v-model="selectedServices"
                         label="انتخاب"

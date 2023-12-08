@@ -33,7 +33,7 @@ const vuetify = createVuetify({
   directives,
 });
 
-const app = createApp(App).use(vuetify)
+const app = createApp(App).use(vuetify, {rtl: true})
 app.use(createPinia())
 app.use(router)
 
