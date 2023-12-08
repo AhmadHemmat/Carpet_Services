@@ -90,11 +90,4 @@ function getUserProfile() {
 .cart {
   border: 1px solid rgb(206, 45, 45);
 }
-.card-outter {
-  padding-bottom: 50px;
-}
-.card-actions {
-  position: absolute;
-  bottom: 0;
-}
 </style>

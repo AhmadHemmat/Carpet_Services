@@ -55,16 +55,17 @@
         <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
           <span> وارد کردن فایل اکسل قالی ها </span>
         </v-card>
-
-        <v-file-input
-          v-model="metaDataFile"
-          class="justify-center mt-12 mx-4"
-          label="انتخاب فایل اکسل"
-          variant="filled"
-          prepend-icon="mdi-file-excel"
-          accept=".xlsx"
-          @change="convert"
-        ></v-file-input>
+        <v-locale-provider rtl>
+          <v-file-input
+            v-model="metaDataFile"
+            class="justify-center mt-12 mx-4"
+            label="انتخاب فایل اکسل"
+            variant="filled"
+            prepend-icon="mdi-file-excel"
+            accept=".xlsx"
+            @change="convert"
+          ></v-file-input>
+        </v-locale-provider>
 
         <v-container class="text-center">
           <v-row align="center" justify="center">
@@ -193,7 +194,7 @@
             </template>
             <div v-if="key === 'id'" style="font-size: 1.4em">شناسه: {{ item }}</div>
             <div v-else-if="key === 'date'" style="font-size: 1.4em">
-              تاریخ: {{ item }}
+              تاریخ: {{ convertGDateToJalali(item) }}
             </div>
             <div v-else-if="key === 'worker'" style="font-size: 1.4em">
               کارگر: {{ item?.first_name + " " + item?.last_name }}
@@ -447,7 +448,7 @@
             </template>
             <div v-if="key === 'id'" style="font-size: 1.4em">شناسه: {{ item }}</div>
             <div v-else-if="key === 'date'" style="font-size: 1.4em">
-              تاریخ: {{ item }}
+              تاریخ: {{ convertGDateToJalali(item) }}
             </div>
             <div v-else-if="key === 'worker'" style="font-size: 1.4em">
               کارگر: {{ item?.first_name + " " + item?.last_name }}
@@ -489,6 +490,12 @@ onMounted(async () => {
   await getCarpetList();
   await getServicesList();
 });
+
+function convertGDateToJalali(gDate) {
+  const date = new Date(gDate).toLocaleDateString("fa-IR");
+  return date;
+}
+
 const APIUrl = "https://carpet.iran.liara.run/";
 // const APIUrl = "http://localhost:8000/";
 
@@ -809,7 +816,7 @@ const selectedCarpet = ref(null);
 const openTransfersDialog = ref(false);
 function openModal(obj) {
   if (obj.type === "منابع انسانی") {
-    router.push("/hr");
+    router.push("/human-resource");
   } else if (obj.type === "ورود قالی ها") {
     inputExcelDialog.value = true;
   } else if (obj.type === "نقل و انتقالات") {

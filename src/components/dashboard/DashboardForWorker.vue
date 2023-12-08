@@ -32,17 +32,15 @@
                 dir="rtl"
                 style="border: 1px solid #3200e6"
               >
-                <!-- :color="i % 2 === 0 ? '#b5e7a0' : '#f7cac9'" -->
-
                 <v-card-item>
                   <div class="mb-1">
-                    {{ obj.type }}
+                    <v-icon :color="obj.color" size="x-large">{{ obj.icon }}</v-icon>
+                    <br />
+                    <v-btn class="mb-2" :color="obj.color" @click="openModal(obj)">
+                      {{ obj.type }}
+                    </v-btn>
                   </div>
                 </v-card-item>
-                <v-icon :color="obj.color" size="x-large">{{ obj.icon }}</v-icon>
-                <v-btn class="mb-2" :color="obj.color" @click="openModal(obj)">
-                  انتخاب
-                </v-btn>
               </v-card>
             </v-col>
           </v-row>
@@ -88,20 +86,6 @@
             </v-col>
           </v-row>
         </div>
-        <!-- <v-autocomplete
-          class="mt-12"
-          v-model="selectedOperator"
-          :items="serviceProviders"
-          color="blue-grey-lighten-2"
-          :item-title="
-            (item) => (item?.first_name ? item?.first_name + ' ' + item?.last_name : null)
-          "
-          label="انتخاب سرویس کار"
-          clearable
-          return-object
-          dir="rtl"
-        >
-        </v-autocomplete> -->
         <v-row>
           <v-col cols="12">
             <div class="text-center">انتخاب سرویس کار</div>
@@ -191,22 +175,6 @@
             </v-col>
           </v-row>
         </div>
-        <!-- <v-autocomplete
-          class="mt-12"
-          v-model="selectedServices"
-          :items="services"
-          color="blue-grey-lighten-2"
-          item-title="title"
-          item-value="id"
-          label="انتخاب سرویس ها"
-          clearable
-          dir="rtl"
-          chips
-          closable-chips
-          multiple
-        >
-        </v-autocomplete> -->
-
         <v-row>
           <v-col cols="12">
             <div class="text-center">انتخاب سرویس ها</div>
@@ -225,7 +193,6 @@
               <v-table>
                 <tbody>
                   <tr v-for="(item, i) in services" :key="i" class="text-center">
-                   
                     <td>
                       <span>{{ item?.title ? item?.title : null }}</span>
                     </td>
@@ -258,7 +225,6 @@
         <v-chip outline @click="selectCarpetDialog = false">
           <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
         </v-chip>
-
         <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
           <span>
             مرحله ۳ خروج قالی
@@ -281,32 +247,8 @@
                 بعدی
               </v-btn>
             </v-col>
-            <!-- <v-col cols="6">
-                <v-btn
-                  class="flex-grow-1"
-                  height="48"
-                  width="100%"
-                  color="#FF1744"
-                  variant="tonal"
-                  @click="stepperPrevious"
-                >
-                  قبلی
-                </v-btn>
-              </v-col> -->
           </v-row>
         </div>
-        <!-- <v-autocomplete
-            class="mt-12"
-            v-model="selectedCarpet"
-            :items="carpetList"
-            color="blue-grey-lighten-2"
-            :item-title="(item) => (item?.barcode ? item?.barcode : null)"
-            label="انتخاب قالی"
-            clearable
-            dir="rtl"
-            return-object
-          >
-          </v-autocomplete> -->
         <v-responsive class="mx-auto" max-width="344">
           <v-text-field
             v-model="selectedCarpet"
@@ -315,15 +257,6 @@
             autofocus
           ></v-text-field>
         </v-responsive>
-
-        <!-- <div class="hello">
-            <StreamBarcodeReader
-              @decode="(a, b, c) => onDecode(a, b, c)"
-              @loaded="() => onLoaded()"
-            ></StreamBarcodeReader>
-            Input Value: {{ text || "Nothing" }}
-          </div> -->
-
         <div class="text-center mt-16">
           <v-row align="center" justify="center">
             <v-col cols="12">
@@ -372,16 +305,6 @@
                 ادامه
               </v-btn>
             </v-col>
-            <!-- <v-col cols="6">
-              <v-btn
-                class="flex-grow-1"
-                height="48"
-                variant="tonal"
-                @click="stepperPrevious"
-              >
-                لغو
-              </v-btn>
-            </v-col> -->
           </v-row>
         </div>
       </v-responsive>
@@ -417,7 +340,7 @@
                 color="#76FF03"
                 variant="tonal"
                 :disabled="!selectedCarpet"
-                @click="inputCarpetFromFactoryTransfer(selectedCarpet)"
+                @click="carpetTransfer()"
               >
                 بعدی
               </v-btn>
@@ -468,19 +391,10 @@ const alertMsg = ref("");
 const alertActivator = ref(false);
 const alertTimeout = ref(5000);
 const alertColor = ref("error");
-
 const text = ref("");
 const id = ref(null);
 function onDecode(a, b, c) {
   text.value = a;
-  console.log(text.value);
-
-  // if (id.value) clearTimeout(id.value);
-  // id.value = setTimeout(() => {
-  //   if (text.value === a) {
-  //     text.value = "";
-  //   }
-  // }, 5000);
 }
 function onLoaded() {
   console.log("load");
@@ -522,7 +436,6 @@ function sendCarpetsToAPI() {
     });
   }
 }
-// const carpetLogo = carpet;
 const store = breakPointsStore();
 
 const device = ref(store.device);
@@ -653,7 +566,6 @@ function getServicesOfSelectedServiceProvider() {
 const userProfile = ref(null);
 function getUserProfile() {
   axios.get(APIUrl + "api/account/user/").then((response) => {
-    console.log("UUUUUUUUUser", response);
     userProfile.value = response.data;
   });
 }
@@ -667,7 +579,7 @@ async function getOpenTransfer() {
     .then((response) => {
       for (let i = 0; i < response.data.results.length; i++) {
         if (
-          response.data.results[i].worker === userProfile.value.pk &&
+          response.data.results[i].worker === userProfile.value.id &&
           response.data.results[i].is_finished === false
         ) {
           openTransfer.value = true;
@@ -676,14 +588,10 @@ async function getOpenTransfer() {
           notIsFinishedTransfer.value.serviceProviders =
             response.data.results[i].service_provider;
           notIsFinishedTransfer.value.services = response.data.results[i].services;
-
-          for (let j = 0; j < response?.data.results[i]?.date?.length; j++) {
-            if (response.data.results[i].date[j] === "T")
-              notIsFinishedTransfer.value.date += " ";
-            else if (response.data.results[i].date[j] === "Z")
-              notIsFinishedTransfer.value.date += "";
-            else notIsFinishedTransfer.value.date += response.data.results[i].date[j];
-          }
+          notIsFinishedTransfer.value.date = response.data.results[i].date;
+          notIsFinishedTransfer.value.status = response.data.results[i].status;
+          notIsFinishedTransfer.value.worker = response.data.results[i].worker;
+          notIsFinishedTransfer.value.carpets = response.data.results[i].carpets;
         }
       }
     });
@@ -691,12 +599,7 @@ async function getOpenTransfer() {
 async function getCarpetList() {
   carpetList.value = [];
   await axios.get(APIUrl + "carpet/all-carpets-list/").then((response) => {
-    console.log("carpet", response);
-    for (const carpet of response.data) {
-      if (carpet.id !== selectedCarpet?.value?.id) {
-        carpetList.value.push(carpet);
-      }
-    }
+    carpetList.value = response.data;
   });
 }
 
@@ -709,37 +612,44 @@ function checkOpenTask() {
 function getDateAndTime() {
   let currentdate = new Date();
   let datetime =
-    "Last Sync: " +
     currentdate.getFullYear() +
-    "/" +
+    "-" +
     (currentdate.getMonth() + 1) +
-    "/" +
+    "-" +
     currentdate.getDate() +
-    " @ " +
+    "T" +
     currentdate.getHours() +
     ":" +
     currentdate.getMinutes() +
     ":" +
-    currentdate.getSeconds();
-  return datetime.replace("@", "").substring(11);
+    currentdate.getSeconds() +
+    "Z";
+
+  return datetime;
 }
 
 const loader = ref(false);
-async function inputCarpetFromFactoryTransfer(carpet) {
+async function carpetTransfer() {
+  let carpet = null;
+  for (const c of carpetList.value) {
+    if (c.barcode == selectedCarpet.value) {
+      carpet = c;
+    }
+  }
   alertActivator.value = false;
   inputCarpetFromFactoryDialog.value = false;
   loader.value = true;
 
   const body = {};
-  body.carpet = [carpet];
-  body.worker = userProfile.value.pk;
+  body.carpets = [carpet?.id];
+  body.worker = userProfile.value?.id;
   body.status = status.value;
-  body.service_provider = 1;
+  body.service_provider = selectedOperator.value?.id;
   body.services = [];
   body.date = getDateAndTime();
   body.is_finished = true;
   body.admin_verify = false;
-  await axios.post(APIUrl + "transfer/create-transfer/", body).then((response) => {
+  await axios.post(APIUrl + "transfer/create-transfer2/", body).then((response) => {
     console.log(response);
     selectedCarpet.value = null;
     alertMsg.value = "ثبت شد";
@@ -753,61 +663,80 @@ async function inputCarpetFromFactoryTransfer(carpet) {
   });
 }
 async function sendTransfer() {
-  getCarpetList();
   await getOpenTransfer();
   const body = {};
   if (!openTransfer.value) {
-    body.carpet = [];
-    // body.id = notIsFinishedTransfer.value.id;
-    body.worker = userProfile.value.pk;
-
+    body.carpets = [];
+    body.worker = userProfile.value.id;
     body.status = outputStatus.value;
     body.service_provider = selectedOperator?.value?.id;
     body.services = selectedServices.value;
     body.date = getDateAndTime();
     body.is_finished = false;
     body.admin_verify = false;
-    axios.post(APIUrl + "transfer/create-transfer/", body).then((response) => {
-      console.log("transfer", response);
+    axios.post(APIUrl + "transfer/create-transfer2/", body).then((response) => {
       openTransfer.value = true;
     });
   } else {
-    body.carpet = [selectedCarpet.value];
-    body.id = notIsFinishedTransfer.value.id;
-    body.worker = userProfile.value.pk;
-    body.status = outputStatus.value;
+    let carpet = null;
+    for (const c of carpetList.value) {
+      if (c.barcode == selectedCarpet.value) {
+        carpet = c;
+      }
+    }
+    notIsFinishedTransfer.value.carpets.push(carpet?.id);
+    selectCarpetDialog.value = false;
+    alertActivator.value = false;
+    loader.value = true;
+    const body = {};
+    body.carpets = notIsFinishedTransfer.value.carpets;
+    body.worker = notIsFinishedTransfer.value.worker;
+    body.status = notIsFinishedTransfer.value.status;
     body.service_provider = notIsFinishedTransfer.value.serviceProviders;
-    body.services = [];
+    body.services = notIsFinishedTransfer.value.services;
     body.date = notIsFinishedTransfer.value.date;
     body.is_finished = false;
     body.admin_verify = false;
-    axios.post(APIUrl + "transfer/update-transfer/", body).then((response) => {
-      console.log("transfer", response);
-      // openTransfer.value = true
-    });
+    axios
+      .put(
+        APIUrl + "transfer/update-transfer2/" + notIsFinishedTransfer.value.id + "/",
+        body
+      )
+      .then((response) => {
+        selectedCarpet.value = null;
+        alertMsg.value = "ثبت شد";
+        alertActivator.value = true;
+        alertTimeout.value = 2000;
+        alertColor.value = "success";
+        setTimeout(() => {
+          loader.value = false;
+          selectCarpetDialog.value = true;
+        }, 2000);
+      });
   }
 }
 
 async function updateIsFinishedTransfer() {
-  // getCarpetList()
   await getOpenTransfer();
-  let status = null;
   const body = {};
-  body.carpet = [];
-  body.id = notIsFinishedTransfer.value.id;
-  body.worker = userProfile.value.pk;
-  body.status = outputStatus.value;
+  body.carpets = notIsFinishedTransfer.value.carpets;
+  body.worker = notIsFinishedTransfer.value.worker;
+  body.status = notIsFinishedTransfer.value.status;
   body.service_provider = notIsFinishedTransfer.value.serviceProviders;
-  body.services = [];
+  body.services = notIsFinishedTransfer.value.services;
   body.date = notIsFinishedTransfer.value.date;
   body.is_finished = true;
   body.admin_verify = false;
-  axios.post(APIUrl + "transfer/update-transfer/", body).then((response) => {
-    console.log("transfer", response);
-    selectCarpetDialog.value = false;
-    openTransfer.value = false;
-    localStorage.removeItem("openTask");
-  });
+  axios
+    .put(
+      APIUrl + "transfer/update-transfer2/" + notIsFinishedTransfer.value.id + "/",
+      body
+    )
+    .then((response) => {
+      selectCarpetDialog.value = false;
+      openTransfer.value = false;
+      localStorage.removeItem("openTask");
+    });
 }
 
 function continueOpenTransfer() {
@@ -816,7 +745,7 @@ function continueOpenTransfer() {
   selectCarpetDialog.value = true;
 }
 </script>
-<style>
+<style scoped>
 .cart {
   border: 1px solid rgb(237, 74, 74);
   overflow: scroll;

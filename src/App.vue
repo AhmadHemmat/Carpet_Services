@@ -2,7 +2,6 @@
 import { ref, onMounted } from "vue";
 import { loginStore } from "@/stores/index";
 import { breakPointsStore } from "@/stores/breakPoints";
-
 import { RouterView } from "vue-router";
 import DefaultLayout from "./layouts/DefaultLayout.vue";
 
@@ -11,8 +10,6 @@ onMounted(() => {
   store.loginStore.onStart();
   store.breakPointsStore.deviceDetector();
 });
-
-const icons = ref(["mdi-facebook", "mdi-twitter", "mdi-linkedin", "mdi-instagram"]);
 </script>
 
 <template>

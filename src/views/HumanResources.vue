@@ -388,24 +388,6 @@
             </v-locale-provider>
 
             <v-locale-provider rtl>
-              <v-autocomplete
-                class="mt-12"
-                v-model="selectedServices"
-                :items="services"
-                color="blue-grey-lighten-2"
-                item-title="title"
-                item-value="id"
-                label="انتخاب سرویس ها"
-                clearable
-                dir="rtl"
-                chips
-                closable-chips
-                multiple
-              >
-              </v-autocomplete>
-            </v-locale-provider>
-
-            <v-locale-provider rtl>
               <v-text-field
                 v-model="phoneNumber"
                 class="pa-2"
@@ -431,6 +413,23 @@
                 label="کد ملی"
                 rounded
               ></v-text-field>
+            </v-locale-provider>
+
+            <v-locale-provider rtl>
+              <v-autocomplete
+                v-model="selectedServices"
+                :items="services"
+                color="blue-grey-lighten-2"
+                item-title="title"
+                item-value="id"
+                label="انتخاب سرویس ها"
+                clearable
+                dir="rtl"
+                chips
+                closable-chips
+                multiple
+              >
+              </v-autocomplete>
             </v-locale-provider>
             <v-divider></v-divider>
             <v-card-actions>
@@ -677,6 +676,10 @@ onMounted(() => {
   // getAllUsers()
 });
 
+function convertGDateToJalali(gDate) {
+  const date = new Date(gDate).toLocaleDateString("fa-IR");
+  return date;
+}
 const APIUrl = "https://carpet.iran.liara.run/";
 // const APIUrl = "http://localhost:8000/";
 const adminsList = ref([]);
