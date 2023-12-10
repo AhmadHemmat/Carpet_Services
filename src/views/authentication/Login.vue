@@ -68,7 +68,37 @@ import axios from "axios";
 import Alert from "@/components/Alert.vue";
 
 const APIUrl = "https://carpet.iran.liara.run/";
+function convertPersianNumberToLatin(number) {
+  let numberStr = number.toString();
 
+  let str = "";
+  for (let i = 0; i < numberStr.length; i++) {
+    if (numberStr[i] === "۰") {
+      str += "0";
+    } else if (numberStr[i] === "۱") {
+      str += "1";
+    } else if (numberStr[i] === "۲") {
+      str += "2";
+    } else if (numberStr[i] === "۳") {
+      str += "3";
+    } else if (numberStr[i] === "۴") {
+      str += "4";
+    } else if (numberStr[i] === "۵") {
+      str += "5";
+    } else if (numberStr[i] === "۶") {
+      str += "6";
+    } else if (numberStr[i] === "۷") {
+      str += "7";
+    } else if (numberStr[i] === "۸") {
+      str += "8";
+    } else if (numberStr[i] === "۹") {
+      str += "9";
+    } else {
+      str += numberStr[i];
+    }
+  }
+  return str;
+}
 // Variables
 const store = loginStore();
 const router = useRouter();
@@ -84,7 +114,7 @@ const radios = ref("شماره تلفن همراه");
 function onSubmit() {
   const apiUrl = APIUrl + "api/account/login/";
   let param = {
-    username: userName.value,
+    username: convertPersianNumberToLatin(userName.value),
     password: password.value,
     email: "",
   };
@@ -92,7 +122,6 @@ function onSubmit() {
   axios
     .post(apiUrl, param)
     .then((response) => {
-      console.log("llllllll", response);
       store.login(response.data.key);
       router.push("/");
     })

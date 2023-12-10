@@ -28,6 +28,7 @@
                       class="my-2"
                       :color="obj.color"
                       rounded
+                      width="150"
                       @click="openModal(obj)"
                     >
                       {{ obj.type }}
@@ -37,6 +38,7 @@
                       class="my-2"
                       :color="obj.color"
                       rounded
+                      width="150"
                       @click="modalManagerForAdd(obj)"
                     >
                       <v-icon color="black" size="x-large">mdi-plus</v-icon>
@@ -66,7 +68,7 @@
           </v-chip>
 
           <v-card class="my-4 d-flex justify-center text-center pa-2" color="warning">
-            <span>لیست مدیران</span>
+            <h2>لیست مدیران</h2>
           </v-card>
           <v-row>
             <v-col cols="12">
@@ -117,7 +119,7 @@
             <span>اضافه کردن مدیر</span>
           </v-card>
 
-          <v-card class="mx-auto" max-width="70%">
+          <v-card class="mx-auto my-2" max-width="70%">
             <v-locale-provider rtl>
               <v-text-field
                 v-model="firstName"
@@ -165,14 +167,17 @@
                 ></v-checkbox> -->
 
             <v-divider></v-divider>
-
-            <v-card-actions>
-              <v-spacer></v-spacer>
-
-              <v-btn color="success" @click="register(true)">
-                <h2>ذخیره کردن مدیر</h2>
+            <div align="center" justify="center">
+              <v-btn
+                :disabled="!firstName || !lastName || !username || !password"
+                class="my-2"
+                color="success"
+                width="200"
+                @click="register(true)"
+              >
+                <div>ذخیره</div>
               </v-btn>
-            </v-card-actions>
+            </div>
           </v-card>
         </v-responsive>
       </v-card>
@@ -192,7 +197,7 @@
           </v-chip>
 
           <v-card class="my-4 d-flex justify-center text-center pa-2" color="warning">
-            <span>لیست کارگران</span>
+            <h2>لیست کارگران</h2>
           </v-card>
           <v-row>
             <v-col cols="12">
@@ -243,7 +248,7 @@
             <span>اضافه کردن کارگر</span>
           </v-card>
 
-          <v-card class="mx-auto" max-width="70%">
+          <v-card class="mx-auto my-2" max-width="70%">
             <v-locale-provider rtl>
               <v-text-field
                 v-model="firstName"
@@ -284,12 +289,17 @@
               ></v-text-field>
             </v-locale-provider>
             <v-divider></v-divider>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="success" @click="register(false)">
-                <h2>ذخیره کردن کارگر</h2>
+            <div align="center" justify="center">
+              <v-btn
+                :disabled="!firstName || !lastName || !username || !password"
+                class="my-2"
+                color="success"
+                width="200"
+                @click="register(false)"
+              >
+                <div>ذخیره</div>
               </v-btn>
-            </v-card-actions>
+            </div>
           </v-card>
         </v-responsive>
       </v-card>
@@ -309,23 +319,23 @@
             <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
           </v-chip>
 
-          <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
-            <span> لیست سرویس کارها </span>
+          <v-card class="my-4 d-flex justify-center text-center pa-2" color="warning">
+            <h2>لیست سرویس کارها</h2>
           </v-card>
           <v-row>
             <v-col cols="12">
-              <v-table>
-                <thead>
-                  <tr>
-                    <th class="text-center">نام</th>
-                    <th class="text-center">نام خانوادگی</th>
-                  </tr>
-                </thead>
-              </v-table>
-            </v-col>
-            <v-col cols="12">
-              <v-card class="cart mx-2" :style="{ height: 400 + 'px', overflow: 'auto' }">
+              <v-card class="cart" :style="{ height: 400 + 'px', overflow: 'auto' }">
                 <v-table>
+                  <thead>
+                    <tr>
+                      <th class="text-center">
+                        <h2>نام</h2>
+                      </th>
+                      <th class="text-center">
+                        <h2>نام خانوادگی</h2>
+                      </th>
+                    </tr>
+                  </thead>
                   <tbody>
                     <tr
                       v-for="(item, i) in serviceProviders"
@@ -333,10 +343,10 @@
                       class="text-center"
                     >
                       <td>
-                        <span>{{ item?.first_name ? item?.first_name : null }}</span>
+                        <h3>{{ item?.first_name ? item?.first_name : null }}</h3>
                       </td>
                       <td>
-                        <span>{{ item?.last_name ? item?.last_name : null }}</span>
+                        <h3>{{ item?.last_name ? item?.last_name : null }}</h3>
                       </td>
                     </tr>
                   </tbody>
@@ -366,7 +376,7 @@
             <span>اضافه کردن سرویس کار</span>
           </v-card>
 
-          <v-card class="mx-auto" max-width="70%">
+          <v-card class="mx-auto my-2" max-width="70%">
             <v-locale-provider rtl>
               <v-text-field
                 v-model="firstNameS"
@@ -432,12 +442,24 @@
               </v-autocomplete>
             </v-locale-provider>
             <v-divider></v-divider>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="success" @click="addServiceProvider()">
-                <h2>ذخیره کردن سرویس کار</h2>
+            <div align="center" justify="center">
+              <v-btn
+                :disabled="
+                  !firstNameS ||
+                  !lastNameS ||
+                  !phoneNumber ||
+                  !address ||
+                  !nationalCode ||
+                  selectedServices.length === 0
+                "
+                class="my-2"
+                color="success"
+                width="200"
+                @click="addServiceProvider()"
+              >
+                <div>ذخیره</div>
               </v-btn>
-            </v-card-actions>
+            </div>
           </v-card>
         </v-responsive>
       </v-card>
@@ -457,30 +479,30 @@
             <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
           </v-chip>
 
-          <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
-            <span> لیست رانندگان </span>
+          <v-card class="my-4 d-flex justify-center text-center pa-2" color="warning">
+            <h2>لیست رانندگان</h2>
           </v-card>
           <v-row>
             <v-col cols="12">
-              <v-table>
-                <thead>
-                  <tr>
-                    <th class="text-center">نام</th>
-                    <th class="text-center">نام خانوادگی</th>
-                  </tr>
-                </thead>
-              </v-table>
-            </v-col>
-            <v-col cols="12">
-              <v-card class="cart mx-2" :style="{ height: 400 + 'px', overflow: 'auto' }">
+              <v-card class="cart" :style="{ height: 400 + 'px', overflow: 'auto' }">
                 <v-table>
+                  <thead>
+                    <tr>
+                      <th class="text-center">
+                        <h2>نام</h2>
+                      </th>
+                      <th class="text-center">
+                        <h2>نام خانوادگی</h2>
+                      </th>
+                    </tr>
+                  </thead>
                   <tbody>
                     <tr v-for="(item, i) in drivers" :key="i" class="text-center">
                       <td>
-                        <span>{{ item?.first_name ? item?.first_name : null }}</span>
+                        <h3>{{ item?.first_name ? item?.first_name : null }}</h3>
                       </td>
                       <td>
-                        <span>{{ item?.last_name ? item?.last_name : null }}</span>
+                        <h3>{{ item?.last_name ? item?.last_name : null }}</h3>
                       </td>
                     </tr>
                   </tbody>
@@ -510,7 +532,7 @@
             <span>اضافه کردن راننده</span>
           </v-card>
 
-          <v-card class="mx-auto" max-width="70%">
+          <v-card class="mx-auto my-2" max-width="70%">
             <v-locale-provider rtl>
               <v-text-field
                 v-model="firstNameD"
@@ -568,12 +590,24 @@
               ></v-text-field>
             </v-locale-provider>
             <v-divider></v-divider>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="success" @click="addDriver()">
-                <h2>ذخیره کردن راننده</h2>
+            <div align="center" justify="center">
+              <v-btn
+                :disabled="
+                  !firstNameD ||
+                  !lastNameD ||
+                  !phoneNumberD ||
+                  !car ||
+                  !carNumber ||
+                  !nationalCodeD
+                "
+                class="my-2"
+                width="200"
+                color="success"
+                @click="addDriver()"
+              >
+                <div>ذخیره</div>
               </v-btn>
-            </v-card-actions>
+            </div>
           </v-card>
         </v-responsive>
       </v-card>
@@ -593,26 +627,24 @@
             <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
           </v-chip>
 
-          <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
-            <span> لیست سرویس ها </span>
+          <v-card class="my-4 d-flex justify-center text-center pa-2" color="warning">
+            <h2>لیست سرویس ها</h2>
           </v-card>
           <v-row>
             <v-col cols="12">
-              <v-table>
-                <thead>
-                  <tr>
-                    <th class="text-center">عنوان</th>
-                  </tr>
-                </thead>
-              </v-table>
-            </v-col>
-            <v-col cols="12">
-              <v-card class="cart mx-2" :style="{ height: 400 + 'px', overflow: 'auto' }">
+              <v-card class="cart" :style="{ height: 400 + 'px', overflow: 'auto' }">
                 <v-table>
+                  <thead>
+                    <tr>
+                      <th class="text-center">
+                        <h2>عنوان</h2>
+                      </th>
+                    </tr>
+                  </thead>
                   <tbody>
                     <tr v-for="(item, i) in services" :key="i" class="text-center">
                       <td>
-                        <span>{{ item?.title }}</span>
+                        <h3>{{ item?.title }}</h3>
                       </td>
                     </tr>
                   </tbody>
@@ -642,7 +674,7 @@
             <span>اضافه کردن سرویس</span>
           </v-card>
 
-          <v-card class="mx-auto" max-width="70%">
+          <v-card class="mx-auto my-2" max-width="70%">
             <v-locale-provider rtl>
               <v-text-field
                 v-model="serviceTitle"
@@ -653,33 +685,75 @@
               ></v-text-field>
             </v-locale-provider>
             <v-divider></v-divider>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="success" @click="addService()">
-                <h2>ذخیره کردن سرویس</h2>
+            <div align="center" justify="center">
+              <v-btn
+                :disabled="!serviceTitle"
+                class="my-2"
+                color="success"
+                width="200"
+                @click="addService()"
+              >
+                <div>ذخیره</div>
               </v-btn>
-            </v-card-actions>
+            </div>
           </v-card>
         </v-responsive>
       </v-card>
     </v-dialog>
+
+    <Alert
+      :msg="alertMsg"
+      :activate="alertActivator"
+      :timeout="alertTimeout"
+      :color="alertColor"
+    />
   </v-container>
 </template>
 
 <script setup>
-import { ref, watch, computed, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import axios from "axios";
 import { breakPointsStore } from "@/stores/breakPoints";
-import * as XLSX from "xlsx";
+import Alert from "@/components/Alert.vue";
+const alertMsg = ref("");
+const alertActivator = ref(false);
+const alertTimeout = ref(5000);
+const alertColor = ref("error");
+// onMounted(() => {
+// });
 
-onMounted(() => {
-  // getAllUsers()
-});
+function convertPersianNumberToLatin(number) {
+  let numberStr = number.toString();
 
-function convertGDateToJalali(gDate) {
-  const date = new Date(gDate).toLocaleDateString("fa-IR");
-  return date;
+  let str = "";
+  for (let i = 0; i < numberStr.length; i++) {
+    if (numberStr[i] === "۰") {
+      str += "0";
+    } else if (numberStr[i] === "۱") {
+      str += "1";
+    } else if (numberStr[i] === "۲") {
+      str += "2";
+    } else if (numberStr[i] === "۳") {
+      str += "3";
+    } else if (numberStr[i] === "۴") {
+      str += "4";
+    } else if (numberStr[i] === "۵") {
+      str += "5";
+    } else if (numberStr[i] === "۶") {
+      str += "6";
+    } else if (numberStr[i] === "۷") {
+      str += "7";
+    } else if (numberStr[i] === "۸") {
+      str += "8";
+    } else if (numberStr[i] === "۹") {
+      str += "9";
+    } else {
+      str += numberStr[i];
+    }
+  }
+  return str;
 }
+
 const APIUrl = "https://carpet.iran.liara.run/";
 // const APIUrl = "http://localhost:8000/";
 const adminsList = ref([]);
@@ -705,18 +779,38 @@ const isStaff = ref(null);
 const username = ref(null);
 const password = ref(null);
 function register(isStaff) {
+  alertActivator.value = false;
+
   const body = {
     firstname: firstName.value,
     lastname: lastName.value,
     is_staff: isStaff,
-    username: username.value,
+    username: convertPersianNumberToLatin(username.value),
     password: password.value,
   };
-  axios.post(APIUrl + "register/", body).then((response) => {
-    console.log(response);
-    if (isStaff) addAdminDialog.value = false;
-    else addWorkerDialog.value = false;
-  });
+  axios
+    .post(APIUrl + "register/", body)
+    .then((response) => {
+      console.log(response);
+      if (isStaff) addAdminDialog.value = false;
+      else addWorkerDialog.value = false;
+
+      firstName.value = null;
+      lastName.value = null;
+      username.value = null;
+      password.value = null;
+    })
+    .catch((error) => {
+      if (
+        error.response.data.status ===
+        "username," + username.value + " allready exsit"
+      ) {
+        alertMsg.value = "شماره همراه تکراری است";
+        alertActivator.value = true;
+        alertTimeout.value = 2000;
+        alertColor.value = "error";
+      }
+    });
 }
 
 const serviceProviderListDialog = ref(false);
@@ -737,18 +831,35 @@ const address = ref(null);
 const nationalCode = ref(null);
 const addServiceProviderDialog = ref(false);
 function addServiceProvider() {
+  alertActivator.value = false;
+
   const body = {
     first_name: firstNameS.value,
     last_name: lastNameS.value,
-    phone_number: phoneNumber.value,
+    phone_number: convertPersianNumberToLatin(phoneNumber.value),
     services: selectedServices.value,
     address: address.value,
-    national_code: nationalCode.value,
+    national_code: convertPersianNumberToLatin(nationalCode.value),
   };
   axios
     .post(APIUrl + "serviceprovider/create-serviceproviders/", body)
     .then((response) => {
       addServiceProviderDialog.value = false;
+      firstNameS.value = null;
+      lastNameS.value = null;
+      phoneNumber.value = null;
+      selectedServices.value = [];
+      address.value = null;
+      nationalCode.value = null;
+    })
+    .catch((error) => {
+      console.log(error);
+      if (error.response.data.title[0]) {
+        alertMsg.value = "شماره همراه یا کد ملی تکراری است";
+        alertActivator.value = true;
+        alertTimeout.value = 2000;
+        alertColor.value = "error";
+      }
     });
 }
 
@@ -768,17 +879,36 @@ const carNumber = ref(null);
 const driversListDialog = ref(false);
 const addDriversDialog = ref(false);
 function addDriver() {
+  alertActivator.value = false;
+
   const body = {
     first_name: firstNameD.value,
     last_name: lastNameD.value,
-    phone_number: phoneNumberD.value,
-    national_code: nationalCodeD.value,
+    phone_number: convertPersianNumberToLatin(phoneNumberD.value),
+    national_code: convertPersianNumberToLatin(nationalCodeD.value),
     car: car.value,
     car_number: carNumber.value,
   };
-  axios.post(APIUrl + "driver/create-driver/", body).then((response) => {
-    addDriversDialog.value = false;
-  });
+  axios
+    .post(APIUrl + "driver/create-driver/", body)
+    .then((response) => {
+      addDriversDialog.value = false;
+      firstNameD.value = null;
+      lastNameD.value = null;
+      phoneNumberD.value = null;
+      nationalCodeD.value = null;
+      car.value = null;
+      carNumber.value = null;
+    })
+    .catch((error) => {
+      console.log(error);
+      if (error.response.data.title[0]) {
+        alertMsg.value = "شماره همراه یا کد ملی یا پلاک تکراری است";
+        alertActivator.value = true;
+        alertTimeout.value = 2000;
+        alertColor.value = "error";
+      }
+    });
 }
 
 const servicesListDialog = ref(false);
@@ -792,12 +922,26 @@ function getAllServices() {
 
 const serviceTitle = ref(null);
 function addService() {
+  alertActivator.value = flase;
+
   const body = {
     title: serviceTitle.value,
   };
-  axios.post(APIUrl + "services/create-services/", body).then((response) => {
-    addServiceDialog.value = false;
-  });
+  axios
+    .post(APIUrl + "services/create-services/", body)
+    .then((response) => {
+      addServiceDialog.value = false;
+      serviceTitle.value = null;
+    })
+    .catch((error) => {
+      console.log(error);
+      if (error.response.data.title[0]) {
+        alertMsg.value = " سرویس تکراری است";
+        alertActivator.value = true;
+        alertTimeout.value = 2000;
+        alertColor.value = "error";
+      }
+    });
 }
 
 const variants = [
@@ -876,265 +1020,65 @@ function modalManagerForAdd(obj) {
   }
 }
 
-const text = ref("");
-const id = ref(null);
-function onDecode(a, b, c) {
-  text.value = a;
-  console.log(text.value);
-
-  // if (id.value) clearTimeout(id.value);
-  // id.value = setTimeout(() => {
-  //   if (text.value === a) {
-  //     text.value = "";
-  //   }
-  // }, 5000);
-}
-function onLoaded() {
-  console.log("load");
-}
-
-const metaDataFile = ref(null);
-const inputExcelDialog = ref(false);
-const carpets = ref([]);
-function convert(e) {
-  var files = e.target.files,
-    f = files[0];
-  var reader = new FileReader();
-  reader.onload = function (e) {
-    var data = new Uint8Array(e.target.result);
-    var workbook = XLSX.read(data, { type: "array" });
-    let sheetName = workbook.SheetNames[0];
-    /* DO SOMETHING WITH workbook HERE */
-    console.log(workbook);
-    let worksheet = workbook.Sheets[sheetName];
-    console.log(XLSX.utils.sheet_to_json(worksheet));
-    carpets.value = XLSX.utils.sheet_to_json(worksheet);
-  };
-  reader.readAsArrayBuffer(f);
-}
-
-function sendCarpetsToAPI() {
-  for (let i = 0; i < carpets.value.length; i++) {
-    const body = {
-      factory: carpets.value[i].factory,
-      barcode: carpets.value[i].barcode,
-      map_code: carpets.value[i].map_code,
-      size: carpets.value[i].size,
-      color: carpets.value[i].color,
-      costumer_name: carpets.value[i].costumer_name,
-    };
-    axios.post(APIUrl + "carpet/register-from-excel/", body).then((response) => {
-      console.log(response);
-      inputExcelDialog.value = false;
-    });
-  }
-}
-// const carpetLogo = carpet;
 const store = breakPointsStore();
-
 const device = ref(store.device);
 
-const selectOperatorDialog = ref(false);
-const selectCarpetDialog = ref(false);
-const selectServicesDialog = ref(false);
-const openTransfer = ref(false);
-const selectedCarpet = ref(null);
-
-const dialog = ref(false);
-const selectedOperator = ref(null);
 watch(
-  () => selectedOperator.value,
+  () => addAdminDialog.value,
   () => {
-    selectedServices.value = [];
+    if (!addAdminDialog.value) {
+      firstName.value = null;
+      lastName.value = null;
+      username.value = null;
+      password.value = null;
+    }
   }
 );
-
-function stepperNext() {
-  if (selectOperatorDialog.value) {
-    selectOperatorDialog.value = false;
-    selectServicesDialog.value = true;
-    selectCarpetDialog.value = false;
-  } else if (selectServicesDialog.value) {
-    localStorage.setItem("openTask", true);
-    sendTransfer();
-    selectOperatorDialog.value = false;
-    selectServicesDialog.value = false;
-    selectedCarpet.value = null;
-    selectCarpetDialog.value = true;
-  }
-}
-
-function stepperPrevious() {
-  if (selectServicesDialog.value) {
-    selectOperatorDialog.value = true;
-    selectServicesDialog.value = false;
-    selectCarpetDialog.value = false;
-  } else if (selectCarpetDialog.value) {
-    selectOperatorDialog.value = false;
-    selectServicesDialog.value = true;
-    selectCarpetDialog.value = false;
-  }
-}
-function getServicesOfSelectedServiceProvider() {
-  stepperNext();
-  services.value = selectedOperator.value.services;
-}
-const userProfile = ref(null);
-function getUserProfile() {
-  axios.get(APIUrl + "api/account/user/").then((response) => {
-    console.log("UUUUUUUUUser", response);
-    userProfile.value = response.data;
-  });
-}
-const carpetList = ref([]);
-const notIsFinishedTransfer = ref({});
-
-async function getOpenTransfer() {
-  notIsFinishedTransfer.value.date = "";
-  await axios
-    .get(APIUrl + "transfer/all-transfer-list/?page_size=1000")
-    .then((response) => {
-      for (let i = 0; i < response.data.results.length; i++) {
-        if (
-          response.data.results[i].worker === userProfile.value.pk &&
-          response.data.results[i].is_finished === false
-        ) {
-          openTransfer.value = true;
-
-          notIsFinishedTransfer.value.id = response.data.results[i].id;
-          notIsFinishedTransfer.value.serviceProviders =
-            response.data.results[i].service_provider;
-          notIsFinishedTransfer.value.services = response.data.results[i].services;
-
-          for (let j = 0; j < response?.data.results[i]?.date?.length; j++) {
-            if (response.data.results[i].date[j] === "T")
-              notIsFinishedTransfer.value.date += " ";
-            else if (response.data.results[i].date[j] === "Z")
-              notIsFinishedTransfer.value.date += "";
-            else notIsFinishedTransfer.value.date += response.data.results[i].date[j];
-          }
-        }
-      }
-    });
-}
-async function getCarpetList() {
-  carpetList.value = [];
-  await axios.get(APIUrl + "carpet/all-carpets-list/").then((response) => {
-    console.log("carpet", response);
-    for (const carpet of response.data) {
-      if (carpet.id !== selectedCarpet?.value?.id) {
-        carpetList.value.push(carpet);
-      }
-    }
-  });
-}
-
-const openTask = ref({});
-const continueOpenTaskDialog = ref(false);
-function checkOpenTask() {
-  continueOpenTaskDialog.value = localStorage.getItem("openTask");
-}
-
-function getDateAndTime() {
-  let currentdate = new Date();
-  let datetime =
-    "Last Sync: " +
-    currentdate.getFullYear() +
-    "/" +
-    (currentdate.getMonth() + 1) +
-    "/" +
-    currentdate.getDate() +
-    " @ " +
-    currentdate.getHours() +
-    ":" +
-    currentdate.getMinutes() +
-    ":" +
-    currentdate.getSeconds();
-  return datetime.replace("@", "").substring(11);
-}
-const statuses = ref(null);
-
-async function getStatuses() {
-  await axios.get(APIUrl + "status/all-status-list/").then((response) => {
-    statuses.value = response.data;
-  });
-}
-async function sendTransfer() {
-  getCarpetList();
-  await getOpenTransfer();
-  let status = null;
-  await getStatuses();
-  for (const s of statuses.value) {
-    if (s.title === "خروج") {
-      status = s.id;
+watch(
+  () => addWorkerDialog.value,
+  () => {
+    if (!addWorkerDialog.value) {
+      firstName.value = null;
+      lastName.value = null;
+      username.value = null;
+      password.value = null;
     }
   }
-  const body = {};
-  if (!openTransfer.value) {
-    body.carpet = [];
-    body.id = notIsFinishedTransfer.value.id;
-    body.worker = userProfile.value.pk;
-
-    body.status = status;
-    body.service_provider = selectedOperator?.value?.id;
-    body.services = selectedServices.value;
-    body.date = getDateAndTime();
-    body.is_finished = false;
-    body.admin_verify = false;
-    axios.post(APIUrl + "transfer/create-transfer/", body).then((response) => {
-      console.log("transfer", response);
-      openTransfer.value = true;
-    });
-  } else {
-    body.carpet = [selectedCarpet.value];
-    body.id = notIsFinishedTransfer.value.id;
-    body.worker = userProfile.value.pk;
-    body.status = status;
-    body.service_provider = notIsFinishedTransfer.value.serviceProviders;
-    body.services = [];
-    body.date = notIsFinishedTransfer.value.date;
-    body.is_finished = false;
-    body.admin_verify = false;
-    axios.post(APIUrl + "transfer/update-transfer/", body).then((response) => {
-      console.log("transfer", response);
-      // openTransfer.value = true
-    });
-  }
-}
-
-async function updateIsFinishedTransfer() {
-  // getCarpetList()
-  await getOpenTransfer();
-  let status = null;
-  await getStatuses();
-  for (const s of statuses.value) {
-    if (s.title === "خروج") {
-      status = s.id;
+);
+watch(
+  () => addServiceProviderDialog.value,
+  () => {
+    if (!addServiceProviderDialog.value) {
+      firstNameS.value = null;
+      lastNameS.value = null;
+      phoneNumber.value = null;
+      selectedServices.value = [];
+      address.value = null;
+      nationalCode.value = null;
     }
   }
-  const body = {};
-  body.carpet = [];
-  body.id = notIsFinishedTransfer.value.id;
-  body.worker = userProfile.value.pk;
-  body.status = status;
-  body.service_provider = notIsFinishedTransfer.value.serviceProviders;
-  body.services = [];
-  body.date = notIsFinishedTransfer.value.date;
-  body.is_finished = true;
-  body.admin_verify = false;
-  axios.post(APIUrl + "transfer/update-transfer/", body).then((response) => {
-    console.log("transfer", response);
-    selectCarpetDialog.value = false;
-    openTransfer.value = false;
-    localStorage.removeItem("openTask");
-  });
-}
-
-function continueOpenTransfer() {
-  selectedCarpet.value = null;
-  continueOpenTaskDialog.value = false;
-  selectCarpetDialog.value = true;
-}
+);
+watch(
+  () => addDriversDialog.value,
+  () => {
+    if (!addDriversDialog.value) {
+      firstNameD.value = null;
+      lastNameD.value = null;
+      phoneNumberD.value = null;
+      nationalCodeD.value = null;
+      car.value = null;
+      carNumber.value = null;
+    }
+  }
+);
+watch(
+  () => addServiceDialog.value,
+  () => {
+    if (!addServiceDialog.value) {
+      serviceTitle.value = null;
+    }
+  }
+);
 </script>
 <style>
 .cart {
