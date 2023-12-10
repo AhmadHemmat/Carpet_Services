@@ -366,20 +366,21 @@
       :fullscreen="device !== 'desktop' && device !== 'large'"
       :width="device === 'desktop' || device === 'large' ? '50%' : '100%'"
     >
-      <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
-        <v-responsive>
-          <v-chip outline @click="addServiceProviderDialog = false">
-            <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
-          </v-chip>
+      <v-card theme="dark" class="pa-8 d-flex justify-center" dir="rtl">
+        <v-chip style="width: 50px" outline @click="addServiceProviderDialog = false">
+          <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
+        </v-chip>
 
-          <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
-            <span>اضافه کردن سرویس کار</span>
-          </v-card>
-          <v-card
-            class="cart mx-auto my-2"
-            max-width="90%"
-            :style="{ height: 700 + 'px', overflow: 'auto' }"
-          >
+        <v-card class="mt-4 text-center pa-2" color="warning">
+          <span>اضافه کردن سرویس کار</span>
+        </v-card>
+        <v-card
+          class="cart my-2"
+          width="100%"
+          :style="{ height: 700 + 'px', overflow: 'auto' }"
+        >
+        <v-row class="px-2" no-gutters>
+          <v-col cols="12" md="6">
             <v-locale-provider rtl>
               <v-text-field
                 v-model="firstNameS"
@@ -389,7 +390,8 @@
                 rounded
               ></v-text-field>
             </v-locale-provider>
-
+          </v-col>
+          <v-col cols="12" md="6">
             <v-locale-provider rtl>
               <v-text-field
                 v-model="lastNameS"
@@ -399,73 +401,69 @@
                 rounded
               ></v-text-field>
             </v-locale-provider>
+          </v-col>
 
-            <v-locale-provider rtl>
-              <v-text-field
-                v-model="phoneNumber"
-                class="pa-2"
-                color="primary"
-                label="شماره همراه"
-                rounded
-              ></v-text-field>
-            </v-locale-provider>
-            <!-- <v-locale-provider rtl>
-              <v-text-field
-                v-model="address"
-                class="pa-2"
-                color="primary"
-                label="آدرس"
-                rounded
-              ></v-text-field>
-            </v-locale-provider> -->
-            <v-locale-provider rtl>
-              <v-text-field
-                v-model="nationalCode"
-                class="pa-2"
-                color="primary"
-                label="کد ملی"
-                rounded
-              ></v-text-field>
-            </v-locale-provider>
+          </v-row>
+          
 
-            <v-locale-provider rtl>
-              <v-autocomplete
-                class="mx-2"
-                v-model="selectedServices"
-                :items="services"
-                color="blue-grey-lighten-2"
-                item-title="title"
-                item-value="id"
-                label="انتخاب سرویس ها"
-                clearable
-                dir="rtl"
-                chips
-                closable-chips
-                multiple
-                rounded
-              >
-              </v-autocomplete>
-            </v-locale-provider>
-            <v-divider></v-divider>
-            <div align="center" justify="center">
-              <v-btn
-                :disabled="
-                  !firstNameS ||
-                  !lastNameS ||
-                  !phoneNumber ||
-                  !nationalCode ||
-                  selectedServices.length === 0
-                "
-                class="my-2"
-                color="success"
-                width="200"
-                @click="addServiceProvider()"
-              >
-                <div>ذخیره</div>
-              </v-btn>
-            </div>
-          </v-card>
-        </v-responsive>
+          
+
+          <v-locale-provider rtl>
+            <v-text-field
+              v-model="phoneNumber"
+              class="pa-2"
+              color="primary"
+              label="شماره همراه"
+              rounded
+            ></v-text-field>
+          </v-locale-provider>
+          <v-locale-provider rtl>
+            <v-text-field
+              v-model="nationalCode"
+              class="pa-2"
+              color="primary"
+              label="کد ملی"
+              rounded
+            ></v-text-field>
+          </v-locale-provider>
+
+          <v-locale-provider rtl>
+            <v-autocomplete
+              class="mx-2"
+              v-model="selectedServices"
+              :items="services"
+              color="blue-grey-lighten-2"
+              item-title="title"
+              item-value="id"
+              label="انتخاب سرویس ها"
+              clearable
+              dir="rtl"
+              chips
+              closable-chips
+              multiple
+              rounded
+            >
+            </v-autocomplete>
+          </v-locale-provider>
+          <v-divider></v-divider>
+          <div align="center" justify="center">
+            <v-btn
+              :disabled="
+                !firstNameS ||
+                !lastNameS ||
+                !phoneNumber ||
+                !nationalCode ||
+                selectedServices.length === 0
+              "
+              class="my-2"
+              color="success"
+              width="200"
+              @click="addServiceProvider()"
+            >
+              <div>ذخیره</div>
+            </v-btn>
+          </div>
+        </v-card>
       </v-card>
     </v-dialog>
 
@@ -526,94 +524,105 @@
       :fullscreen="device !== 'desktop' && device !== 'large'"
       :width="device === 'desktop' || device === 'large' ? '50%' : '100%'"
     >
-      <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
-        <v-responsive>
-          <v-chip outline @click="addDriversDialog = false">
-            <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
-          </v-chip>
+      <v-card theme="dark" class="pa-8 d-flex justify-center" dir="rtl">
+        <v-chip style="width: 50px" outline @click="addDriversDialog = false">
+          <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
+        </v-chip>
 
-          <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
-            <span>اضافه کردن راننده</span>
-          </v-card>
+        <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
+          <span>اضافه کردن راننده</span>
+        </v-card>
 
-          <v-card class="mx-auto my-2" max-width="70%">
-            <v-locale-provider rtl>
-              <v-text-field
-                v-model="firstNameD"
-                class="pa-2"
-                color="primary"
-                label="نام"
-                rounded
-              ></v-text-field>
-            </v-locale-provider>
+        <v-card
+          class="cart my-2"
+          width="100%"
+          :style="{ height: 700 + 'px', overflow: 'auto' }"
+        >
+          <v-row class="px-2" no-gutters>
+            <v-col cols="12" md="6">
+              <v-locale-provider rtl>
+                <v-text-field
+                  v-model="firstNameD"
+                  class="pa-2"
+                  color="primary"
+                  label="نام"
+                  rounded
+                ></v-text-field>
+              </v-locale-provider>
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-locale-provider rtl>
+                <v-text-field
+                  v-model="lastNameD"
+                  class="pa-2"
+                  color="primary"
+                  label="نام خانوادگی"
+                  rounded
+                ></v-text-field>
+              </v-locale-provider>
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-locale-provider rtl>
+                <v-text-field
+                  v-model="phoneNumberD"
+                  class="pa-2"
+                  color="primary"
+                  label="شماره همراه"
+                  rounded
+                ></v-text-field>
+              </v-locale-provider>
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-locale-provider rtl>
+                <v-text-field
+                  v-model="car"
+                  class="pa-2"
+                  color="primary"
+                  label="ماشین"
+                  rounded
+                ></v-text-field>
+              </v-locale-provider>
+            </v-col>
+          </v-row>
 
-            <v-locale-provider rtl>
-              <v-text-field
-                v-model="lastNameD"
-                class="pa-2"
-                color="primary"
-                label="نام خانوادگی"
-                rounded
-              ></v-text-field>
-            </v-locale-provider>
-
-            <v-locale-provider rtl>
-              <v-text-field
-                v-model="phoneNumberD"
-                class="pa-2"
-                color="primary"
-                label="شماره همراه"
-                rounded
-              ></v-text-field>
-            </v-locale-provider>
-            <v-locale-provider rtl>
-              <v-text-field
-                v-model="car"
-                class="pa-2"
-                color="primary"
-                label="ماشین"
-                rounded
-              ></v-text-field>
-            </v-locale-provider>
-            <v-locale-provider rtl>
-              <v-text-field
-                v-model="carNumber"
-                class="pa-2"
-                color="primary"
-                label="شماره پلاک"
-                rounded
-              ></v-text-field>
-            </v-locale-provider>
-            <v-locale-provider rtl>
-              <v-text-field
-                v-model="nationalCodeD"
-                class="pa-2"
-                color="primary"
-                label="کد ملی"
-                rounded
-              ></v-text-field>
-            </v-locale-provider>
-            <v-divider></v-divider>
-            <div align="center" justify="center">
-              <v-btn
-                :disabled="
-                  !firstNameD ||
-                  !lastNameD ||
-                  !phoneNumberD ||
-                  !car ||
-                  !carNumber ||
-                  !nationalCodeD
-                "
-                class="my-2"
-                width="200"
-                color="success"
-                @click="addDriver()"
-              >
-                <div>ذخیره</div>
-              </v-btn>
-            </div>
-          </v-card>
-        </v-responsive>
+          <v-locale-provider rtl>
+            <v-text-field
+              v-model="carNumber"
+              class="pa-2"
+              color="primary"
+              label="شماره پلاک"
+              rounded
+            ></v-text-field>
+          </v-locale-provider>
+          <v-locale-provider rtl>
+            <v-text-field
+              v-model="nationalCodeD"
+              class="pa-2"
+              color="primary"
+              label="کد ملی"
+              rounded
+            ></v-text-field>
+          </v-locale-provider>
+          <v-divider></v-divider>
+          <div align="center" justify="center">
+            <v-btn
+              :disabled="
+                !firstNameD ||
+                !lastNameD ||
+                !phoneNumberD ||
+                !car ||
+                !carNumber ||
+                !nationalCodeD
+              "
+              class="my-2"
+              width="200"
+              color="success"
+              @click="addDriver()"
+            >
+              <div>ذخیره</div>
+            </v-btn>
+          </div>
+        </v-card>
       </v-card>
     </v-dialog>
 

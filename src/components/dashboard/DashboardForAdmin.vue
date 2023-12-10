@@ -102,26 +102,26 @@
         </v-chip>
 
         <v-card
-          :width="device === 'mobile' ? '100%' : '20%'"
+          :width="device === 'mobile' ? '100%' : '30%'"
           class="my-4 mx-auto d-flex justify-center text-center pa-2"
           color="warning"
         >
-          <div style="font-size: 1.5em">لیست نقل و انتقالات تایید نشده</div>
+          <div style="font-size: 1.3em">لیست نقل و انتقالات تایید نشده</div>
         </v-card>
         <v-row v-if="device === 'mobile'">
           <v-col cols="12">
-            <v-card class="cart" :style="{ height: 400 + 'px', overflow: 'auto' }">
+            <v-card class="cart" :style="{ height: 700 + 'px', overflow: 'auto' }">
               <v-table>
                 <thead>
                   <tr>
                     <th class="text-center">
-                      <h2>شناسه</h2>
+                      <div style="font-size: 1.3em">شناسه</div>
                     </th>
                     <th class="text-center">
-                      <h2>وضعیت</h2>
+                      <div style="font-size: 1.3em">وضعیت</div>
                     </th>
                     <th class="text-center">
-                      <h2>تایید؟</h2>
+                      <div style="font-size: 1.3em">تایید؟</div>
                     </th>
                   </tr>
                 </thead>
@@ -133,10 +133,12 @@
                     :style="{ 'background-color': i % 2 === 0 ? '#3F51B5' : '#004D40' }"
                   >
                     <td class="pa-2">
-                      <h3>{{ item?.id }}</h3>
+                      <div style="font-size: 1.2em">{{ item?.id }}</div>
                     </td>
                     <td class="pa-2">
-                      <h3>{{ item?.status?.title ? item?.status?.title : null }}</h3>
+                      <div style="font-size: 1.2em">
+                        {{ item?.status?.title ? item?.status?.title : null }}
+                      </div>
                       <br />
                       <v-btn
                         height="40"
@@ -167,33 +169,33 @@
         </v-row>
         <v-row v-else>
           <v-col cols="12">
-            <v-card class="cart" :style="{ height: 600 + 'px', overflow: 'auto' }">
+            <v-card class="cart" :style="{ height: 500 + 'px', overflow: 'auto' }">
               <v-table>
                 <thead>
                   <tr>
                     <th class="text-center">
-                      <div style="font-size: 1.5em">شناسه</div>
+                      <div style="font-size: 1.2em">شناسه</div>
                     </th>
                     <th class="text-center">
-                      <div style="font-size: 1.5em">وضعیت</div>
+                      <div style="font-size: 1.2em">وضعیت</div>
                     </th>
                     <th class="text-center">
-                      <div style="font-size: 1.5em">کارگر</div>
+                      <div style="font-size: 1.2em">کارگر</div>
                     </th>
                     <th class="text-center">
-                      <div style="font-size: 1.5em">تاریخ</div>
+                      <div style="font-size: 1.2em">تاریخ</div>
                     </th>
                     <th class="text-center">
-                      <div style="font-size: 1.5em">سرویس کار</div>
+                      <div style="font-size: 1.2em">سرویس کار</div>
                     </th>
                     <th class="text-center">
-                      <div style="font-size: 1.5em">سرویس ها</div>
+                      <div style="font-size: 1.2em">سرویس ها</div>
                     </th>
                     <th class="text-center">
-                      <div style="font-size: 1.5em">فرش ها</div>
+                      <div style="font-size: 1.2em">فرش ها</div>
                     </th>
                     <th class="text-center">
-                      <h2>تایید؟</h2>
+                      <div style="font-size: 1.2em">تایید؟</div>
                     </th>
                   </tr>
                 </thead>
@@ -205,15 +207,15 @@
                     :style="{ 'background-color': i % 2 === 0 ? '#3F51B5' : '#004D40' }"
                   >
                     <td class="pa-2">
-                      <div style="font-size: 1.4em">{{ item?.id }}</div>
+                      <div style="font-size: 1em">{{ item?.id }}</div>
                     </td>
                     <td class="pa-2">
-                      <div style="font-size: 1.4em">
+                      <div style="font-size: 1em">
                         {{ item?.status?.title }}
                       </div>
                     </td>
                     <td>
-                      <div style="font-size: 1.4em">
+                      <div style="font-size: 1em">
                         {{
                           item?.worker?.first_name
                             ? item?.worker?.first_name + " " + item?.worker?.last_name
@@ -222,7 +224,7 @@
                       </div>
                     </td>
                     <td>
-                      <div style="font-size: 1.4em">
+                      <div style="font-size: 1em">
                         {{
                           convertPersianNumberToLatin(
                             gregorian_to_jalali(
@@ -235,7 +237,7 @@
                       </div>
                     </td>
                     <td>
-                      <div style="font-size: 1.4em">
+                      <div style="font-size: 1em">
                         {{
                           item?.serviceProvider?.first_name
                             ? item?.serviceProvider?.first_name +
@@ -250,12 +252,12 @@
                         <div
                           v-for="(service, i) in item?.services"
                           :key="i"
-                          style="font-size: 1.4em"
+                          style="font-size: 1em"
                         >
                           {{ service?.title }} <br />
                         </div>
                       </div>
-                      <div v-else style="font-size: 1.4em">ثبت نشده <br /></div>
+                      <div v-else style="font-size: 1em">ثبت نشده <br /></div>
                     </td>
                     <td class="pa-2">
                       <div v-if="item?.carpets.length > 0">
@@ -263,7 +265,7 @@
                           class="pa-2"
                           v-for="(carpet, i) in item?.carpets"
                           :key="i"
-                          style="font-size: 1.4em"
+                          style="font-size: 1em"
                         >
                           <v-btn
                             height="40"
@@ -277,7 +279,7 @@
                           <br />
                         </div>
                       </div>
-                      <div v-else style="font-size: 1.4em">ثبت نشده <br /></div>
+                      <div v-else style="font-size: 1em">ثبت نشده <br /></div>
                     </td>
                     <td>
                       <v-btn
@@ -388,31 +390,31 @@
         </v-chip>
 
         <v-card
-          :width="device === 'mobile' ? '100%' : '20%'"
+          :width="device === 'mobile' ? '100%' : '40%'"
           class="my-4 mx-auto d-flex justify-center text-center pa-2"
           color="warning"
         >
-          <div style="font-size: 1.5em">لیست قالی ها</div>
+          <div style="font-size: 1.3em">لیست قالی ها</div>
         </v-card>
 
         <v-row v-if="device === 'mobile'">
           <v-col cols="12">
-            <v-card class="cart" :style="{ height: 400 + 'px', overflow: 'auto' }">
+            <v-card class="cart" :style="{ height: 700 + 'px', overflow: 'auto' }">
               <v-table>
                 <thead>
                   <tr>
                     <th class="text-center">
-                      <h2>بارکد</h2>
+                      <div style="font-size: 1.3em">بارکد</div>
                     </th>
                     <th class="text-center">
-                      <h2>کارخانه</h2>
+                      <div style="font-size: 1.3em">کارخانه</div>
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="(item, i) in carpetList" :key="i" class="text-center">
                     <td class="pa-2">
-                      <h3>{{ item?.barcode }}</h3>
+                      <div style="font-size: 1.2em">{{ item?.barcode }}</div>
                       <br />
                       <v-btn
                         height="40"
@@ -425,7 +427,7 @@
                       </v-btn>
                     </td>
                     <td>
-                      <h3>{{ item?.factory }}</h3>
+                      <div style="font-size: 1.2em">{{ item?.factory }}</div>
                     </td>
                   </tr>
                 </tbody>
@@ -436,30 +438,30 @@
 
         <v-row v-else>
           <v-col cols="12">
-            <v-card class="cart" :style="{ height: 600 + 'px', overflow: 'auto' }">
+            <v-card class="cart" :style="{ height: 500 + 'px', overflow: 'auto' }">
               <v-table>
                 <thead>
                   <tr>
                     <th class="text-center">
-                      <div style="font-size: 1.7em">شناسه</div>
+                      <div style="font-size: 1.2em">شناسه</div>
                     </th>
                     <th class="text-center">
-                      <div style="font-size: 1.7em">بارکد</div>
+                      <div style="font-size: 1.2em">بارکد</div>
                     </th>
                     <th class="text-center">
-                      <div style="font-size: 1.7em">کارخانه</div>
+                      <div style="font-size: 1.2em">کارخانه</div>
                     </th>
                     <th class="text-center">
-                      <div style="font-size: 1.7em">کد نقشه</div>
+                      <div style="font-size: 1.2em">کد نقشه</div>
                     </th>
                     <th class="text-center">
-                      <div style="font-size: 1.7em">اندازه</div>
+                      <div style="font-size: 1.2em">اندازه</div>
                     </th>
                     <th class="text-center">
-                      <div style="font-size: 1.7em">رنگ</div>
+                      <div style="font-size: 1.2em">رنگ</div>
                     </th>
                     <th class="text-center">
-                      <div style="font-size: 1.7em">مشتری</div>
+                      <div style="font-size: 1.2em">مشتری</div>
                     </th>
                   </tr>
                 </thead>
@@ -471,33 +473,33 @@
                     :style="{ 'background-color': i % 2 === 0 ? '#3F51B5' : '#004D40' }"
                   >
                     <td class="pa-2">
-                      <div style="font-size: 1.4em">
+                      <div style="font-size: 1em">
                         {{ item?.id }}
                       </div>
                     </td>
                     <td class="pa-2">
-                      <div style="font-size: 1.4em">{{ item?.barcode }}</div>
+                      <div style="font-size: 1em">{{ item?.barcode }}</div>
                     </td>
                     <td>
-                      <div style="font-size: 1.4em">
+                      <div style="font-size: 1em">
                         {{ item?.factory }}
                       </div>
                     </td>
                     <td>
-                      <div style="font-size: 1.4em">{{ item?.map_code }}</div>
+                      <div style="font-size: 1em">{{ item?.map_code }}</div>
                     </td>
                     <td>
-                      <div style="font-size: 1.4em">
+                      <div style="font-size: 1em">
                         {{ item?.size }}
                       </div>
                     </td>
                     <td>
-                      <div style="font-size: 1.4em">
+                      <div style="font-size: 1em">
                         {{ item?.color }}
                       </div>
                     </td>
                     <td class="pa-2">
-                      <div style="font-size: 1.4em">
+                      <div style="font-size: 1em">
                         {{ item?.costumer_name }}
                       </div>
                     </td>
@@ -581,7 +583,7 @@
           :width="device === 'mobile' ? '100%' : '20%'"
           color="warning"
         >
-          <div style="font-size: 1.5em">لیست نقل و انتقالات</div>
+          <div style="font-size: 1.3em">لیست نقل و انتقالات</div>
         </v-card>
 
         <v-row v-if="device !== 'mobile'" align="center" justify="center">
@@ -653,18 +655,18 @@
 
         <v-row v-if="device === 'mobile'">
           <v-col cols="12">
-            <v-card class="cart" :style="{ height: 600 + 'px', overflow: 'auto' }">
+            <v-card class="cart" :style="{ height: 700 + 'px', overflow: 'auto' }">
               <v-table>
                 <thead>
                   <tr>
                     <th class="text-center">
-                      <h2>شناسه</h2>
+                      <div style="font-size: 1.3em">شناسه</div>
                     </th>
                     <th class="text-center">
-                      <h2>وضعیت</h2>
+                      <div style="font-size: 1.3em">وضعیت</div>
                     </th>
                     <th class="text-center">
-                      <h2>جزییات</h2>
+                      <div style="font-size: 1.3em">جزییات</div>
                     </th>
                   </tr>
                 </thead>
@@ -676,10 +678,10 @@
                     :style="{ 'background-color': i % 2 === 0 ? '#3F51B5' : '#004D40' }"
                   >
                     <td class="pa-2">
-                      <h3>{{ item?.id }}</h3>
+                      <div style="font-size: 1.2em">{{ item?.id }}</div>
                     </td>
                     <td class="pa-2">
-                      <h3>{{ item?.status?.title }}</h3>
+                      <div style="font-size: 1.2em">{{ item?.status?.title }}</div>
                     </td>
                     <td>
                       <v-btn
@@ -701,30 +703,30 @@
 
         <v-row v-else>
           <v-col cols="12">
-            <v-card class="cart" :style="{ height: 600 + 'px', overflow: 'auto' }">
+            <v-card class="cart" :style="{ height: 500 + 'px', overflow: 'auto' }">
               <v-table>
                 <thead>
                   <tr>
                     <th class="text-center">
-                      <div style="font-size: 1.5em">شناسه</div>
+                      <div style="font-size: 1.2em">شناسه</div>
                     </th>
                     <th class="text-center">
-                      <div style="font-size: 1.5em">وضعیت</div>
+                      <div style="font-size: 1.2em">وضعیت</div>
                     </th>
                     <th class="text-center">
-                      <div style="font-size: 1.5em">کارگر</div>
+                      <div style="font-size: 1.2em">کارگر</div>
                     </th>
                     <th class="text-center">
-                      <div style="font-size: 1.5em">تاریخ</div>
+                      <div style="font-size: 1.2em">تاریخ</div>
                     </th>
                     <th class="text-center">
-                      <div style="font-size: 1.5em">سرویس کار</div>
+                      <div style="font-size: 1.2em">سرویس کار</div>
                     </th>
                     <th class="text-center">
-                      <div style="font-size: 1.5em">سرویس ها</div>
+                      <div style="font-size: 1.2em">سرویس ها</div>
                     </th>
                     <th class="text-center">
-                      <div style="font-size: 1.5em">فرش ها</div>
+                      <div style="font-size: 1.2em">فرش ها</div>
                     </th>
                   </tr>
                 </thead>
@@ -736,15 +738,15 @@
                     :style="{ 'background-color': i % 2 === 0 ? '#3F51B5' : '#004D40' }"
                   >
                     <td class="pa-2">
-                      <div style="font-size: 1.4em">{{ item?.id }}</div>
+                      <div style="font-size: 1em">{{ item?.id }}</div>
                     </td>
                     <td class="pa-2">
-                      <div style="font-size: 1.4em">
+                      <div style="font-size: 1em">
                         {{ item?.status?.title }}
                       </div>
                     </td>
                     <td>
-                      <div style="font-size: 1.4em">
+                      <div style="font-size: 1em">
                         {{
                           item?.worker?.first_name
                             ? item?.worker?.first_name + " " + item?.worker?.last_name
@@ -753,7 +755,7 @@
                       </div>
                     </td>
                     <td>
-                      <div style="font-size: 1.4em">
+                      <div style="font-size: 1em">
                         {{
                           convertPersianNumberToLatin(
                             gregorian_to_jalali(
@@ -766,7 +768,7 @@
                       </div>
                     </td>
                     <td>
-                      <div style="font-size: 1.4em">
+                      <div style="font-size: 1em">
                         {{
                           item?.serviceProvider?.first_name
                             ? item?.serviceProvider?.first_name +
@@ -781,12 +783,12 @@
                         <div
                           v-for="(service, i) in item?.services"
                           :key="i"
-                          style="font-size: 1.4em"
+                          style="font-size: 1em"
                         >
                           {{ service?.title }} <br />
                         </div>
                       </div>
-                      <div v-else style="font-size: 1.4em">ثبت نشده <br /></div>
+                      <div v-else style="font-size: 1em">ثبت نشده <br /></div>
                     </td>
                     <td class="pa-2">
                       <div v-if="item?.carpets.length > 0">
@@ -794,7 +796,7 @@
                           class="pa-2"
                           v-for="(carpet, i) in item?.carpets"
                           :key="i"
-                          style="font-size: 1.4em"
+                          style="font-size: 1em"
                         >
                           <v-btn
                             height="40"
@@ -808,7 +810,7 @@
                           <br />
                         </div>
                       </div>
-                      <div v-else style="font-size: 1.4em">ثبت نشده <br /></div>
+                      <div v-else style="font-size: 1em">ثبت نشده <br /></div>
                     </td>
                   </tr>
                 </tbody>
