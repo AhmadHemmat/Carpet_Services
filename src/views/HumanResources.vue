@@ -375,8 +375,11 @@
           <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
             <span>اضافه کردن سرویس کار</span>
           </v-card>
-
-          <v-card class="mx-auto my-2" max-width="70%">
+          <v-card
+            class="cart mx-auto my-2"
+            max-width="90%"
+            :style="{ height: 700 + 'px', overflow: 'auto' }"
+          >
             <v-locale-provider rtl>
               <v-text-field
                 v-model="firstNameS"
@@ -406,7 +409,7 @@
                 rounded
               ></v-text-field>
             </v-locale-provider>
-            <v-locale-provider rtl>
+            <!-- <v-locale-provider rtl>
               <v-text-field
                 v-model="address"
                 class="pa-2"
@@ -414,7 +417,7 @@
                 label="آدرس"
                 rounded
               ></v-text-field>
-            </v-locale-provider>
+            </v-locale-provider> -->
             <v-locale-provider rtl>
               <v-text-field
                 v-model="nationalCode"
@@ -427,6 +430,7 @@
 
             <v-locale-provider rtl>
               <v-autocomplete
+                class="mx-2"
                 v-model="selectedServices"
                 :items="services"
                 color="blue-grey-lighten-2"
@@ -438,6 +442,7 @@
                 chips
                 closable-chips
                 multiple
+                rounded
               >
               </v-autocomplete>
             </v-locale-provider>
@@ -448,7 +453,6 @@
                   !firstNameS ||
                   !lastNameS ||
                   !phoneNumber ||
-                  !address ||
                   !nationalCode ||
                   selectedServices.length === 0
                 "
@@ -838,7 +842,7 @@ function addServiceProvider() {
     last_name: lastNameS.value,
     phone_number: convertPersianNumberToLatin(phoneNumber.value),
     services: selectedServices.value,
-    address: address.value,
+    address: null,
     national_code: convertPersianNumberToLatin(nationalCode.value),
   };
   axios

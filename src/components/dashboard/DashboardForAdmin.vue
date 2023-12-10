@@ -4,10 +4,6 @@
       <v-icon icon="mdi-comment-check" color="white"></v-icon>
       <span> خوش آمدید </span>
     </v-btn>
-    <v-spacer></v-spacer>
-    <v-btn>
-      <v-icon icon="mdi-apps" color="#FFFF00" size="large"></v-icon>
-    </v-btn>
   </v-app-bar>
   <v-col cols="12" xs="12" sm="12" md="8" lg="8">
     <v-card rounded="lg" elevation="12">
@@ -917,6 +913,16 @@
             >
             </v-autocomplete>
           </v-locale-provider>
+          <v-btn
+            :disabled="!filteredWorker"
+            height="40"
+            width="50%"
+            color="yellow"
+            @click="filter()"
+            style="cursor: pointer"
+          >
+            ثبت
+          </v-btn>
         </div>
         <div v-if="filterType === 'serviceProvider'">
           <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
@@ -938,6 +944,16 @@
             >
             </v-autocomplete>
           </v-locale-provider>
+          <v-btn
+            :disabled="!filteredServiceProvider"
+            height="40"
+            width="50%"
+            color="yellow"
+            @click="filter()"
+            style="cursor: pointer"
+          >
+            ثبت
+          </v-btn>
         </div>
         <div v-if="filterType === 'carpet'">
           <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
@@ -960,6 +976,16 @@
             >
             </v-autocomplete>
           </v-locale-provider>
+          <v-btn
+            :disabled="filteredCarpets.length === 0"
+            height="40"
+            width="50%"
+            color="yellow"
+            @click="filter()"
+            style="cursor: pointer"
+          >
+            ثبت
+          </v-btn>
         </div>
         <div v-if="filterType === 'date'">
           <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
@@ -983,6 +1009,17 @@
             display-format="jYYYY-jMM-jDD"
             style="color: #e65100"
           />
+          <v-btn
+            class="mt-8"
+            :disabled="!filteredStartDate || !filteredEndDate"
+            height="40"
+            width="50%"
+            color="yellow"
+            @click="filter()"
+            style="cursor: pointer"
+          >
+            ثبت
+          </v-btn>
         </div>
         <div v-if="filterType === 'status'">
           <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
@@ -1004,16 +1041,17 @@
             >
             </v-autocomplete>
           </v-locale-provider>
+          <v-btn
+            :disabled="!filteredStatus"
+            height="40"
+            width="50%"
+            color="yellow"
+            @click="filter()"
+            style="cursor: pointer"
+          >
+            ثبت
+          </v-btn>
         </div>
-        <v-btn
-          height="40"
-          width="50%"
-          color="yellow"
-          @click="filter()"
-          style="cursor: pointer"
-        >
-          ثبت
-        </v-btn>
       </v-responsive>
     </v-card>
   </v-dialog>
@@ -1277,25 +1315,57 @@ function showCarpetDetail(id) {
 }
 
 const allTransfers = ref([]);
+const filterHolder = ref({});
+
+watch(
+  () => filterDialog.value,
+  () => {
+    if (!filterDialog.value) {
+      filteredWorker.value = null;
+      filteredServiceProvider.value = null;
+      filteredCarpets.value = [];
+      filteredStartDate.value = null;
+      filteredEndDate.value = null;
+      filteredStatus.value = null;
+    }
+  }
+);
 async function filter() {
   filterDialog.value = false;
   let filterParams = "?";
-  if (filteredWorker.value) filterParams += "worker=" + filteredWorker.value + "&";
-  if (filteredServiceProvider.value)
-    filterParams += "service_provider=" + filteredServiceProvider.value + "&";
+  if (filteredWorker.value) {
+    filterHolder.value.filteredWorker = filteredWorker.value;
+    filterParams += "worker=" + filterHolder.value.filteredWorker + "&";
+  }
+  if (filteredServiceProvider.value) {
+    filterHolder.value.filteredServiceProvider = filteredServiceProvider.value;
+    filterParams +=
+      "service_provider=" + filterHolder.value.filteredServiceProvider + "&";
+  }
+
   if (filteredCarpets.value.length > 0) {
+    filterHolder.value.filteredCarpets = filteredCarpets.value;
     filterParams += "carpets=";
-    for (const c of filteredCarpets.value) {
+    for (const c of filterHolder.value.filteredCarpets) {
       filterParams += c + ",";
     }
     if (filterParams.slice(-1) === ",") filterParams = filterParams.replace(/.$/, "");
     filterParams += "&";
   }
 
-  if (filteredStartDate.value)
-    filterParams += "start_date=" + filteredStartDate.value + "&";
-  if (filteredEndDate.value) filterParams += "end_date=" + filteredEndDate.value + "&";
-  if (filteredStatus.value) filterParams += "status=" + filteredStatus.value + "&";
+  if (filteredStartDate.value) {
+    filterHolder.value.filteredStartDate = filteredStartDate.value;
+    filterParams += "start_date=" + filterHolder.value.filteredStartDate + "&";
+  }
+
+  if (filteredEndDate.value) {
+    filterHolder.value.filteredEndDate = filteredEndDate.value;
+    filterParams += "end_date=" + filterHolder.value.filteredEndDate + "&";
+  }
+  if (filteredStatus.value) {
+    filterHolder.value.filteredStatus = filteredStatus.value;
+    filterParams += "status=" + filterHolder.value.filteredStatus + "&";
+  }
 
   allTransfers.value = [];
   let transfer = {};
@@ -1344,7 +1414,6 @@ async function filter() {
         }
 
         allTransfers.value.push(transfer);
-        console.log("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ");
         console.log(allTransfers.value);
       }
     });
@@ -1357,6 +1426,7 @@ async function getAllTransfers() {
   filteredStartDate.value = null;
   filteredEndDate.value = null;
   filteredStatus.value = null;
+  filterHolder.value = [];
   allTransfers.value = [];
   let transfer = {};
   await axios.get(APIUrl + "transfer/all-transfer-list/").then((response) => {
@@ -1402,7 +1472,6 @@ async function getAllTransfers() {
       }
 
       allTransfers.value.push(transfer);
-      console.log("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ");
       console.log(allTransfers.value);
     }
   });
@@ -1418,8 +1487,6 @@ async function showAllTransferDetail(id) {
     }
   }
 }
-
-function filterTransfersByWorker(id) {}
 
 const services = ref([]);
 const selectedOperator = ref(null);
