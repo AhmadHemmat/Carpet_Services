@@ -14,7 +14,7 @@
             :rules="[required]"
             class="mb-4"
             clearable
-            label="نام کاربری"
+            label="شماره همراه"
             type="text"
             dir="ltr"
           ></v-text-field>
@@ -63,11 +63,12 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { loginStore } from "@/stores/index";
 import axios from "axios";
-
-// Childs
 import Alert from "@/components/Alert.vue";
 
+// const APIUrl = "http://192.168.1.62:8000/";
 const APIUrl = "https://carpet.iran.liara.run/";
+// const APIUrl = "http://localhost:8000/";s
+
 function convertPersianNumberToLatin(number) {
   let numberStr = number.toString();
 
@@ -128,7 +129,7 @@ function onSubmit() {
     .catch((error) => {
       console.log("error from api", error);
       alertActivator.value = true;
-      alertMsg.value = "رمز ورود یا نام کاربری اشتباه است";
+      alertMsg.value = "رمز ورود یا شماره همراه اشتباه است";
     })
     .finally(() => {
       alertActivator.value = false;

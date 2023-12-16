@@ -79,7 +79,7 @@
                 color="#76FF03"
                 variant="tonal"
                 :disabled="!selectedOperator"
-                @click="getServicesOfSelectedServiceProvider"
+                @click="getServicesOfSelectedServiceProvider(false)"
               >
                 بعدی
               </v-btn>
@@ -101,7 +101,7 @@
             </v-table>
           </v-col>
           <v-col cols="12">
-            <v-card class="cart mx-2" :style="{ height: 400 + 'px', overflow: 'auto' }">
+            <v-card class="cart mx-2" :style="{ height: 300 + 'px', overflow: 'auto' }">
               <v-table>
                 <tbody>
                   <tr v-for="(item, i) in serviceProviders" :key="i" class="text-center">
@@ -189,7 +189,7 @@
             </v-table>
           </v-col>
           <v-col cols="12">
-            <v-card class="cart mx-2" :style="{ height: 400 + 'px', overflow: 'auto' }">
+            <v-card class="cart mx-2" :style="{ height: 300 + 'px', overflow: 'auto' }">
               <v-table>
                 <tbody>
                   <tr v-for="(item, i) in services" :key="i" class="text-center">
@@ -359,7 +359,217 @@
       </v-responsive>
     </v-card>
   </v-dialog>
+  <v-dialog
+    v-model="inputCarpetFromServiceDialog"
+    persistent
+    transition="dialog-bottom-transition"
+    :fullscreen="device !== 'desktop' && device !== 'large'"
+    :width="device === 'desktop' || device === 'large' ? '50%' : '100%'"
+  >
+    <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
+      <v-responsive>
+        <v-chip outline @click="inputCarpetFromServiceDialog = false">
+          <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
+        </v-chip>
+        <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
+          <span>
+            {{ dialogTitle }}
+            <br />
+            اسکن قالی
+          </span>
+        </v-card>
+        <div class="text-center my-4">
+          <v-row align="center" justify="center">
+            <v-col cols="12">
+              <v-btn
+                class="flex-grow-1"
+                height="48"
+                width="100%"
+                color="#76FF03"
+                variant="tonal"
+                :disabled="!selectedCarpet"
+                @click="carpetTransfer2()"
+              >
+                بعدی
+              </v-btn>
+            </v-col>
+          </v-row>
+        </div>
+        <v-responsive class="mx-auto" max-width="344">
+          <v-text-field
+            v-model="selectedCarpet"
+            label="اسکن قالی"
+            hide-details="auto"
+            autofocus
+            rounded
+          ></v-text-field>
+        </v-responsive>
+      </v-responsive>
+    </v-card>
+  </v-dialog>
+  <v-dialog
+    v-model="inputSelectOperatorDialog"
+    persistent
+    transition="dialog-bottom-transition"
+    :fullscreen="device !== 'desktop' && device !== 'large'"
+    :width="device === 'desktop' || device === 'large' ? '50%' : '100%'"
+  >
+    <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
+      <v-responsive>
+        <v-chip outline @click="inputSelectOperatorDialog = false">
+          <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
+        </v-chip>
 
+        <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
+          <span>
+            مرحله ۱ ورود قالی
+            <br />
+            انتخاب سرویس کار
+          </span>
+        </v-card>
+        <div class="text-center my-4">
+          <v-row align="center" justify="center">
+            <v-col>
+              <v-btn
+                class="flex-grow-1"
+                height="48"
+                width="100%"
+                color="#76FF03"
+                variant="tonal"
+                :disabled="!selectedOperator"
+                @click="getServicesOfSelectedServiceProvider(true)"
+              >
+                بعدی
+              </v-btn>
+            </v-col>
+          </v-row>
+        </div>
+        <v-row>
+          <v-col cols="12">
+            <div class="text-center">انتخاب سرویس کار</div>
+
+            <v-table>
+              <thead>
+                <tr>
+                  <th class="text-center">نام</th>
+                  <th class="text-center">نام خانوادگی</th>
+                  <th class="text-center">انتخاب</th>
+                </tr>
+              </thead>
+            </v-table>
+          </v-col>
+          <v-col cols="12">
+            <v-card class="cart mx-2" :style="{ height: 300 + 'px', overflow: 'auto' }">
+              <v-table>
+                <tbody>
+                  <tr v-for="(item, i) in serviceProviders" :key="i" class="text-center">
+                    <td>
+                      <span>{{ item?.first_name ? item?.first_name : null }}</span>
+                    </td>
+                    <td>
+                      <span>{{ item?.last_name ? item?.last_name : null }}</span>
+                    </td>
+                    <td>
+                      <v-radio-group v-model="selectedOperator" column>
+                        <v-radio label="انتخاب" color="indigo" :value="item"></v-radio>
+                      </v-radio-group>
+                    </td>
+                  </tr>
+                </tbody>
+              </v-table>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-responsive>
+    </v-card>
+  </v-dialog>
+
+  <v-dialog
+    v-model="inputSelectServicesDialog"
+    persistent
+    transition="dialog-bottom-transition"
+    :fullscreen="device !== 'desktop' && device !== 'large'"
+    :width="device === 'desktop' || device === 'large' ? '50%' : '100%'"
+  >
+    <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
+      <v-responsive>
+        <v-chip outline @click="inputSelectServicesDialog = false">
+          <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
+        </v-chip>
+
+        <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
+          <span>
+            مرحله ۲ ورود قالی
+            <br />
+            انتخاب سرویس ها
+          </span>
+        </v-card>
+        <div class="text-center my-4">
+          <v-row align="center" justify="center">
+            <v-col cols="6">
+              <v-btn
+                class="flex-grow-1"
+                height="48"
+                width="100%"
+                color="#76FF03"
+                variant="tonal"
+                :disabled="selectedServices.length === 0"
+                @click="stepperNext2"
+              >
+                بعدی
+              </v-btn>
+            </v-col>
+            <v-col cols="6">
+              <v-btn
+                class="flex-grow-1"
+                height="48"
+                width="100%"
+                color="#FF1744"
+                variant="tonal"
+                @click="stepperPrevious2"
+              >
+                قبلی
+              </v-btn>
+            </v-col>
+          </v-row>
+        </div>
+        <v-row>
+          <v-col cols="12">
+            <div class="text-center">انتخاب سرویس ها</div>
+
+            <v-table>
+              <thead>
+                <tr>
+                  <th class="text-center">سرویس</th>
+                  <th class="text-center">انتخاب</th>
+                </tr>
+              </thead>
+            </v-table>
+          </v-col>
+          <v-col cols="12">
+            <v-card class="cart mx-2" :style="{ height: 300 + 'px', overflow: 'auto' }">
+              <v-table>
+                <tbody>
+                  <tr v-for="(item, i) in services" :key="i" class="text-center">
+                    <td>
+                      <span>{{ item?.title ? item?.title : null }}</span>
+                    </td>
+                    <td>
+                      <v-checkbox
+                        v-model="selectedServices"
+                        label="انتخاب"
+                        :value="item.id"
+                      ></v-checkbox>
+                    </td>
+                  </tr>
+                </tbody>
+              </v-table>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-responsive>
+    </v-card>
+  </v-dialog>
   <Alert
     :msg="alertMsg"
     :activate="alertActivator"
@@ -369,14 +579,11 @@
 </template>
 
 <script setup>
-import { ref, watch, computed, onMounted } from "vue";
+import { ref, watch, onMounted } from "vue";
 import axios from "axios";
 import { breakPointsStore } from "@/stores/breakPoints";
-// import { StreamBarcodeReader } from "vue-barcode-reader";
 import Alert from "@/components/Alert.vue";
 
-// import carpet from "../../assets/carpet_logo.png";
-import * as XLSX from "xlsx";
 onMounted(async () => {
   getServiceProviders();
   getCarpetList();
@@ -385,68 +592,18 @@ onMounted(async () => {
   getStatuses();
   await getOpenTransfer();
 });
+
+// const APIUrl = "http://192.168.1.62:8000/";
 const APIUrl = "https://carpet.iran.liara.run/";
 // const APIUrl = "http://localhost:8000/";
+
 const alertMsg = ref("");
 const alertActivator = ref(false);
 const alertTimeout = ref(5000);
 const alertColor = ref("error");
-const text = ref("");
-const id = ref(null);
-function onDecode(a, b, c) {
-  text.value = a;
-}
-function onLoaded() {
-  console.log("load");
-}
-
-const metaDataFile = ref(null);
-const inputExcelDialog = ref(false);
-const carpets = ref([]);
-function convert(e) {
-  var files = e.target.files,
-    f = files[0];
-  var reader = new FileReader();
-  reader.onload = function (e) {
-    var data = new Uint8Array(e.target.result);
-    var workbook = XLSX.read(data, { type: "array" });
-    let sheetName = workbook.SheetNames[0];
-    /* DO SOMETHING WITH workbook HERE */
-    console.log(workbook);
-    let worksheet = workbook.Sheets[sheetName];
-    console.log(XLSX.utils.sheet_to_json(worksheet));
-    carpets.value = XLSX.utils.sheet_to_json(worksheet);
-  };
-  reader.readAsArrayBuffer(f);
-}
-
-function sendCarpetsToAPI() {
-  for (let i = 0; i < carpets.value.length; i++) {
-    const body = {
-      factory: carpets.value[i].factory,
-      barcode: carpets.value[i].barcode,
-      map_code: carpets.value[i].map_code,
-      size: carpets.value[i].size,
-      color: carpets.value[i].color,
-      costumer_name: carpets.value[i].costumer_name,
-    };
-    axios.post(APIUrl + "carpet/register-from-excel/", body).then((response) => {
-      console.log(response);
-      inputExcelDialog.value = false;
-    });
-  }
-}
 const store = breakPointsStore();
-
 const device = ref(store.device);
-
 const variants = [
-  // {
-  //   type: "ورود اکسل قالی ها",
-  //   color: "warning",
-  //   variant: "elevated",
-  //   icon: "mdi-file-excel",
-  // },
   {
     type: "ورود قالی از کارخانه",
     color: "success",
@@ -478,6 +635,7 @@ const selectServicesDialog = ref(false);
 const openTransfer = ref(false);
 const selectedCarpet = ref(null);
 const inputCarpetFromFactoryDialog = ref(false);
+const inputCarpetFromServiceDialog = ref(false);
 const status = ref(null);
 const dialogTitle = ref("");
 const inputStatus = ref(null);
@@ -509,12 +667,11 @@ function openModal(obj) {
     dialogTitle.value = obj.type;
     status.value = outputStatus.value;
   } else if (obj.type === "ورود قالی از سرویس") {
-    inputCarpetFromFactoryDialog.value = true;
+    inputSelectOperatorDialog.value = true;
     dialogTitle.value = obj.type;
     status.value = inputStatus.value;
   }
 }
-const dialog = ref(false);
 const serviceProviders = ref(null);
 const selectedOperator = ref(null);
 watch(
@@ -547,20 +704,44 @@ function stepperNext() {
     selectCarpetDialog.value = true;
   }
 }
+const inputSelectOperatorDialog = ref(false);
+const inputSelectServicesDialog = ref(false);
 
-function stepperPrevious() {
-  if (selectServicesDialog.value) {
-    selectOperatorDialog.value = true;
-    selectServicesDialog.value = false;
-    selectCarpetDialog.value = false;
-  } else if (selectCarpetDialog.value) {
-    selectOperatorDialog.value = false;
-    selectServicesDialog.value = true;
-    selectCarpetDialog.value = false;
+const sP = ref(null);
+const s = ref(null);
+function stepperNext2() {
+  if (inputSelectOperatorDialog.value) {
+    inputSelectOperatorDialog.value = false;
+    inputSelectServicesDialog.value = true;
+    inputCarpetFromFactoryDialog.value = false;
+  } else if (inputSelectServicesDialog.value) {
+    inputSelectOperatorDialog.value = false;
+    inputSelectServicesDialog.value = false;
+    selectedCarpet.value = null;
+    inputCarpetFromServiceDialog.value = true;
+    sP.value = selectedOperator.value?.id;
+    s.value = selectedServices.value;
   }
 }
-function getServicesOfSelectedServiceProvider() {
-  stepperNext();
+
+function stepperPrevious() {
+  if (inputSelectServicesDialog.value) {
+    inputSelectOperatorDialog.value = true;
+    inputSelectServicesDialog.value = false;
+    inputCarpetFromFactoryDialog.value = false;
+  } else if (inputCarpetFromFactoryDialog.value) {
+    inputSelectOperatorDialog.value = false;
+    inputSelectServicesDialog.value = true;
+    inputCarpetFromFactoryDialog.value = false;
+  }
+}
+function stepperPrevious2() {
+  inputSelectOperatorDialog.value = true;
+  inputSelectServicesDialog.value = false;
+}
+function getServicesOfSelectedServiceProvider(p) {
+  if (p) stepperNext2();
+  else stepperNext();
   services.value = selectedOperator.value.services;
 }
 const userProfile = ref(null);
@@ -574,27 +755,21 @@ const notIsFinishedTransfer = ref({});
 
 async function getOpenTransfer() {
   notIsFinishedTransfer.value.date = "";
-  await axios
-    .get(APIUrl + "transfer/all-transfer-list/?page_size=1000")
-    .then((response) => {
-      for (let i = 0; i < response.data.results.length; i++) {
-        if (
-          response.data.results[i].worker === userProfile.value.id &&
-          response.data.results[i].is_finished === false
-        ) {
-          openTransfer.value = true;
+  await axios.get(APIUrl + "transfer/worker-isfinished-transfer/").then((response) => {
+    if (response.data.length > 0) {
+      for (let i = 0; i < response.data.length; i++) {
+        openTransfer.value = true;
 
-          notIsFinishedTransfer.value.id = response.data.results[i].id;
-          notIsFinishedTransfer.value.serviceProviders =
-            response.data.results[i].service_provider;
-          notIsFinishedTransfer.value.services = response.data.results[i].services;
-          notIsFinishedTransfer.value.date = response.data.results[i].date;
-          notIsFinishedTransfer.value.status = response.data.results[i].status;
-          notIsFinishedTransfer.value.worker = response.data.results[i].worker;
-          notIsFinishedTransfer.value.carpets = response.data.results[i].carpets;
-        }
+        notIsFinishedTransfer.value.id = response.data[i].id;
+        notIsFinishedTransfer.value.serviceProviders = response.data[i].service_provider;
+        notIsFinishedTransfer.value.services = response.data[i].services;
+        notIsFinishedTransfer.value.date = response.data[i].date;
+        notIsFinishedTransfer.value.status = response.data[i].status;
+        notIsFinishedTransfer.value.worker = response.data[i].worker;
+        notIsFinishedTransfer.value.carpets = response.data[i].carpets;
       }
-    });
+    }
+  });
 }
 async function getCarpetList() {
   carpetList.value = [];
@@ -644,25 +819,86 @@ async function carpetTransfer() {
   body.carpets = [carpet?.id];
   body.worker = userProfile.value?.id;
   body.status = status.value;
-  body.service_provider = selectedOperator.value?.id;
+  body.service_provider = null;
   body.services = [];
   body.date = getDateAndTime();
   body.is_finished = true;
   body.admin_verify = false;
-  await axios.post(APIUrl + "transfer/create-transfer2/", body).then((response) => {
-    console.log(response);
-    selectedCarpet.value = null;
-    alertMsg.value = "ثبت شد";
-    alertActivator.value = true;
-    alertTimeout.value = 2000;
-    alertColor.value = "success";
-    setTimeout(() => {
-      loader.value = false;
-      inputCarpetFromFactoryDialog.value = true;
-    }, 2000);
-  });
+  await axios
+    .post(APIUrl + "transfer/create-transfer2/", body)
+    .then((response) => {
+      selectedCarpet.value = null;
+      alertMsg.value = "ثبت شد";
+      alertActivator.value = true;
+      alertTimeout.value = 2000;
+      alertColor.value = "success";
+      setTimeout(() => {
+        loader.value = false;
+        inputCarpetFromFactoryDialog.value = true;
+      }, 2000);
+    })
+    .catch((error) => {
+      selectedCarpet.value = null;
+      alertMsg.value = "این قالی در لیست وجود ندارد";
+      alertActivator.value = true;
+      alertTimeout.value = 2000;
+      alertColor.value = "error";
+      setTimeout(() => {
+        loader.value = false;
+        inputCarpetFromFactoryDialog.value = true;
+      }, 2000);
+    });
+}
+
+async function carpetTransfer2() {
+  let carpet = null;
+  for (const c of carpetList.value) {
+    if (c.barcode == selectedCarpet.value) {
+      carpet = c;
+    }
+  }
+  alertActivator.value = false;
+  inputCarpetFromServiceDialog.value = false;
+  loader.value = true;
+
+  const body = {};
+  body.carpets = [carpet?.id];
+  body.worker = userProfile.value?.id;
+  body.status = status.value;
+  body.service_provider = sP.value;
+  body.services = s.value;
+  body.date = getDateAndTime();
+  body.is_finished = true;
+  body.admin_verify = false;
+  await axios
+    .post(APIUrl + "transfer/create-transfer2/", body)
+    .then((response) => {
+      selectedCarpet.value = null;
+      alertMsg.value = "ثبت شد";
+      alertActivator.value = true;
+      alertTimeout.value = 2000;
+      alertColor.value = "success";
+      setTimeout(() => {
+        loader.value = false;
+        inputCarpetFromServiceDialog.value = true;
+      }, 2000);
+    })
+    .catch((error) => {
+      selectedCarpet.value = null;
+      alertMsg.value = "این قالی در لیست وجود ندارد";
+      alertActivator.value = true;
+      alertTimeout.value = 2000;
+      alertColor.value = "error";
+      setTimeout(() => {
+        loader.value = false;
+        inputCarpetFromServiceDialog.value = true;
+      }, 2000);
+    });
 }
 async function sendTransfer() {
+  alertActivator.value = false;
+  selectCarpetDialog.value = false;
+  loader.value = true;
   await getOpenTransfer();
   const body = {};
   if (!openTransfer.value) {
@@ -674,9 +910,22 @@ async function sendTransfer() {
     body.date = getDateAndTime();
     body.is_finished = false;
     body.admin_verify = false;
-    axios.post(APIUrl + "transfer/create-transfer2/", body).then((response) => {
-      openTransfer.value = true;
-    });
+    axios
+      .post(APIUrl + "transfer/create-transfer2/", body)
+      .then((response) => {
+        openTransfer.value = true;
+      })
+      .catch((error) => {
+        selectedCarpet.value = null;
+        alertMsg.value = "این قالی در لیست وجود ندارد";
+        alertActivator.value = true;
+        alertTimeout.value = 2000;
+        alertColor.value = "error";
+        setTimeout(() => {
+          loader.value = false;
+          selectCarpetDialog.value = true;
+        }, 2000);
+      });
   } else {
     let carpet = null;
     for (const c of carpetList.value) {
@@ -684,7 +933,7 @@ async function sendTransfer() {
         carpet = c;
       }
     }
-    notIsFinishedTransfer.value.carpets.push(carpet?.id);
+    notIsFinishedTransfer.value?.carpets?.push(carpet?.id);
     selectCarpetDialog.value = false;
     alertActivator.value = false;
     loader.value = true;
@@ -712,11 +961,25 @@ async function sendTransfer() {
           loader.value = false;
           selectCarpetDialog.value = true;
         }, 2000);
+      })
+      .catch((error) => {
+        selectedCarpet.value = null
+        alertMsg.value = "این قالی در لیست وجود ندارد";
+        alertActivator.value = true;
+        alertTimeout.value = 2000;
+        alertColor.value = "error";
+        setTimeout(() => {
+          loader.value = false;
+          selectCarpetDialog.value = true;
+        }, 2000);
       });
   }
 }
 
 async function updateIsFinishedTransfer() {
+  alertActivator.value = false;
+  loader.value = true;
+
   await getOpenTransfer();
   const body = {};
   body.carpets = notIsFinishedTransfer.value.carpets;
@@ -735,7 +998,24 @@ async function updateIsFinishedTransfer() {
     .then((response) => {
       selectCarpetDialog.value = false;
       openTransfer.value = false;
+      loader.value = false;
+
+      alertMsg.value = "ثبت شد";
+      alertActivator.value = true;
+      alertTimeout.value = 2000;
+      alertColor.value = "success";
+
       localStorage.removeItem("openTask");
+    })
+    .catch((error) => {
+      alertMsg.value = "دوباره امتحان کنید";
+      alertActivator.value = true;
+      alertTimeout.value = 2000;
+      alertColor.value = "error";
+      setTimeout(() => {
+        loader.value = false;
+        selectCarpetDialog.value = true;
+      }, 2000);
     });
 }
 

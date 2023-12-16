@@ -379,34 +379,30 @@
           width="100%"
           :style="{ height: 700 + 'px', overflow: 'auto' }"
         >
-        <v-row class="px-2" no-gutters>
-          <v-col cols="12" md="6">
-            <v-locale-provider rtl>
-              <v-text-field
-                v-model="firstNameS"
-                class="pa-2"
-                color="primary"
-                label="نام"
-                rounded
-              ></v-text-field>
-            </v-locale-provider>
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-locale-provider rtl>
-              <v-text-field
-                v-model="lastNameS"
-                class="pa-2"
-                color="primary"
-                label="نام خانوادگی"
-                rounded
-              ></v-text-field>
-            </v-locale-provider>
-          </v-col>
-
+          <v-row class="px-2" no-gutters>
+            <v-col cols="12" md="6">
+              <v-locale-provider rtl>
+                <v-text-field
+                  v-model="firstNameS"
+                  class="pa-2"
+                  color="primary"
+                  label="نام"
+                  rounded
+                ></v-text-field>
+              </v-locale-provider>
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-locale-provider rtl>
+                <v-text-field
+                  v-model="lastNameS"
+                  class="pa-2"
+                  color="primary"
+                  label="نام خانوادگی"
+                  rounded
+                ></v-text-field>
+              </v-locale-provider>
+            </v-col>
           </v-row>
-          
-
-          
 
           <v-locale-provider rtl>
             <v-text-field
@@ -767,8 +763,10 @@ function convertPersianNumberToLatin(number) {
   return str;
 }
 
+// const APIUrl = "http://192.168.1.62:8000/";
 const APIUrl = "https://carpet.iran.liara.run/";
 // const APIUrl = "http://localhost:8000/";
+
 const adminsList = ref([]);
 const workerList = ref([]);
 
@@ -804,7 +802,6 @@ function register(isStaff) {
   axios
     .post(APIUrl + "register/", body)
     .then((response) => {
-      console.log(response);
       if (isStaff) addAdminDialog.value = false;
       else addWorkerDialog.value = false;
 
@@ -915,12 +912,10 @@ function addDriver() {
     })
     .catch((error) => {
       console.log(error);
-      if (error.response.data.title[0]) {
         alertMsg.value = "شماره همراه یا کد ملی یا پلاک تکراری است";
         alertActivator.value = true;
         alertTimeout.value = 2000;
         alertColor.value = "error";
-      }
     });
 }
 
@@ -935,7 +930,7 @@ function getAllServices() {
 
 const serviceTitle = ref(null);
 function addService() {
-  alertActivator.value = flase;
+  alertActivator.value = false;
 
   const body = {
     title: serviceTitle.value,

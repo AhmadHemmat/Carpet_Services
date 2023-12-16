@@ -7,7 +7,7 @@
   </v-app-bar>
   <v-col cols="12" xs="12" sm="12" md="8" lg="8">
     <v-card rounded="lg" elevation="12">
-      <v-card class="cart" :style="{ height: windowHeight + 'px', overflow: 'auto' }">
+      <v-card>
         <v-container>
           <v-row dense align="center" justify="center">
             <v-col v-for="(obj, i) in variants" :key="i" cols="12" md="6">
@@ -110,7 +110,10 @@
         </v-card>
         <v-row v-if="device === 'mobile'">
           <v-col cols="12">
-            <v-card class="cart" :style="{ height: 700 + 'px', overflow: 'auto' }">
+            <v-card
+              class="cart"
+              :style="{ height: windowHeight2 + 'px', overflow: 'auto' }"
+            >
               <v-table>
                 <thead>
                   <tr>
@@ -169,7 +172,10 @@
         </v-row>
         <v-row v-else>
           <v-col cols="12">
-            <v-card class="cart" :style="{ height: 500 + 'px', overflow: 'auto' }">
+            <v-card
+              class="cart"
+              :style="{ height: windowHeight2 + 'px', overflow: 'auto' }"
+            >
               <v-table>
                 <thead>
                   <tr>
@@ -399,7 +405,10 @@
 
         <v-row v-if="device === 'mobile'">
           <v-col cols="12">
-            <v-card class="cart" :style="{ height: 700 + 'px', overflow: 'auto' }">
+            <v-card
+              class="cart"
+              :style="{ height: windowHeight2 + 'px', overflow: 'auto' }"
+            >
               <v-table>
                 <thead>
                   <tr>
@@ -438,7 +447,10 @@
 
         <v-row v-else>
           <v-col cols="12">
-            <v-card class="cart" :style="{ height: 500 + 'px', overflow: 'auto' }">
+            <v-card
+              class="cart"
+              :style="{ height: windowHeight2 + 'px', overflow: 'auto' }"
+            >
               <v-table>
                 <thead>
                   <tr>
@@ -573,89 +585,207 @@
     transition="dialog-bottom-transition"
     fullscreen
   >
-    <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
+    <v-card class="pa-2 d-flex justify-center flex-wrap" dir="rtl">
       <v-responsive>
-        <v-chip outline @click="allTransfersDialog = false">
-          <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
-        </v-chip>
-        <v-card
-          class="mx-auto my-4 text-center pa-2"
-          :width="device === 'mobile' ? '100%' : '20%'"
-          color="warning"
-        >
-          <div style="font-size: 1.3em">لیست نقل و انتقالات</div>
-        </v-card>
-
-        <v-row v-if="device !== 'mobile'" align="center" justify="center">
-          <v-btn
-            height="40"
-            width="200"
-            color="error"
-            @click="getAllTransfers"
-            style="cursor: pointer"
-          >
-            پاک کردن فیلترها
-          </v-btn>
+        <v-row align="center" justify="center">
           <v-col cols="2">
+            <v-chip outline @click="allTransfersDialog = false">
+              <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
+            </v-chip>
+          </v-col>
+          <v-spacer></v-spacer>
+          <v-col cols="8">
+            <v-card
+              class="mx-auto my-1 text-center pa-2"
+              :width="device === 'mobile' ? '100%' : '50%'"
+              color="warning"
+            >
+              <div style="font-size: 1.3em">لیست نقل و انتقالات</div>
+            </v-card>
+          </v-col>
+          <v-col cols="2" v-if="device !== 'mobile'">
             <v-btn
               height="40"
               width="100%"
-              color="yellow"
-              @click="openFilterDialog('worker')"
+              color="error"
+              @click="getAllTransfers"
               style="cursor: pointer"
             >
-              فیلتر کارگر
+              پاک کردن فیلترها
             </v-btn>
           </v-col>
-          <v-col cols="2"
-            ><v-btn
-              height="40"
-              width="100%"
-              color="yellow"
-              @click="openFilterDialog('serviceProvider')"
-              style="cursor: pointer"
-            >
-              فیلتر سرویس کار
-            </v-btn></v-col
-          >
-          <v-col cols="2"
-            ><v-btn
-              height="40"
-              width="100%"
-              color="yellow"
-              @click="openFilterDialog('carpet')"
-              style="cursor: pointer"
-            >
-              فیلتر فرش
-            </v-btn></v-col
-          >
-          <v-col cols="2">
-            <v-btn
-              height="40"
-              width="100%"
-              color="yellow"
-              @click="openFilterDialog('date')"
-              style="cursor: pointer"
-            >
-              فیلتر تاریخ
-            </v-btn></v-col
-          >
-          <v-col cols="2"
-            ><v-btn
-              height="40"
-              width="100%"
-              color="yellow"
-              @click="openFilterDialog('status')"
-              style="cursor: pointer"
-            >
-              فیلتر وضعیت
-            </v-btn></v-col
-          >
+          <v-col cols="12">
+            <v-row v-if="device !== 'mobile'" align="center" justify="center">
+              <v-col cols="2" align="center" justify="center">
+                <v-btn
+                  height="40"
+                  width="100%"
+                  color="#000000"
+                  @click="openFilterDialog('status')"
+                  style="cursor: pointer"
+                >
+                  فیلتر وضعیت
+                </v-btn>
+
+                <v-card width="100%" class="my-1" color="teal">
+                  <div v-if="filteredStatusStand">
+                    <span>{{ filteredStatusStand }}</span>
+                    <v-icon @click="cleanFilter('status')">mdi-close</v-icon>
+                  </div>
+                  <div v-else>
+                    <span>خالی</span>
+                  </div>
+                </v-card>
+              </v-col>
+              <v-col cols="2" align="center" justify="center">
+                <v-btn
+                  height="40"
+                  width="100%"
+                  color="#000000"
+                  @click="openFilterDialog('worker')"
+                  style="cursor: pointer"
+                >
+                  فیلتر کارگر
+                </v-btn>
+                <v-card width="100%" class="my-1" color="teal">
+                  <div v-if="filteredWorkerStand">
+                    <span>{{ filteredWorkerStand }}</span>
+                    <v-icon @click="cleanFilter('worker')">mdi-close</v-icon>
+                  </div>
+                  <div v-else>
+                    <span>خالی</span>
+                  </div>
+                </v-card>
+              </v-col>
+              <v-col cols="2" align="center" justify="center">
+                <v-btn
+                  height="40"
+                  width="100%"
+                  color="#000000"
+                  @click="openFilterDialog('date')"
+                  style="cursor: pointer"
+                >
+                  فیلتر تاریخ
+                </v-btn>
+                <v-card width="100%" class="my-1" color="teal">
+                  <div v-if="filteredStartDateStand && filteredEndDateStand">
+                    از:
+                    <span>{{
+                      convertPersianNumberToLatin(
+                        gregorian_to_jalali(
+                          Number(filteredStartDateStand.substr(0, 4)),
+                          Number(filteredStartDateStand.substr(5, 2)),
+                          Number(filteredStartDateStand.substr(8, 2))
+                        )
+                      )
+                    }}</span>
+                    تا:
+                    <span>
+                      {{
+                        convertPersianNumberToLatin(
+                          gregorian_to_jalali(
+                            Number(filteredEndDateStand.substr(0, 4)),
+                            Number(filteredEndDateStand.substr(5, 2)),
+                            Number(filteredEndDateStand.substr(8, 2))
+                          )
+                        )
+                      }}</span
+                    >
+                    <v-icon @click="cleanFilter('date')">mdi-close</v-icon>
+                  </div>
+                  <div v-else>
+                    <span>خالی</span>
+                  </div>
+                </v-card>
+              </v-col>
+              <v-col cols="2" align="center" justify="center">
+                <v-btn
+                  height="40"
+                  width="100%"
+                  color="#000000"
+                  @click="openFilterDialog('serviceProvider')"
+                  style="cursor: pointer"
+                >
+                  فیلتر سرویس کار
+                </v-btn>
+                <v-card width="100%" class="my-1" color="teal">
+                  <div v-if="filteredServiceProviderStand">
+                    <span>{{ filteredServiceProviderStand }}</span>
+                    <v-icon @click="cleanFilter('serviceProvider')">mdi-close</v-icon>
+                  </div>
+                  <div v-else>
+                    <span>خالی</span>
+                  </div>
+                </v-card>
+              </v-col>
+              <v-col cols="2" align="center" justify="center">
+                <v-btn
+                  height="40"
+                  width="100%"
+                  color="#000000"
+                  @click="openFilterDialog('service')"
+                  style="cursor: pointer"
+                >
+                  فیلتر سرویس
+                </v-btn>
+                <v-card width="100%" class="my-1" color="teal">
+                  <div v-if="filteredServiceStand">
+                    <span>{{ filteredServiceStand }}</span>
+                    <v-icon @click="cleanFilter('service')">mdi-close</v-icon>
+                  </div>
+                  <div v-else>
+                    <span>خالی</span>
+                  </div>
+                </v-card>
+              </v-col>
+              <v-col cols="2" align="center" justify="center">
+                <v-btn
+                  height="40"
+                  width="100%"
+                  color="#000000"
+                  @click="openFilterDialog('carpet')"
+                  style="cursor: pointer"
+                >
+                  فیلتر فرش
+                </v-btn>
+                <v-card width="100%" class="my-1" color="teal">
+                  <div
+                    v-if="
+                      filteredBarcodeStand ||
+                      filteredColorStand ||
+                      filteredFactoryStand ||
+                      filteredSizeStand ||
+                      filteredMapCodeStand ||
+                      filteredCostumerStand
+                    "
+                  >
+                    <v-btn
+                      class="ma-1"
+                      height="30"
+                      width="80%"
+                      color="yellow"
+                      @click="carpetFiltersDialog = true"
+                      style="cursor: pointer"
+                    >
+                      مشاهده
+                    </v-btn>
+                    <v-icon @click="cleanFilter('carpet')">mdi-close</v-icon>
+                  </div>
+                  <div v-else>
+                    <span>خالی</span>
+                  </div>
+                </v-card>
+              </v-col>
+            </v-row>
+          </v-col>
         </v-row>
 
         <v-row v-if="device === 'mobile'">
           <v-col cols="12">
-            <v-card class="cart" :style="{ height: 700 + 'px', overflow: 'auto' }">
+            <v-card
+              class="cart"
+              :style="{ height: windowHeight + 'px', overflow: 'auto' }"
+            >
               <v-table>
                 <thead>
                   <tr>
@@ -703,8 +833,11 @@
 
         <v-row v-else>
           <v-col cols="12">
-            <v-card class="cart" :style="{ height: 500 + 'px', overflow: 'auto' }">
-              <v-table>
+            <v-card
+              class="cart"
+              :style="{ height: windowHeight + 'px', overflow: 'auto' }"
+            >
+              <v-table density="compact">
                 <thead>
                   <tr>
                     <th class="text-center">
@@ -735,7 +868,7 @@
                     v-for="(item, i) in allTransfers"
                     :key="i"
                     class="text-center"
-                    :style="{ 'background-color': i % 2 === 0 ? '#3F51B5' : '#004D40' }"
+                    :style="{ 'background-color': i % 2 === 0 ? '#BDBDBD' : '#FAFAFA' }"
                   >
                     <td class="pa-2">
                       <div style="font-size: 1em">{{ item?.id }}</div>
@@ -801,7 +934,7 @@
                           <v-btn
                             height="40"
                             width="70%"
-                            color="yellow"
+                            color="#FF1744"
                             @click="showCarpetDetail(carpet?.id)"
                             style="cursor: pointer"
                           >
@@ -818,6 +951,21 @@
             </v-card>
           </v-col>
         </v-row>
+        <div class="text-center">
+          <v-container>
+            <v-row justify="center">
+              <v-col cols="12">
+                <v-container class="max-width">
+                  <v-pagination
+                    v-model="transferPage"
+                    :length="pageCount"
+                    @click="switchTransferPage"
+                  ></v-pagination>
+                </v-container>
+              </v-col>
+            </v-row>
+          </v-container>
+        </div>
       </v-responsive>
     </v-card>
   </v-dialog>
@@ -889,7 +1037,7 @@
   >
     <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
       <v-responsive>
-        <v-chip outline @click="filterDialog = false">
+        <v-chip outline @click="cleanNoAcceptFilters">
           <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
         </v-chip>
       </v-responsive>
@@ -906,12 +1054,12 @@
               :items="workerList"
               color="blue-grey-lighten-2"
               :item-title="(item) => item?.first_name + ' ' + item?.last_name"
-              item-value="id"
               label="انتخاب کارگر"
               clearable
               dir="rtl"
               chips
               closable-chips
+              return-object
             >
             </v-autocomplete>
           </v-locale-provider>
@@ -937,17 +1085,48 @@
               :items="serviceProviders"
               color="blue-grey-lighten-2"
               :item-title="(item) => item?.first_name + ' ' + item?.last_name"
-              item-value="id"
               label="انتخاب سرویس کار"
               clearable
               dir="rtl"
               chips
-              closable-chips
+              closable-chip
+              return-object
             >
             </v-autocomplete>
           </v-locale-provider>
           <v-btn
             :disabled="!filteredServiceProvider"
+            height="40"
+            width="50%"
+            color="yellow"
+            @click="filter()"
+            style="cursor: pointer"
+          >
+            ثبت
+          </v-btn>
+        </div>
+        <div v-if="filterType === 'service'">
+          <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
+            <span style="font-size: 1.7em">فیلتر سرویس</span>
+          </v-card>
+          <v-locale-provider rtl>
+            <v-autocomplete
+              class="mt-2"
+              v-model="filteredService"
+              :items="servicesList"
+              color="blue-grey-lighten-2"
+              item-title="title"
+              label="انتخاب سرویس"
+              clearable
+              dir="rtl"
+              chips
+              closable-chip
+              return-object
+            >
+            </v-autocomplete>
+          </v-locale-provider>
+          <v-btn
+            :disabled="!filteredService"
             height="40"
             width="50%"
             color="yellow"
@@ -964,22 +1143,96 @@
           <v-locale-provider rtl>
             <v-autocomplete
               class="mt-2"
-              v-model="filteredCarpets"
-              :items="carpetList"
+              v-model="filteredBarcode"
+              :items="carpetsBarcodes"
               color="blue-grey-lighten-2"
-              item-title="barcode"
-              item-value="id"
-              label="انتخاب فرش ها"
+              label="انتخاب بارکد"
               clearable
               dir="rtl"
               chips
               closable-chips
-              multiple
+            >
+            </v-autocomplete>
+          </v-locale-provider>
+          <v-locale-provider rtl>
+            <v-autocomplete
+              class="mt-2"
+              v-model="filteredColor"
+              :items="carpetsColors"
+              color="blue-grey-lighten-2"
+              label="انتخاب رنگ "
+              clearable
+              dir="rtl"
+              chips
+              closable-chips
+            >
+            </v-autocomplete>
+          </v-locale-provider>
+          <v-locale-provider rtl>
+            <v-autocomplete
+              class="mt-2"
+              v-model="filteredFactory"
+              :items="carpetsFactorys"
+              color="blue-grey-lighten-2"
+              label="انتخاب کارخانه "
+              clearable
+              dir="rtl"
+              chips
+              closable-chips
+            >
+            </v-autocomplete>
+          </v-locale-provider>
+          <v-locale-provider rtl>
+            <v-autocomplete
+              class="mt-2"
+              v-model="filteredCostumer"
+              :items="carpetsCostumers"
+              color="blue-grey-lighten-2"
+              label="انتخاب مشتری "
+              clearable
+              dir="rtl"
+              chips
+              closable-chips
+            >
+            </v-autocomplete>
+          </v-locale-provider>
+          <v-locale-provider rtl>
+            <v-autocomplete
+              class="mt-2"
+              v-model="filteredSize"
+              :items="carpetsSizes"
+              color="blue-grey-lighten-2"
+              label="انتخاب اندازه "
+              clearable
+              dir="rtl"
+              chips
+              closable-chips
+            >
+            </v-autocomplete>
+          </v-locale-provider>
+          <v-locale-provider rtl>
+            <v-autocomplete
+              class="mt-2"
+              v-model="filteredMapCode"
+              :items="carpetsMapCodes"
+              color="blue-grey-lighten-2"
+              label="انتخاب کد نقشه "
+              clearable
+              dir="rtl"
+              chips
+              closable-chips
             >
             </v-autocomplete>
           </v-locale-provider>
           <v-btn
-            :disabled="filteredCarpets.length === 0"
+            :disabled="
+              !filteredBarcode &&
+              !filteredColor &&
+              !filteredFactory &&
+              !filteredSize &&
+              !filteredMapCode &&
+              !filteredCostumer
+            "
             height="40"
             width="50%"
             color="yellow"
@@ -1034,12 +1287,12 @@
               :items="statuses"
               color="blue-grey-lighten-2"
               item-title="title"
-              item-value="id"
               label="انتخاب وضعیت"
               clearable
               dir="rtl"
               chips
               closable-chips
+              return-object=""
             >
             </v-autocomplete>
           </v-locale-provider>
@@ -1054,6 +1307,83 @@
             ثبت
           </v-btn>
         </div>
+      </v-responsive>
+    </v-card>
+  </v-dialog>
+
+  <!-- carpet filters dialog -->
+  <v-dialog
+    v-model="carpetFiltersDialog"
+    persistent
+    transition="dialog-bottom-transition"
+    :fullscreen="device !== 'desktop' && device !== 'large'"
+    :width="device === 'desktop' || device === 'large' ? '50%' : '100%'"
+  >
+    <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
+      <v-responsive>
+        <v-chip outline @click="carpetFiltersDialog = false">
+          <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
+        </v-chip>
+
+        <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
+          <span style="font-size: 1.7em">فیلترهای فرش</span>
+        </v-card>
+        <v-list>
+          <v-list-item v-if="filteredBarcode" color="white" rounded="xl">
+            <template v-slot:prepend>
+              <v-icon icon="mdi-checkbox-marked" color="#1DE9B6"></v-icon>
+            </template>
+            <div style="font-size: 1.4em">
+              بارکد: {{ filteredBarcode }}
+              <v-icon @click="filteredBarcode = null">mdi-close</v-icon>
+            </div>
+          </v-list-item>
+          <v-list-item v-if="filteredColor" color="white" rounded="xl">
+            <template v-slot:prepend>
+              <v-icon icon="mdi-checkbox-marked" color="#1DE9B6"></v-icon>
+            </template>
+            <div style="font-size: 1.4em">
+              رنگ: {{ filteredColor }}
+              <v-icon @click="filteredColor = null">mdi-close</v-icon>
+            </div>
+          </v-list-item>
+          <v-list-item v-if="filteredFactory" color="white" rounded="xl">
+            <template v-slot:prepend>
+              <v-icon icon="mdi-checkbox-marked" color="#1DE9B6"></v-icon>
+            </template>
+            <div style="font-size: 1.4em">
+              کارخانه: {{ filteredFactory }}
+              <v-icon @click="filteredFactory = null">mdi-close</v-icon>
+            </div>
+          </v-list-item>
+          <v-list-item v-if="filteredSize" color="white" rounded="xl">
+            <template v-slot:prepend>
+              <v-icon icon="mdi-checkbox-marked" color="#1DE9B6"></v-icon>
+            </template>
+            <div style="font-size: 1.4em">
+              اندازه: {{ filteredSize }}
+              <v-icon @click="filteredSize = null">mdi-close</v-icon>
+            </div>
+          </v-list-item>
+          <v-list-item v-if="filteredMapCode" color="white" rounded="xl">
+            <template v-slot:prepend>
+              <v-icon icon="mdi-checkbox-marked" color="#1DE9B6"></v-icon>
+            </template>
+            <div style="font-size: 1.4em">
+              کد نقشه: {{ filteredMapCode }}
+              <v-icon @click="filteredMapCode = null">mdi-close</v-icon>
+            </div>
+          </v-list-item>
+          <v-list-item v-if="filteredCostumer" color="white" rounded="xl">
+            <template v-slot:prepend>
+              <v-icon icon="mdi-checkbox-marked" color="#1DE9B6"></v-icon>
+            </template>
+            <div style="font-size: 1.4em">
+              مشتری: {{ filteredCostumer }}
+              <v-icon @click="filteredCostumer = null">mdi-close</v-icon>
+            </div>
+          </v-list-item>
+        </v-list>
       </v-responsive>
     </v-card>
   </v-dialog>
@@ -1074,8 +1404,15 @@ onMounted(async () => {
   await getCarpetList();
   await getServicesList();
 });
+const windowHeight = computed(() => {
+  return window.innerHeight - 320;
+});
+const windowHeight2 = computed(() => {
+  return window.innerHeight - 220;
+});
 const store = breakPointsStore();
 const device = ref(store.device);
+const transferPage = ref(1);
 function convertGDateToJalali(gDate) {
   const date = new Date(gDate).toLocaleDateString("fa-IR");
   return date;
@@ -1147,15 +1484,40 @@ function convertPersianNumberToLatin(number) {
   return str;
 }
 
+// const APIUrl = "http://192.168.1.62:8000/";
 const APIUrl = "https://carpet.iran.liara.run/";
 // const APIUrl = "http://localhost:8000/";
 
+const carpetFiltersDialog = ref(false);
 const filteredWorker = ref(null);
 const filteredServiceProvider = ref(null);
-const filteredCarpets = ref([]);
 const filteredStartDate = ref(null);
 const filteredEndDate = ref(null);
 const filteredStatus = ref(null);
+const filteredService = ref(null);
+const filteredCarpets = ref(null);
+
+const filteredBarcode = ref(null);
+const filteredColor = ref(null);
+const filteredFactory = ref(null);
+const filteredSize = ref(null);
+const filteredMapCode = ref(null);
+const filteredCostumer = ref(null);
+
+const filteredWorkerStand = ref(null);
+const filteredServiceProviderStand = ref(null);
+const filteredCarpetsStand = ref([]);
+const filteredStartDateStand = ref(null);
+const filteredEndDateStand = ref(null);
+const filteredStatusStand = ref(null);
+const filteredServiceStand = ref(null);
+
+const filteredBarcodeStand = ref(null);
+const filteredColorStand = ref(null);
+const filteredFactoryStand = ref(null);
+const filteredSizeStand = ref(null);
+const filteredMapCodeStand = ref(null);
+const filteredCostumerStand = ref(null);
 
 const filterDialog = ref(false);
 
@@ -1194,9 +1556,37 @@ async function getAllUsers() {
 }
 
 const carpetList = ref([]);
+
+const carpetsBarcodes = ref([]);
+const carpetsColors = ref([]);
+const carpetsFactorys = ref([]);
+const carpetsSizes = ref([]);
+const carpetsMapCodes = ref([]);
+const carpetsCostumers = ref([]);
+
 async function getCarpetList() {
   await axios.get(APIUrl + "carpet/all-carpets-list/").then((response) => {
     carpetList.value = response.data;
+    for (const carpet of response.data) {
+      if (!carpetsBarcodes.value.includes(carpet.barcode)) {
+        carpetsBarcodes.value.push(carpet.barcode);
+      }
+      if (!carpetsColors.value.includes(carpet.color)) {
+        carpetsColors.value.push(carpet.color);
+      }
+      if (!carpetsFactorys.value.includes(carpet.factory)) {
+        carpetsFactorys.value.push(carpet.factory);
+      }
+      if (!carpetsSizes.value.includes(carpet.size)) {
+        carpetsSizes.value.push(carpet.size);
+      }
+      if (!carpetsMapCodes.value.includes(carpet.map_code)) {
+        carpetsMapCodes.value.push(carpet.map_code);
+      }
+      if (!carpetsCostumers.value.includes(carpet.costumer_name)) {
+        carpetsCostumers.value.push(carpet.costumer_name);
+      }
+    }
   });
 }
 
@@ -1211,34 +1601,34 @@ const openTransfers = ref([]);
 async function getOpenTransfer() {
   openTransfers.value = [];
   let openTransfer = {};
-  await axios.get(APIUrl + "transfer/all-transfer-list/").then((response) => {
-    for (let i = 0; i < response.data.results.length; i++) {
+  await axios.get(APIUrl + "transfer/admin-verify-transfer/").then((response) => {
+    for (let i = 0; i < response.data.length; i++) {
       openTransfer = {};
-      if (response.data.results[i].admin_verify === false) {
-        openTransfer.id = response.data.results[i].id;
-        openTransfer.date = response.data.results[i].date;
+      if (response.data[i].is_finished) {
+        openTransfer.id = response.data[i].id;
+        openTransfer.date = response.data[i].date;
 
         for (const status of statuses.value) {
-          if (status.id === response.data.results[i].status) {
+          if (status.id === response.data[i].status) {
             openTransfer.status = status;
           }
         }
 
         for (const serviceProvider of serviceProviders.value) {
-          if (serviceProvider.id === response.data.results[i].service_provider) {
+          if (serviceProvider.id === response.data[i].service_provider) {
             openTransfer.serviceProvider = serviceProvider;
           }
         }
 
         for (const worker of workerList.value) {
-          if (worker.id === response.data.results[i].worker) {
+          if (worker.id === response.data[i].worker) {
             openTransfer.worker = worker;
           }
         }
 
         openTransfer.carpets = [];
         for (const carpet of carpetList.value) {
-          for (const c of response.data.results[i].carpets) {
+          for (const c of response.data[i].carpets) {
             if (carpet.id === c) {
               openTransfer.carpets.push(carpet);
             }
@@ -1247,7 +1637,7 @@ async function getOpenTransfer() {
 
         openTransfer.services = [];
         for (const service of servicesList.value) {
-          for (const s of response.data.results[i].services) {
+          for (const s of response.data[i].services) {
             if (service.id === s) {
               openTransfer.services.push(service);
             }
@@ -1255,8 +1645,6 @@ async function getOpenTransfer() {
         }
 
         openTransfers.value.push(openTransfer);
-        console.log("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ");
-        console.log(openTransfers.value);
       }
     }
   });
@@ -1299,7 +1687,6 @@ async function acceptTransfer(s, id) {
   axios
     .put(APIUrl + "transfer/update-transfer2/" + openTransfer?.value?.id + "/", body)
     .then((response) => {
-      console.log(response);
       getOpenTransfer();
     });
 }
@@ -1318,37 +1705,63 @@ function showCarpetDetail(id) {
 
 const allTransfers = ref([]);
 const filterHolder = ref({});
+const pageCount = ref(0);
 
-watch(
-  () => filterDialog.value,
-  () => {
-    if (!filterDialog.value) {
-      filteredWorker.value = null;
-      filteredServiceProvider.value = null;
-      filteredCarpets.value = [];
-      filteredStartDate.value = null;
-      filteredEndDate.value = null;
-      filteredStatus.value = null;
-    }
-  }
-);
 async function filter() {
   filterDialog.value = false;
-  let filterParams = "?";
-  if (filteredWorker.value) {
-    filterHolder.value.filteredWorker = filteredWorker.value;
-    filterParams += "worker=" + filterHolder.value.filteredWorker + "&";
+  let filterParams = "&";
+
+  filteredWorkerStand.value = filteredWorker.value?.first_name
+    ? filteredWorker.value?.first_name + " " + filteredWorker.value?.last_name
+    : null;
+  filteredServiceProviderStand.value = filteredServiceProvider.value?.first_name
+    ? filteredServiceProvider.value?.first_name +
+      " " +
+      filteredServiceProvider.value?.last_name
+    : null;
+  filteredCarpetsStand.value = filteredCarpets.value;
+  filteredStartDateStand.value = filteredStartDate.value;
+  filteredEndDateStand.value = filteredEndDate.value;
+  filteredStatusStand.value = filteredStatus.value?.title;
+  filteredServiceStand.value = filteredService.value?.title;
+
+  filteredBarcodeStand.value = filteredBarcode.value;
+  filteredColorStand.value = filteredColor.value;
+  filteredFactoryStand.value = filteredFactory.value;
+  filteredSizeStand.value = filteredSize.value;
+  filteredMapCodeStand.value = filteredMapCode.value;
+  filteredCostumerStand.value = filteredCostumer.value;
+
+  if (filteredBarcode.value) {
+    filterParams += "barcode=" + filteredBarcode.value + "&";
   }
-  if (filteredServiceProvider.value) {
-    filterHolder.value.filteredServiceProvider = filteredServiceProvider.value;
-    filterParams +=
-      "service_provider=" + filterHolder.value.filteredServiceProvider + "&";
+  if (filteredColor.value) {
+    filterParams += "color=" + filteredColor.value + "&";
+  }
+  if (filteredFactory.value) {
+    filterParams += "factory=" + filteredFactory.value + "&";
+  }
+  if (filteredSize.value) {
+    filterParams += "size=" + filteredSize.value + "&";
+  }
+  if (filteredMapCode.value) {
+    filterParams += "map_code=" + filteredMapCode.value + "&";
+  }
+  if (filteredCostumer.value) {
+    filterParams += "costumer=" + filteredCostumer.value + "&";
   }
 
-  if (filteredCarpets.value.length > 0) {
-    filterHolder.value.filteredCarpets = filteredCarpets.value;
+  if (filteredWorker.value) {
+    filterParams += "worker=" + filteredWorker.value?.id + "&";
+  }
+
+  if (filteredServiceProvider.value) {
+    filterParams += "service_provider=" + filteredServiceProvider.value?.id + "&";
+  }
+
+  if (filteredCarpets.value?.length > 0) {
     filterParams += "carpets=";
-    for (const c of filterHolder.value.filteredCarpets) {
+    for (const c of filteredCarpets.value) {
       filterParams += c + ",";
     }
     if (filterParams.slice(-1) === ",") filterParams = filterParams.replace(/.$/, "");
@@ -1356,24 +1769,120 @@ async function filter() {
   }
 
   if (filteredStartDate.value) {
-    filterHolder.value.filteredStartDate = filteredStartDate.value;
-    filterParams += "start_date=" + filterHolder.value.filteredStartDate + "&";
+    filterParams += "start_date=" + filteredStartDate.value + "&";
   }
 
   if (filteredEndDate.value) {
-    filterHolder.value.filteredEndDate = filteredEndDate.value;
-    filterParams += "end_date=" + filterHolder.value.filteredEndDate + "&";
+    filterParams += "end_date=" + filteredEndDate.value + "&";
   }
+
   if (filteredStatus.value) {
-    filterHolder.value.filteredStatus = filteredStatus.value;
-    filterParams += "status=" + filterHolder.value.filteredStatus + "&";
+    filterParams += "status=" + filteredStatus.value?.id + "&";
+  }
+
+  if (filteredService.value) {
+    filterParams += "services=" + filteredService.value?.id + "&";
   }
 
   allTransfers.value = [];
   let transfer = {};
   await axios
-    .get(APIUrl + "transfer/all-transfer-list/" + filterParams)
+    .get(
+      APIUrl +
+        "transfer/all-transfer-list/" +
+        "?page=" +
+        transferPage.value +
+        filterParams
+    )
     .then((response) => {
+      if (response.data.count % 10 === 0) pageCount.value = response.data.count / 10;
+      else pageCount.value = response.data.count / 10 + 1;
+      for (let i = 0; i < response.data.results.length; i++) {
+        transfer = {};
+        transfer.id = response.data.results[i].id;
+        transfer.date = response.data.results[i].date;
+
+        for (const status of statuses.value) {
+          if (status.id === response.data.results[i].status) {
+            transfer.status = status;
+          }
+        }
+
+        for (const serviceProvider of serviceProviders.value) {
+          if (serviceProvider.id === response.data.results[i].service_provider) {
+            transfer.serviceProvider = serviceProvider;
+          }
+        }
+
+        for (const worker of workerList.value) {
+          if (worker.id === response.data.results[i].worker) {
+            transfer.worker = worker;
+          }
+        }
+
+        transfer.carpets = [];
+        for (const carpet of carpetList.value) {
+          for (const c of response.data.results[i].carpets) {
+            if (carpet.id === c) {
+              transfer.carpets.push(carpet);
+            }
+          }
+        }
+
+        transfer.services = [];
+        for (const service of servicesList.value) {
+          for (const s of response.data.results[i].services) {
+            if (service.id === s) {
+              transfer.services.push(service);
+            }
+          }
+        }
+
+        allTransfers.value.push(transfer);
+      }
+    });
+}
+
+function cleanNoAcceptFilters() {
+  filterDialog.value = false;
+}
+const allTransfersDialog = ref(false);
+async function getAllTransfers() {
+  filteredWorker.value = null;
+  filteredServiceProvider.value = null;
+  filteredCarpets.value = [];
+  filteredStartDate.value = null;
+  filteredEndDate.value = null;
+  filteredStatus.value = null;
+  filteredService.value = null;
+  filteredBarcode.value = null;
+  filteredColor.value = null;
+  filteredFactory.value = null;
+  filteredSize.value = null;
+  filteredMapCode.value = null;
+  filteredCostumer.value = null;
+
+  filteredWorkerStand.value = null;
+  filteredServiceProviderStand.value = null;
+  filteredCarpetsStand.value = [];
+  filteredStartDateStand.value = null;
+  filteredEndDateStand.value = null;
+  filteredStatusStand.value = null;
+  filteredServiceStand.value = null;
+  filteredBarcodeStand.value = null;
+  filteredColorStand.value = null;
+  filteredFactoryStand.value = null;
+  filteredSizeStand.value = null;
+  filteredMapCodeStand.value = null;
+  filteredCostumerStand.value = null;
+  allTransfers.value = [];
+  let transfer = {};
+  await axios
+    .get(APIUrl + "transfer/all-transfer-list/" + "?page=" + transferPage.value)
+    .then((response) => {
+      if (response.data.count % 10 === 0) pageCount.value = response.data.count / 10;
+      else pageCount.value = response.data.count / 10 + 1;
+
       for (let i = 0; i < response.data.results.length; i++) {
         transfer = {};
         transfer.id = response.data.results[i].id;
@@ -1420,65 +1929,101 @@ async function filter() {
       }
     });
 }
-const allTransfersDialog = ref(false);
-async function getAllTransfers() {
-  filteredWorker.value = null;
-  filteredServiceProvider.value = null;
-  filteredCarpets.value = [];
-  filteredStartDate.value = null;
-  filteredEndDate.value = null;
-  filteredStatus.value = null;
-  filterHolder.value = [];
-  allTransfers.value = [];
-  let transfer = {};
-  await axios.get(APIUrl + "transfer/all-transfer-list/").then((response) => {
-    for (let i = 0; i < response.data.results.length; i++) {
-      transfer = {};
-      transfer.id = response.data.results[i].id;
-      transfer.date = response.data.results[i].date;
 
-      for (const status of statuses.value) {
-        if (status.id === response.data.results[i].status) {
-          transfer.status = status;
-        }
-      }
-
-      for (const serviceProvider of serviceProviders.value) {
-        if (serviceProvider.id === response.data.results[i].service_provider) {
-          transfer.serviceProvider = serviceProvider;
-        }
-      }
-
-      for (const worker of workerList.value) {
-        if (worker.id === response.data.results[i].worker) {
-          transfer.worker = worker;
-        }
-      }
-
-      transfer.carpets = [];
-      for (const carpet of carpetList.value) {
-        for (const c of response.data.results[i].carpets) {
-          if (carpet.id === c) {
-            transfer.carpets.push(carpet);
-          }
-        }
-      }
-
-      transfer.services = [];
-      for (const service of servicesList.value) {
-        for (const s of response.data.results[i].services) {
-          if (service.id === s) {
-            transfer.services.push(service);
-          }
-        }
-      }
-
-      allTransfers.value.push(transfer);
-      console.log(allTransfers.value);
-    }
-  });
+function switchTransferPage() {
+  if (
+    filteredWorker.value === null &&
+    filteredServiceProvider.value === null &&
+    filteredStartDate.value === null &&
+    filteredEndDate.value === null &&
+    filteredStatus.value === null &&
+    filteredService.value === null &&
+    filteredBarcode.value === null &&
+    filteredColor.value === null &&
+    filteredFactory.value === null &&
+    filteredSize.value === null &&
+    filteredMapCode.value === null &&
+    filteredCostumer.value === null
+  ) {
+    getAllTransfers();
+  } else {
+    filter();
+  }
 }
 
+function cleanFilter(filter) {
+  if (filter === "status") {
+    filteredStatus.value = null;
+    filteredStatusStand.value = null;
+  } else if (filter === "worker") {
+    filteredWorker.value = null;
+    filteredWorkerStand.value = null;
+  } else if (filter === "serviceProvider") {
+    filteredServiceProvider.value = null;
+    filteredServiceProviderStand.value = null;
+  } else if (filter === "date") {
+    filteredStartDate.value = null;
+    filteredEndDate.value = null;
+    filteredStartDateStand.value = null;
+    filteredEndDateStand.value = null;
+  } else if (filter === "service") {
+    filteredService.value = null;
+    filteredServiceStand.value = null;
+  } else if (filter === "carpet") {
+    filteredBarcode.value = null;
+    filteredColor.value = null;
+    filteredFactory.value = null;
+    filteredSize.value = null;
+    filteredMapCode.value = null;
+    filteredCostumer.value = null;
+
+    filteredBarcodeStand.value = null;
+    filteredColorStand.value = null;
+    filteredFactoryStand.value = null;
+    filteredSizeStand.value = null;
+    filteredMapCodeStand.value = null;
+    filteredCostumerStand.value = null;
+  }
+
+  switchTransferPage();
+}
+
+watch(
+  () => filteredBarcode.value,
+  () => {
+    if (!filteredBarcode.value) switchTransferPage();
+  }
+);
+watch(
+  () => filteredColor.value,
+  () => {
+    if (!filteredColor.value) switchTransferPage();
+  }
+);
+watch(
+  () => filteredFactory.value,
+  () => {
+    if (!filteredFactory.value) switchTransferPage();
+  }
+);
+watch(
+  () => filteredSize.value,
+  () => {
+    if (!filteredSize.value) switchTransferPage();
+  }
+);
+watch(
+  () => filteredMapCode.value,
+  () => {
+    if (!filteredMapCode.value) switchTransferPage();
+  }
+);
+watch(
+  () => filteredCostumer.value,
+  () => {
+    if (!filteredCostumer.value) switchTransferPage();
+  }
+);
 const detailAllTransferDialog = ref(false);
 const transfer = ref(null);
 async function showAllTransferDetail(id) {
@@ -1570,8 +2115,6 @@ const variants = [
     icon: "mdi-newspaper",
   },
 ];
-const selectCarpetDialog = ref(false);
-const selectedCarpet = ref(null);
 
 const openTransfersDialog = ref(false);
 function openModal(obj) {
