@@ -95,7 +95,7 @@
     transition="dialog-bottom-transition"
     fullscreen
   >
-    <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
+    <v-card class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
       <v-responsive>
         <v-chip outline @click="openTransfersDialog = false">
           <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
@@ -114,7 +114,7 @@
               class="cart"
               :style="{ height: windowHeight2 + 'px', overflow: 'auto' }"
             >
-              <v-table>
+              <v-table density="compact">
                 <thead>
                   <tr>
                     <th class="text-center">
@@ -133,7 +133,7 @@
                     v-for="(item, i) in openTransfers"
                     :key="i"
                     class="text-center"
-                    :style="{ 'background-color': i % 2 === 0 ? '#3F51B5' : '#004D40' }"
+                    :style="{ 'background-color': i % 2 === 0 ? '#BDBDBD' : '#FAFAFA' }"
                   >
                     <td class="pa-2">
                       <div style="font-size: 1.2em">{{ item?.id }}</div>
@@ -156,8 +156,8 @@
                     <td>
                       <v-btn
                         class="flex-grow-1"
-                        height="48"
-                        width="100%"
+                        height="30"
+                        width="70"
                         variant="tonal"
                         @click="acceptTransfer(true, item?.id)"
                       >
@@ -176,11 +176,11 @@
               class="cart"
               :style="{ height: windowHeight2 + 'px', overflow: 'auto' }"
             >
-              <v-table>
+              <v-table density="compact">
                 <thead>
                   <tr>
                     <th class="text-center">
-                      <div style="font-size: 1.2em">شناسه</div>
+                      <div style="font-size: 1.2em">ردیف</div>
                     </th>
                     <th class="text-center">
                       <div style="font-size: 1.2em">وضعیت</div>
@@ -210,10 +210,10 @@
                     v-for="(item, i) in openTransfers"
                     :key="i"
                     class="text-center"
-                    :style="{ 'background-color': i % 2 === 0 ? '#3F51B5' : '#004D40' }"
+                    :style="{ 'background-color': i % 2 === 0 ? '#BDBDBD' : '#FAFAFA' }"
                   >
                     <td class="pa-2">
-                      <div style="font-size: 1em">{{ item?.id }}</div>
+                      <div style="font-size: 1em">{{ ++i }}</div>
                     </td>
                     <td class="pa-2">
                       <div style="font-size: 1em">
@@ -267,32 +267,18 @@
                     </td>
                     <td class="pa-2">
                       <div v-if="item?.carpets.length > 0">
-                        <div
-                          class="pa-2"
-                          v-for="(carpet, i) in item?.carpets"
-                          :key="i"
-                          style="font-size: 1em"
-                        >
-                          <v-btn
-                            height="40"
-                            width="70%"
-                            color="yellow"
-                            @click="showCarpetDetail(carpet?.id)"
-                            style="cursor: pointer"
-                          >
-                            {{ carpet?.barcode }}
-                          </v-btn>
-                          <br />
-                        </div>
+                        <v-icon color="#FF1744" @click="fillTransferCarpets2(item?.id)">
+                          mdi-eye
+                        </v-icon>
                       </div>
                       <div v-else style="font-size: 1em">ثبت نشده <br /></div>
                     </td>
                     <td>
                       <v-btn
-                        class="flex-grow-1"
-                        height="48"
-                        width="100%"
-                        variant="tonal"
+                        class="ma-2"
+                        height="30"
+                        width="70"
+                        color="black"
                         @click="acceptTransfer(true, item?.id)"
                       >
                         تایید
@@ -368,8 +354,8 @@
             <v-col>
               <v-btn
                 class="flex-grow-1"
-                height="48"
-                width="100%"
+                height="30"
+                width="70"
                 variant="tonal"
                 @click="acceptTransfer(false, null)"
               >
@@ -389,7 +375,7 @@
     transition="dialog-bottom-transition"
     fullscreen
   >
-    <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
+    <v-card class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
       <v-responsive>
         <v-chip outline @click="carpetListDialog = false">
           <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
@@ -409,7 +395,7 @@
               class="cart"
               :style="{ height: windowHeight2 + 'px', overflow: 'auto' }"
             >
-              <v-table>
+              <v-table density="compact">
                 <thead>
                   <tr>
                     <th class="text-center">
@@ -451,11 +437,11 @@
               class="cart"
               :style="{ height: windowHeight2 + 'px', overflow: 'auto' }"
             >
-              <v-table>
+              <v-table density="compact">
                 <thead>
                   <tr>
                     <th class="text-center">
-                      <div style="font-size: 1.2em">شناسه</div>
+                      <div style="font-size: 1.2em">ردیف</div>
                     </th>
                     <th class="text-center">
                       <div style="font-size: 1.2em">بارکد</div>
@@ -475,6 +461,9 @@
                     <th class="text-center">
                       <div style="font-size: 1.2em">مشتری</div>
                     </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">شکل هندسی</div>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -482,12 +471,10 @@
                     v-for="(item, i) in carpetList"
                     :key="i"
                     class="text-center"
-                    :style="{ 'background-color': i % 2 === 0 ? '#3F51B5' : '#004D40' }"
+                    :style="{ 'background-color': i % 2 === 0 ? '#BDBDBD' : '#FAFAFA' }"
                   >
                     <td class="pa-2">
-                      <div style="font-size: 1em">
-                        {{ item?.id }}
-                      </div>
+                      <div style="font-size: 1em">{{ ++i }}</div>
                     </td>
                     <td class="pa-2">
                       <div style="font-size: 1em">{{ item?.barcode }}</div>
@@ -513,6 +500,11 @@
                     <td class="pa-2">
                       <div style="font-size: 1em">
                         {{ item?.costumer_name }}
+                      </div>
+                    </td>
+                    <td class="pa-2">
+                      <div style="font-size: 1em">
+                        {{ item?.kind ? item?.kind : "ثبت نشده" }}
                       </div>
                     </td>
                   </tr>
@@ -614,7 +606,7 @@
               style="cursor: pointer"
             >
               <v-icon class="ml-1" color="yellow">mdi-chart-donut-variant</v-icon>
-              محاسبه مساحت
+              گزارش فیلتر
             </v-btn>
           </v-col>
           <v-col cols="2" v-if="device !== 'mobile'">
@@ -809,7 +801,7 @@
               class="cart"
               :style="{ height: windowHeight + 'px', overflow: 'auto' }"
             >
-              <v-table>
+              <v-table density="compact">
                 <thead>
                   <tr>
                     <th class="text-center">
@@ -995,7 +987,7 @@
     transition="dialog-bottom-transition"
     fullscreen
   >
-    <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
+    <v-card class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
       <v-responsive>
         <v-chip outline @click="transferCarpetsDialog = false">
           <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
@@ -1015,7 +1007,7 @@
               class="cart"
               :style="{ height: windowHeight2 + 'px', overflow: 'auto' }"
             >
-              <v-table>
+              <v-table density="compact">
                 <thead>
                   <tr>
                     <th class="text-center">
@@ -1039,6 +1031,9 @@
                     <th class="text-center">
                       <div style="font-size: 1.2em">مشتری</div>
                     </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">شکل هندسی</div>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1046,7 +1041,7 @@
                     v-for="(item, i) in transferCarpets"
                     :key="i"
                     class="text-center"
-                    :style="{ 'background-color': i % 2 === 0 ? '#3F51B5' : '#004D40' }"
+                    :style="{ 'background-color': i % 2 === 0 ? '#BDBDBD' : '#FAFAFA' }"
                   >
                     <td class="pa-2">
                       <div style="font-size: 1em">
@@ -1077,6 +1072,11 @@
                     <td class="pa-2">
                       <div style="font-size: 1em">
                         {{ item?.costumer_name }}
+                      </div>
+                    </td>
+                    <td class="pa-2">
+                      <div style="font-size: 1em">
+                        {{ item?.kind }}
                       </div>
                     </td>
                   </tr>
@@ -1440,7 +1440,7 @@
     :fullscreen="device !== 'desktop' && device !== 'large'"
     :width="device === 'desktop' || device === 'large' ? '50%' : '100%'"
   >
-    <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
+    <v-card class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
       <v-responsive>
         <v-chip outline @click="carpetFiltersDialog = false">
           <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
@@ -1550,24 +1550,40 @@
         <v-row class="px-2" no-gutters>
           <v-col cols="12" md="6">
             <v-locale-provider rtl>
-              <v-text-field
+              <v-autocomplete
+                class="mx-2"
                 v-model="size"
-                class="pa-2"
-                color="primary"
-                label="اندازه"
+                :items="sizes"
+                color="blue-grey-lighten-2"
+                item-title="title"
+                label="انتخاب اندازه"
+                clearable
+                dir="rtl"
+                chips
+                closable-chips
                 rounded
-              ></v-text-field>
+                @focus="getSizes"
+              >
+              </v-autocomplete>
             </v-locale-provider>
           </v-col>
           <v-col cols="12" md="6">
             <v-locale-provider rtl>
-              <v-text-field
+              <v-autocomplete
+                class="mx-2"
                 v-model="geometry"
-                class="pa-2"
-                color="primary"
-                label="شکل هندسی"
+                :items="kinds"
+                color="blue-grey-lighten-2"
+                item-title="title"
+                label="انتخاب شکل هندسی"
+                clearable
+                dir="rtl"
+                chips
+                closable-chips
                 rounded
-              ></v-text-field>
+                @focus="getKinds"
+              >
+              </v-autocomplete>
             </v-locale-provider>
           </v-col>
           <v-col cols="12" md="12">
@@ -1606,7 +1622,7 @@
     transition="dialog-bottom-transition"
     fullscreen
   >
-    <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
+    <v-card class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
       <v-responsive>
         <v-chip outline @click="statisticsListDialog = false">
           <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
@@ -1625,7 +1641,7 @@
               class="cart"
               :style="{ height: windowHeight2 + 'px', overflow: 'auto' }"
             >
-              <v-table v-if="statistics.length > 0">
+              <v-table density="compact" v-if="statistics.length > 0">
                 <thead>
                   <tr>
                     <th class="text-center">
@@ -1637,6 +1653,9 @@
                     <th class="text-center">
                       <div style="font-size: 1.2em">مساحت</div>
                     </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">تعداد قالی ها</div>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1644,7 +1663,7 @@
                     v-for="(item, i) in statistics"
                     :key="i"
                     class="text-center"
-                    :style="{ 'background-color': i % 2 === 0 ? '#3F51B5' : '#004D40' }"
+                    :style="{ 'background-color': i % 2 === 0 ? '#BDBDBD' : '#FAFAFA' }"
                   >
                     <td class="pa-2">
                       <div style="font-size: 1em">{{ ++i }}</div>
@@ -1655,6 +1674,11 @@
                     <td>
                       <div style="font-size: 1em">
                         {{ item?.area }}
+                      </div>
+                    </td>
+                    <td>
+                      <div>
+                        {{ item?.carpets?.length }}
                       </div>
                     </td>
                   </tr>
@@ -1763,8 +1787,8 @@ function convertPersianNumberToLatin(number) {
   return str;
 }
 
-// const APIUrl = "http://192.168.1.62:8000/";
-const APIUrl = "https://carpet.iran.liara.run/";
+const APIUrl = "http://192.168.1.62:8000/";
+// const APIUrl = "https://carpet.iran.liara.run/";
 // const APIUrl = "http://localhost:8000/";
 
 const carpetFiltersDialog = ref(false);
@@ -2254,6 +2278,15 @@ function fillTransferCarpets(id) {
     }
   }
 }
+function fillTransferCarpets2(id) {
+  transferCarpetsDialog.value = true;
+
+  for (const t of openTransfers.value) {
+    if (t.id === id) {
+      transferCarpets.value = t.carpets;
+    }
+  }
+}
 function switchTransferPage() {
   if (
     filteredWorker.value === null &&
@@ -2530,6 +2563,7 @@ function calculateArea() {
       obj = {};
       obj.service = s.service;
       obj.area = 0;
+      obj.carpets = [];
       statistics.value.push(obj);
     }
     for (const t of transfersForCalculteArea.value) {
@@ -2544,6 +2578,7 @@ function calculateArea() {
                   if (o.service === ss.id) {
                     o.area += s.custom_size;
                     o.title = ss.title;
+                    o.carpets.push(c);
                   }
                 }
               }
@@ -2567,6 +2602,19 @@ function calculateArea() {
     }
 
     console.log(totalArea, "/ ", statistics.value);
+  });
+}
+
+const sizes = ref([]);
+function getSizes() {
+  axios.get(APIUrl + "carpet/size-carpet-list/").then((response) => {
+    sizes.value = response.data;
+  });
+}
+const kinds = ref([]);
+function getKinds() {
+  axios.get(APIUrl + "carpet/kind-carpet-list/").then((response) => {
+    kinds.value = response.data;
   });
 }
 </script>

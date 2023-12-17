@@ -593,8 +593,8 @@ onMounted(async () => {
   await getOpenTransfer();
 });
 
-// const APIUrl = "http://192.168.1.62:8000/";
-const APIUrl = "https://carpet.iran.liara.run/";
+const APIUrl = "http://192.168.1.62:8000/";
+// const APIUrl = "https://carpet.iran.liara.run/";
 // const APIUrl = "http://localhost:8000/";
 
 const alertMsg = ref("");
@@ -638,16 +638,22 @@ const inputCarpetFromFactoryDialog = ref(false);
 const inputCarpetFromServiceDialog = ref(false);
 const status = ref(null);
 const dialogTitle = ref("");
-const inputStatus = ref(null);
-const outputStatus = ref(null);
+const outputServiceStatus = ref(null);
+const inputFactoryStatus = ref(null);
+const outputFactoryStatus = ref(null);
+const inputServiceStatus = ref(null);
 
 async function getStatuses() {
   await axios.get(APIUrl + "status/all-status-list/").then((response) => {
     for (const s of response.data) {
-      if (s.title === "خروج") {
-        outputStatus.value = s.id;
-      } else {
-        inputStatus.value = s.id;
+      if (s.title === "ورود از کارخانه") {
+        inputFactoryStatus.value = s.id;
+      } else if (s.title === "خروج به سرویس") {
+        outputServiceStatus.value = s.id;
+      } else if (s.title === "خروج به کارخانه") {
+        outputFactoryStatus.value = s.id;
+      } else if (s.title === "ورود از سرویس") {
+        inputServiceStatus.value = s.id;
       }
     }
   });
@@ -656,20 +662,22 @@ function openModal(obj) {
   selectedCarpet.value = null;
   if (openTransfer.value && obj.type === "خروج قالی به سرویس") {
     selectCarpetDialog.value = true;
+    status.value = outputServiceStatus.value;
   } else if (!openTransfer.value && obj.type === "خروج قالی به سرویس") {
     selectOperatorDialog.value = true;
+    status.value = outputServiceStatus.value;
   } else if (obj.type === "ورود قالی از کارخانه") {
     inputCarpetFromFactoryDialog.value = true;
     dialogTitle.value = obj.type;
-    status.value = inputStatus.value;
+    status.value = inputFactoryStatus.value;
   } else if (obj.type === "خروج قالی به کارخانه") {
     inputCarpetFromFactoryDialog.value = true;
     dialogTitle.value = obj.type;
-    status.value = outputStatus.value;
+    status.value = outputFactoryStatus.value;
   } else if (obj.type === "ورود قالی از سرویس") {
     inputSelectOperatorDialog.value = true;
     dialogTitle.value = obj.type;
-    status.value = inputStatus.value;
+    status.value = inputServiceStatus.value;
   }
 }
 const serviceProviders = ref(null);
@@ -904,7 +912,7 @@ async function sendTransfer() {
   if (!openTransfer.value) {
     body.carpets = [];
     body.worker = userProfile.value.id;
-    body.status = outputStatus.value;
+    body.status = inputFactoryStatus.value;
     body.service_provider = selectedOperator?.value?.id;
     body.services = selectedServices.value;
     body.date = getDateAndTime();
