@@ -594,23 +594,40 @@
             </v-chip>
           </v-col>
           <v-spacer></v-spacer>
-          <v-col cols="8">
+          <v-col cols="4">
             <v-card
-              class="mx-auto my-1 text-center pa-2"
-              :width="device === 'mobile' ? '100%' : '50%'"
-              color="warning"
+              class="cart mx-auto my-1 text-center pa-2"
+              :width="device === 'mobile' ? '100%' : '100%'"
+              elevation="12"
             >
               <div style="font-size: 1.3em">لیست نقل و انتقالات</div>
             </v-card>
           </v-col>
           <v-col cols="2" v-if="device !== 'mobile'">
             <v-btn
+              :disabled="!statisticsBtn"
+              height="40"
+              width="100%"
+              color="primary"
+              rounded
+              @click="calculateArea"
+              style="cursor: pointer"
+            >
+              <v-icon class="ml-1" color="yellow">mdi-chart-donut-variant</v-icon>
+              محاسبه مساحت
+            </v-btn>
+          </v-col>
+          <v-col cols="2" v-if="device !== 'mobile'">
+            <v-btn
+              :disabled="!statisticsBtn"
               height="40"
               width="100%"
               color="error"
+              rounded
               @click="getAllTransfers"
               style="cursor: pointer"
             >
+              <v-icon class="ml-1" color="yellow">mdi-filter-remove-outline</v-icon>
               پاک کردن فیلترها
             </v-btn>
           </v-col>
@@ -623,6 +640,7 @@
                   color="#000000"
                   @click="openFilterDialog('status')"
                   style="cursor: pointer"
+                  rounded
                 >
                   فیلتر وضعیت
                 </v-btn>
@@ -644,6 +662,7 @@
                   color="#000000"
                   @click="openFilterDialog('worker')"
                   style="cursor: pointer"
+                  rounded
                 >
                   فیلتر کارگر
                 </v-btn>
@@ -664,6 +683,7 @@
                   color="#000000"
                   @click="openFilterDialog('date')"
                   style="cursor: pointer"
+                  rounded
                 >
                   فیلتر تاریخ
                 </v-btn>
@@ -705,6 +725,7 @@
                   color="#000000"
                   @click="openFilterDialog('serviceProvider')"
                   style="cursor: pointer"
+                  rounded
                 >
                   فیلتر سرویس کار
                 </v-btn>
@@ -725,6 +746,7 @@
                   color="#000000"
                   @click="openFilterDialog('service')"
                   style="cursor: pointer"
+                  rounded
                 >
                   فیلتر سرویس
                 </v-btn>
@@ -745,6 +767,7 @@
                   color="#000000"
                   @click="openFilterDialog('carpet')"
                   style="cursor: pointer"
+                  rounded
                 >
                   فیلتر فرش
                 </v-btn>
@@ -834,14 +857,15 @@
         <v-row v-else>
           <v-col cols="12">
             <v-card
-              class="cart"
+              class="cart mx-2"
+              elevation="24"
               :style="{ height: windowHeight + 'px', overflow: 'auto' }"
             >
               <v-table density="compact">
                 <thead>
-                  <tr>
+                  <tr style="color: red; background-color: black">
                     <th class="text-center">
-                      <div style="font-size: 1.2em">شناسه</div>
+                      <div style="font-size: 1.2em">ردیف</div>
                     </th>
                     <th class="text-center">
                       <div style="font-size: 1.2em">وضعیت</div>
@@ -871,7 +895,7 @@
                     :style="{ 'background-color': i % 2 === 0 ? '#BDBDBD' : '#FAFAFA' }"
                   >
                     <td class="pa-2">
-                      <div style="font-size: 1em">{{ item?.id }}</div>
+                      <div style="font-size: 1em">{{ ++i }}</div>
                     </td>
                     <td class="pa-2">
                       <div style="font-size: 1em">
@@ -925,23 +949,17 @@
                     </td>
                     <td class="pa-2">
                       <div v-if="item?.carpets.length > 0">
-                        <div
-                          class="pa-2"
-                          v-for="(carpet, i) in item?.carpets"
-                          :key="i"
-                          style="font-size: 1em"
-                        >
-                          <v-btn
-                            height="40"
-                            width="70%"
-                            color="#FF1744"
-                            @click="showCarpetDetail(carpet?.id)"
-                            style="cursor: pointer"
-                          >
-                            {{ carpet?.barcode }}
-                          </v-btn>
-                          <br />
-                        </div>
+                        <!-- <v-btn
+                          height="30"
+                          width="50"
+                          color="#FF1744"
+                          @click="fillTransferCarpets(item?.id)"
+                          style="cursor: pointer"
+                        > -->
+                        <v-icon color="#FF1744" @click="fillTransferCarpets(item?.id)">
+                          mdi-eye
+                        </v-icon>
+                        <!-- </v-btn> -->
                       </div>
                       <div v-else style="font-size: 1em">ثبت نشده <br /></div>
                     </td>
@@ -966,6 +984,107 @@
             </v-row>
           </v-container>
         </div>
+      </v-responsive>
+    </v-card>
+  </v-dialog>
+
+  <!-- transfer carpets -->
+  <v-dialog
+    v-model="transferCarpetsDialog"
+    persistent
+    transition="dialog-bottom-transition"
+    fullscreen
+  >
+    <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
+      <v-responsive>
+        <v-chip outline @click="transferCarpetsDialog = false">
+          <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
+        </v-chip>
+
+        <v-card
+          :width="device === 'mobile' ? '100%' : '40%'"
+          class="my-4 mx-auto d-flex justify-center text-center pa-2"
+          color="warning"
+        >
+          <div style="font-size: 1.3em">لیست قالی های انتقال</div>
+        </v-card>
+
+        <v-row>
+          <v-col cols="12">
+            <v-card
+              class="cart"
+              :style="{ height: windowHeight2 + 'px', overflow: 'auto' }"
+            >
+              <v-table>
+                <thead>
+                  <tr>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">ردیف</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">بارکد</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">کارخانه</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">کد نقشه</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">اندازه</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">رنگ</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">مشتری</div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="(item, i) in transferCarpets"
+                    :key="i"
+                    class="text-center"
+                    :style="{ 'background-color': i % 2 === 0 ? '#3F51B5' : '#004D40' }"
+                  >
+                    <td class="pa-2">
+                      <div style="font-size: 1em">
+                        {{ ++i }}
+                      </div>
+                    </td>
+                    <td class="pa-2">
+                      <div style="font-size: 1em">{{ item?.barcode }}</div>
+                    </td>
+                    <td>
+                      <div style="font-size: 1em">
+                        {{ item?.factory }}
+                      </div>
+                    </td>
+                    <td>
+                      <div style="font-size: 1em">{{ item?.map_code }}</div>
+                    </td>
+                    <td>
+                      <div style="font-size: 1em">
+                        {{ item?.size }}
+                      </div>
+                    </td>
+                    <td>
+                      <div style="font-size: 1em">
+                        {{ item?.color }}
+                      </div>
+                    </td>
+                    <td class="pa-2">
+                      <div style="font-size: 1em">
+                        {{ item?.costumer_name }}
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </v-table>
+            </v-card>
+          </v-col>
+        </v-row>
       </v-responsive>
     </v-card>
   </v-dialog>
@@ -1243,7 +1362,7 @@
           </v-btn>
         </div>
         <div v-if="filterType === 'date'">
-          <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
+          <v-card class="my-4 d-flex justify-center text-center pa-2" color="warning">
             <span style="font-size: 1.7em">فیلتر تاریخ</span>
           </v-card>
           تاریخ شروع
@@ -1257,6 +1376,8 @@
           />
           <br />
           تاریخ پایان
+          <br />
+
           <date-picker
             class="ma-2"
             v-model="filteredEndDate"
@@ -1387,6 +1508,165 @@
       </v-responsive>
     </v-card>
   </v-dialog>
+
+  <!-- add statistics -->
+  <v-dialog
+    v-model="addStatisticsDialog"
+    persistent
+    transition="dialog-bottom-transition"
+    :fullscreen="device !== 'desktop' && device !== 'large'"
+    :width="device === 'desktop' || device === 'large' ? '50%' : '100%'"
+  >
+    <v-card theme="dark" class="pa-8 d-flex justify-center" dir="rtl">
+      <v-chip style="width: 50px" outline @click="addStatisticsDialog = false">
+        <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
+      </v-chip>
+
+      <v-card class="mt-4 text-center pa-2" color="warning">
+        <span>اضافه کردن محاسبه</span>
+      </v-card>
+      <v-card
+        class="cart my-2"
+        width="100%"
+        :style="{ height: 700 + 'px', overflow: 'auto' }"
+      >
+        <v-locale-provider rtl>
+          <v-autocomplete
+            class="mx-2"
+            v-model="selectedService"
+            :items="servicesList"
+            color="blue-grey-lighten-2"
+            item-title="title"
+            item-value="id"
+            label="انتخاب سرویس"
+            clearable
+            dir="rtl"
+            chips
+            closable-chips
+            rounded
+          >
+          </v-autocomplete>
+        </v-locale-provider>
+        <v-row class="px-2" no-gutters>
+          <v-col cols="12" md="6">
+            <v-locale-provider rtl>
+              <v-text-field
+                v-model="size"
+                class="pa-2"
+                color="primary"
+                label="اندازه"
+                rounded
+              ></v-text-field>
+            </v-locale-provider>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-locale-provider rtl>
+              <v-text-field
+                v-model="geometry"
+                class="pa-2"
+                color="primary"
+                label="شکل هندسی"
+                rounded
+              ></v-text-field>
+            </v-locale-provider>
+          </v-col>
+          <v-col cols="12" md="12">
+            <v-locale-provider rtl>
+              <v-text-field
+                v-model="area"
+                class="pa-2"
+                color="primary"
+                label="مساحت"
+                rounded
+              ></v-text-field>
+            </v-locale-provider>
+          </v-col>
+        </v-row>
+
+        <v-divider></v-divider>
+        <div align="center" justify="center">
+          <v-btn
+            :disabled="!selectedService || !size || !geometry || !area"
+            class="my-2"
+            color="success"
+            width="200"
+            @click="addStatistics()"
+          >
+            <div>ذخیره</div>
+          </v-btn>
+        </div>
+      </v-card>
+    </v-card>
+  </v-dialog>
+
+  <!-- statistics -->
+  <v-dialog
+    v-model="statisticsListDialog"
+    persistent
+    transition="dialog-bottom-transition"
+    fullscreen
+  >
+    <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
+      <v-responsive>
+        <v-chip outline @click="statisticsListDialog = false">
+          <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
+        </v-chip>
+
+        <v-card
+          :width="device === 'mobile' ? '100%' : '40%'"
+          class="my-4 mx-auto d-flex justify-center text-center pa-2"
+          color="warning"
+        >
+          <div style="font-size: 1.3em">آمار</div>
+        </v-card>
+        <v-row>
+          <v-col cols="12">
+            <v-card
+              class="cart"
+              :style="{ height: windowHeight2 + 'px', overflow: 'auto' }"
+            >
+              <v-table v-if="statistics.length > 0">
+                <thead>
+                  <tr>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">ردیف</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">سرویس</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">مساحت</div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="(item, i) in statistics"
+                    :key="i"
+                    class="text-center"
+                    :style="{ 'background-color': i % 2 === 0 ? '#3F51B5' : '#004D40' }"
+                  >
+                    <td class="pa-2">
+                      <div style="font-size: 1em">{{ ++i }}</div>
+                    </td>
+                    <td class="pa-2">
+                      <div style="font-size: 1em">{{ item?.title }}</div>
+                    </td>
+                    <td>
+                      <div style="font-size: 1em">
+                        {{ item?.area }}
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </v-table>
+              <div class="text-center" v-else>داده ای جهت نمایش وجود ندارد</div>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-responsive>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup>
@@ -1396,7 +1676,6 @@ import { breakPointsStore } from "@/stores/breakPoints";
 import * as XLSX from "xlsx";
 import { useRouter } from "vue-router";
 import DatePicker from "vue3-persian-datetime-picker";
-import persianDate from "persian-date";
 onMounted(async () => {
   await getStatuses();
   await getServiceProviders();
@@ -1405,7 +1684,7 @@ onMounted(async () => {
   await getServicesList();
 });
 const windowHeight = computed(() => {
-  return window.innerHeight - 320;
+  return window.innerHeight - 290;
 });
 const windowHeight2 = computed(() => {
   return window.innerHeight - 220;
@@ -1703,11 +1982,15 @@ function showCarpetDetail(id) {
   }
 }
 
+const transfersForCalculteArea = ref([]);
 const allTransfers = ref([]);
+const transferCarpetsDialog = ref(false);
+const transferCarpets = ref(null);
 const filterHolder = ref({});
 const pageCount = ref(0);
-
+const statisticsBtn = ref(false);
 async function filter() {
+  statisticsBtn.value = true;
   filterDialog.value = false;
   let filterParams = "&";
 
@@ -1786,6 +2069,7 @@ async function filter() {
 
   allTransfers.value = [];
   let transfer = {};
+
   await axios
     .get(
       APIUrl +
@@ -1841,6 +2125,37 @@ async function filter() {
         allTransfers.value.push(transfer);
       }
     });
+
+  let transfer2 = {};
+  transfersForCalculteArea.value = [];
+  await axios
+    .get(
+      APIUrl + "transfer/all-transfer-list/" + "?page_size=9000000000000" + filterParams
+    )
+    .then((response) => {
+      for (let i = 0; i < response.data.results.length; i++) {
+        transfer2 = {};
+
+        transfer2.carpets = [];
+        for (const carpet of carpetList.value) {
+          for (const c of response.data.results[i].carpets) {
+            if (carpet.id === c) {
+              transfer2.carpets.push(carpet);
+            }
+          }
+        }
+        transfer2.services = [];
+        for (const service of servicesList.value) {
+          for (const s of response.data.results[i].services) {
+            if (service.id === s) {
+              transfer2.services.push(service);
+            }
+          }
+        }
+
+        transfersForCalculteArea.value.push(transfer2);
+      }
+    });
 }
 
 function cleanNoAcceptFilters() {
@@ -1848,6 +2163,8 @@ function cleanNoAcceptFilters() {
 }
 const allTransfersDialog = ref(false);
 async function getAllTransfers() {
+  statisticsBtn.value = false;
+
   filteredWorker.value = null;
   filteredServiceProvider.value = null;
   filteredCarpets.value = [];
@@ -1929,7 +2246,14 @@ async function getAllTransfers() {
       }
     });
 }
-
+function fillTransferCarpets(id) {
+  transferCarpetsDialog.value = true;
+  for (const t of allTransfers.value) {
+    if (t.id === id) {
+      transferCarpets.value = t.carpets;
+    }
+  }
+}
 function switchTransferPage() {
   if (
     filteredWorker.value === null &&
@@ -2075,6 +2399,7 @@ function sendCarpetsToAPI() {
       size: carpets.value[i].size,
       color: carpets.value[i].color,
       costumer_name: carpets.value[i].costumer_name,
+      kind: carpets.value[i].kind,
     };
     axios.post(APIUrl + "carpet/register-from-excel/", body).then((response) => {
       console.log(response);
@@ -2084,6 +2409,12 @@ function sendCarpetsToAPI() {
 }
 
 const variants = [
+  {
+    type: "تنظیمات",
+    color: "#009688",
+    variant: "elevated",
+    icon: "mdi-calculator",
+  },
   {
     type: "ورود قالی ها",
     color: "#1B5E20",
@@ -2116,6 +2447,58 @@ const variants = [
   },
 ];
 
+const allStatistics = ref(null);
+async function getAllStatistics() {
+  await axios.get(APIUrl + "statistics/all-statistics-list/").then((response) => {
+    allStatistics.value = response.data;
+  });
+}
+
+const addStatisticsDialog = ref(false);
+const selectedService = ref(null);
+const size = ref(null);
+const geometry = ref(null);
+const area = ref(null);
+async function addStatistics() {
+  let updateCheck = false;
+  await getAllStatistics();
+  let body = {
+    service: selectedService.value,
+    size: size.value,
+    kind: geometry.value,
+    custom_size: area.value,
+  };
+  for (const s of allStatistics.value) {
+    if (
+      s.service === selectedService.value &&
+      s.size === size.value &&
+      s.kind === geometry.value
+    ) {
+      updateCheck = true;
+      axios
+        .patch(APIUrl + "statistics/update-statistics/" + s.id + "/", body)
+        .then((response) => {
+          console.log(response);
+          addStatisticsDialog.value = false;
+          selectedService.value = null;
+          size.value = null;
+          geometry.value = null;
+          area.value = null;
+        });
+    }
+  }
+
+  if (!updateCheck) {
+    axios.post(APIUrl + "statistics/create-statistics/", body).then((response) => {
+      console.log(response);
+      addStatisticsDialog.value = false;
+      selectedService.value = null;
+      size.value = null;
+      geometry.value = null;
+      area.value = null;
+    });
+  }
+}
 const openTransfersDialog = ref(false);
 function openModal(obj) {
   if (obj.type === "منابع انسانی") {
@@ -2130,7 +2513,61 @@ function openModal(obj) {
   } else if (obj.type === "گزارش گیری") {
     allTransfersDialog.value = true;
     getAllTransfers();
+  } else if (obj.type === "تنظیمات") {
+    addStatisticsDialog.value = true;
   }
+}
+
+const statisticsListDialog = ref(false);
+const statistics = ref([]);
+function calculateArea() {
+  statisticsListDialog.value = true;
+  let totalArea = 0;
+  let obj = {};
+  statistics.value = [];
+  axios.get(APIUrl + "statistics/all-statistics-list/").then((response) => {
+    for (const s of response.data) {
+      obj = {};
+      obj.service = s.service;
+      obj.area = 0;
+      statistics.value.push(obj);
+    }
+    for (const t of transfersForCalculteArea.value) {
+      for (const ss of t.services) {
+        for (const s of response.data) {
+          if (s.service === ss.id) {
+            for (const c of t.carpets) {
+              if (s.size === c.size && s.kind === c.kind) {
+                // && s.kind === c.kind
+                totalArea += s.custom_size;
+                for (const o of statistics.value) {
+                  if (o.service === ss.id) {
+                    o.area += s.custom_size;
+                    o.title = ss.title;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    for (const o of statistics.value) {
+      if (o.area === 0) {
+        let index = statistics.value.indexOf(o);
+        statistics.value.splice(index, 1);
+      }
+    }
+    for (const o of statistics.value) {
+      if (o.area === 0) {
+        let index = statistics.value.indexOf(o);
+        statistics.value.splice(index, 1);
+      }
+    }
+
+    console.log(totalArea, "/ ", statistics.value);
+  });
 }
 </script>
 <style>

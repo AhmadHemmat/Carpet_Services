@@ -963,7 +963,7 @@ async function sendTransfer() {
         }, 2000);
       })
       .catch((error) => {
-        selectedCarpet.value = null
+        selectedCarpet.value = null;
         alertMsg.value = "این قالی در لیست وجود ندارد";
         alertActivator.value = true;
         alertTimeout.value = 2000;
