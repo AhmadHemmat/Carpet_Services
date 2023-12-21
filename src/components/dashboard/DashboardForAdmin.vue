@@ -464,6 +464,12 @@
                     <th class="text-center">
                       <div style="font-size: 1.2em">شکل هندسی</div>
                     </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">تعداد شانه</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">آخرین انتقال</div>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -505,6 +511,18 @@
                     <td class="pa-2">
                       <div style="font-size: 1em">
                         {{ item?.kind ? item?.kind : "ثبت نشده" }}
+                      </div>
+                    </td>
+                    <td class="pa-2">
+                      <div style="font-size: 1em">
+                        {{ item?.density ? item?.density : "ثبت نشده" }}
+                      </div>
+                    </td>
+                    <td class="pa-2">
+                      <div style="font-size: 1em">
+                        <v-icon color="#FF1744" @click="getLastTransfer(item?.id)">
+                          mdi-eye
+                        </v-icon>
                       </div>
                     </td>
                   </tr>
@@ -580,13 +598,39 @@
     <v-card class="pa-2 d-flex justify-center flex-wrap" dir="rtl">
       <v-responsive>
         <v-row align="center" justify="center">
-          <v-col cols="2">
+          <v-col cols="1">
             <v-chip outline @click="allTransfersDialog = false">
               <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
             </v-chip>
           </v-col>
           <v-spacer></v-spacer>
-          <v-col cols="4">
+          <v-col cols="2" v-if="device !== 'mobile'">
+            <v-btn
+              height="40"
+              width="100%"
+              color="#0091EA"
+              rounded
+              @click="getOpenCarpets"
+              style="cursor: pointer"
+            >
+              <v-icon class="ml-1" color="yellow">mdi-alert-circle</v-icon>
+              قالی های بدون بازگشت
+            </v-btn>
+          </v-col>
+          <v-col cols="2" v-if="device !== 'mobile'">
+            <v-btn
+              height="40"
+              width="100%"
+              color="#FF1744"
+              rounded
+              @click="getAndShowCarpets"
+              style="cursor: pointer"
+            >
+              <v-icon class="ml-1" color="yellow">mdi-google-nearby</v-icon>
+              قالی ها
+            </v-btn>
+          </v-col>
+          <v-col cols="3">
             <v-card
               class="cart mx-auto my-1 text-center pa-2"
               :width="device === 'mobile' ? '100%' : '100%'"
@@ -771,7 +815,9 @@
                       filteredFactoryStand ||
                       filteredSizeStand ||
                       filteredMapCodeStand ||
-                      filteredCostumerStand
+                      filteredCostumerStand ||
+                      filteredKindStand ||
+                      filteredDensityStand
                     "
                   >
                     <v-btn
@@ -998,7 +1044,7 @@
           class="my-4 mx-auto d-flex justify-center text-center pa-2"
           color="warning"
         >
-          <div style="font-size: 1.3em">لیست قالی های انتقال</div>
+          <div style="font-size: 1.3em">لیست قالی ها</div>
         </v-card>
 
         <v-row>
@@ -1033,6 +1079,12 @@
                     </th>
                     <th class="text-center">
                       <div style="font-size: 1.2em">شکل هندسی</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">تعداد شانه</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">آخرین انتقال</div>
                     </th>
                   </tr>
                 </thead>
@@ -1077,6 +1129,18 @@
                     <td class="pa-2">
                       <div style="font-size: 1em">
                         {{ item?.kind }}
+                      </div>
+                    </td>
+                    <td class="pa-2">
+                      <div style="font-size: 1em">
+                        {{ item?.density }}
+                      </div>
+                    </td>
+                    <td class="pa-2">
+                      <div style="font-size: 1em">
+                        <v-icon color="#FF1744" @click="getLastTransfer(item?.id)">
+                          mdi-eye
+                        </v-icon>
                       </div>
                     </td>
                   </tr>
@@ -1259,90 +1323,137 @@
           <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
             <span style="font-size: 1.7em">فیلتر فرش</span>
           </v-card>
-          <v-locale-provider rtl>
-            <v-autocomplete
-              class="mt-2"
-              v-model="filteredBarcode"
-              :items="carpetsBarcodes"
-              color="blue-grey-lighten-2"
-              label="انتخاب بارکد"
-              clearable
-              dir="rtl"
-              chips
-              closable-chips
-            >
-            </v-autocomplete>
-          </v-locale-provider>
-          <v-locale-provider rtl>
-            <v-autocomplete
-              class="mt-2"
-              v-model="filteredColor"
-              :items="carpetsColors"
-              color="blue-grey-lighten-2"
-              label="انتخاب رنگ "
-              clearable
-              dir="rtl"
-              chips
-              closable-chips
-            >
-            </v-autocomplete>
-          </v-locale-provider>
-          <v-locale-provider rtl>
-            <v-autocomplete
-              class="mt-2"
-              v-model="filteredFactory"
-              :items="carpetsFactorys"
-              color="blue-grey-lighten-2"
-              label="انتخاب کارخانه "
-              clearable
-              dir="rtl"
-              chips
-              closable-chips
-            >
-            </v-autocomplete>
-          </v-locale-provider>
-          <v-locale-provider rtl>
-            <v-autocomplete
-              class="mt-2"
-              v-model="filteredCostumer"
-              :items="carpetsCostumers"
-              color="blue-grey-lighten-2"
-              label="انتخاب مشتری "
-              clearable
-              dir="rtl"
-              chips
-              closable-chips
-            >
-            </v-autocomplete>
-          </v-locale-provider>
-          <v-locale-provider rtl>
-            <v-autocomplete
-              class="mt-2"
-              v-model="filteredSize"
-              :items="carpetsSizes"
-              color="blue-grey-lighten-2"
-              label="انتخاب اندازه "
-              clearable
-              dir="rtl"
-              chips
-              closable-chips
-            >
-            </v-autocomplete>
-          </v-locale-provider>
-          <v-locale-provider rtl>
-            <v-autocomplete
-              class="mt-2"
-              v-model="filteredMapCode"
-              :items="carpetsMapCodes"
-              color="blue-grey-lighten-2"
-              label="انتخاب کد نقشه "
-              clearable
-              dir="rtl"
-              chips
-              closable-chips
-            >
-            </v-autocomplete>
-          </v-locale-provider>
+          <v-row align="center" justify="center">
+            <v-col cols="6">
+              <v-locale-provider rtl>
+                <v-autocomplete
+                  class="mt-2"
+                  v-model="filteredBarcode"
+                  :items="carpetsBarcodes"
+                  color="blue-grey-lighten-2"
+                  label="انتخاب بارکد"
+                  clearable
+                  dir="rtl"
+                  chips
+                  closable-chips
+                >
+                </v-autocomplete>
+              </v-locale-provider>
+            </v-col>
+            <v-col cols="6">
+              <v-locale-provider rtl>
+                <v-autocomplete
+                  class="mt-2"
+                  v-model="filteredColor"
+                  :items="carpetsColors"
+                  color="blue-grey-lighten-2"
+                  label="انتخاب رنگ "
+                  clearable
+                  dir="rtl"
+                  chips
+                  closable-chips
+                >
+                </v-autocomplete>
+              </v-locale-provider>
+            </v-col>
+            <v-col cols="6">
+              <v-locale-provider rtl>
+                <v-autocomplete
+                  class="mt-2"
+                  v-model="filteredFactory"
+                  :items="carpetsFactorys"
+                  color="blue-grey-lighten-2"
+                  label="انتخاب کارخانه "
+                  clearable
+                  dir="rtl"
+                  chips
+                  closable-chips
+                >
+                </v-autocomplete>
+              </v-locale-provider>
+            </v-col>
+            <v-col cols="6">
+              <v-locale-provider rtl>
+                <v-autocomplete
+                  class="mt-2"
+                  v-model="filteredCostumer"
+                  :items="carpetsCostumers"
+                  color="blue-grey-lighten-2"
+                  label="انتخاب مشتری "
+                  clearable
+                  dir="rtl"
+                  chips
+                  closable-chips
+                >
+                </v-autocomplete>
+              </v-locale-provider>
+            </v-col>
+            <v-col cols="6">
+              <v-locale-provider rtl>
+                <v-autocomplete
+                  class="mt-2"
+                  v-model="filteredSize"
+                  :items="carpetsSizes"
+                  color="blue-grey-lighten-2"
+                  label="انتخاب اندازه "
+                  clearable
+                  dir="rtl"
+                  chips
+                  closable-chips
+                >
+                </v-autocomplete>
+              </v-locale-provider>
+            </v-col>
+            <v-col cols="6">
+              <v-locale-provider rtl>
+                <v-autocomplete
+                  class="mt-2"
+                  v-model="filteredMapCode"
+                  :items="carpetsMapCodes"
+                  color="blue-grey-lighten-2"
+                  label="انتخاب کد نقشه "
+                  clearable
+                  dir="rtl"
+                  chips
+                  closable-chips
+                >
+                </v-autocomplete>
+              </v-locale-provider>
+            </v-col>
+            <v-col cols="6">
+              <v-locale-provider rtl>
+                <v-autocomplete
+                  class="mt-2"
+                  v-model="filteredKind"
+                  :items="carpetsKindes"
+                  color="blue-grey-lighten-2"
+                  label="انتخاب شکل هندسی"
+                  clearable
+                  dir="rtl"
+                  chips
+                  closable-chips
+                >
+                </v-autocomplete>
+              </v-locale-provider>
+            </v-col>
+            <v-col cols="6">
+              <v-locale-provider rtl>
+                <v-autocomplete
+                  class="mt-2"
+                  v-model="filteredDensity"
+                  :items="carpetsDensities"
+                  color="blue-grey-lighten-2"
+                  label="انتخاب تعداد شانه  "
+                  clearable
+                  dir="rtl"
+                  chips
+                  closable-chips
+                >
+                </v-autocomplete>
+              </v-locale-provider>
+            </v-col>
+          </v-row>
+
           <v-btn
             :disabled="
               !filteredBarcode &&
@@ -1350,7 +1461,9 @@
               !filteredFactory &&
               !filteredSize &&
               !filteredMapCode &&
-              !filteredCostumer
+              !filteredCostumer &&
+              !filteredKind &&
+              !filteredDensity
             "
             height="40"
             width="50%"
@@ -1504,6 +1617,26 @@
               <v-icon @click="filteredCostumer = null">mdi-close</v-icon>
             </div>
           </v-list-item>
+
+          <v-list-item v-if="filteredKind" color="white" rounded="xl">
+            <template v-slot:prepend>
+              <v-icon icon="mdi-checkbox-marked" color="#1DE9B6"></v-icon>
+            </template>
+            <div style="font-size: 1.4em">
+              شکل هندسی: {{ filteredKind }}
+              <v-icon @click="filteredKind = null">mdi-close</v-icon>
+            </div>
+          </v-list-item>
+
+          <v-list-item v-if="filteredDensity" color="white" rounded="xl">
+            <template v-slot:prepend>
+              <v-icon icon="mdi-checkbox-marked" color="#1DE9B6"></v-icon>
+            </template>
+            <div style="font-size: 1.4em">
+              تعداد شانه: {{ filteredDensity }}
+              <v-icon @click="filteredDensity = null">mdi-close</v-icon>
+            </div>
+          </v-list-item>
         </v-list>
       </v-responsive>
     </v-card>
@@ -1635,11 +1768,18 @@
         >
           <div style="font-size: 1.3em">آمار</div>
         </v-card>
+        <v-chip class="ma-2" color="warning">
+          <div style="font-size: 1em">جمع کل مساحت: {{ totalAreaAll }}</div>
+        </v-chip>
+        <v-chip class="ma-2" color="warning">
+          <div style="font-size: 1em">جمع کل قالی ها: {{ totalCarpets }}</div>
+        </v-chip>
+
         <v-row>
           <v-col cols="12">
             <v-card
               class="cart"
-              :style="{ height: windowHeight2 + 'px', overflow: 'auto' }"
+              :style="{ height: windowHeight2 - 30 + 'px', overflow: 'auto' }"
             >
               <v-table density="compact" v-if="statistics.length > 0">
                 <thead>
@@ -1691,6 +1831,499 @@
       </v-responsive>
     </v-card>
   </v-dialog>
+
+  <!-- report carpets -->
+  <v-dialog
+    v-model="reportCarpetsDialog"
+    persistent
+    transition="dialog-bottom-transition"
+    fullscreen
+  >
+    <v-card class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
+      <v-responsive>
+        <v-chip outline @click="reportCarpetsDialog = false">
+          <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
+        </v-chip>
+
+        <v-card
+          :width="device === 'mobile' ? '100%' : '40%'"
+          class="my-4 mx-auto d-flex justify-center text-center pa-2"
+          color="warning"
+        >
+          <div style="font-size: 1.3em">لیست قالی ها</div>
+        </v-card>
+
+        <v-row>
+          <v-col cols="12">
+            <v-card
+              class="cart"
+              :style="{ height: windowHeight2 + 'px', overflow: 'auto' }"
+            >
+              <v-table density="compact">
+                <thead>
+                  <tr>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">ردیف</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">بارکد</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">کارخانه</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">کد نقشه</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">اندازه</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">رنگ</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">مشتری</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">شکل هندسی</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">تعداد شانه</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">نقل و انتقالات</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">آخرین انتقال</div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody v-for="(item, i) in reportCarpets" :key="i">
+                  <tr
+                    v-if="item?.transfers?.length > 0"
+                    class="text-center"
+                    :style="{
+                      'background-color': !item?.isSelected
+                        ? i % 2 === 0
+                          ? '#BDBDBD'
+                          : '#FAFAFA'
+                        : '#B2FF59',
+                    }"
+                  >
+                    <td class="pa-2">
+                      <div style="font-size: 1em">
+                        {{ ++i }}
+                      </div>
+                    </td>
+                    <td class="pa-2">
+                      <div style="font-size: 1em">{{ item?.carpet?.barcode }}</div>
+                    </td>
+                    <td>
+                      <div style="font-size: 1em">
+                        {{ item?.carpet?.factory }}
+                      </div>
+                    </td>
+                    <td>
+                      <div style="font-size: 1em">{{ item?.carpet?.map_code }}</div>
+                    </td>
+                    <td>
+                      <div style="font-size: 1em">
+                        {{ item?.carpet?.size }}
+                      </div>
+                    </td>
+                    <td>
+                      <div style="font-size: 1em">
+                        {{ item?.carpet?.color }}
+                      </div>
+                    </td>
+                    <td class="pa-2">
+                      <div style="font-size: 1em">
+                        {{ item?.carpet?.costumer_name }}
+                      </div>
+                    </td>
+                    <td class="pa-2">
+                      <div style="font-size: 1em">
+                        {{ item?.carpet?.kind }}
+                      </div>
+                    </td>
+                    <td class="pa-2">
+                      <div style="font-size: 1em">
+                        {{ item?.carpet?.density }}
+                      </div>
+                    </td>
+                    <td class="pa-2">
+                      <div>
+                        <v-icon
+                          color="#FF1744"
+                          @click="getCarpetTransfers(item?.carpet?.id)"
+                        >
+                          mdi-eye
+                        </v-icon>
+                      </div>
+                    </td>
+                    <td class="pa-2">
+                      <div style="font-size: 1em">
+                        <v-icon color="#FF1744" @click="getLastTransfer(item?.carpet.id)">
+                          mdi-eye
+                        </v-icon>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </v-table>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-responsive>
+    </v-card>
+  </v-dialog>
+
+  <!-- report transfers -->
+  <v-dialog
+    v-model="reportTransfersDialog"
+    persistent
+    transition="dialog-bottom-transition"
+    fullscreen
+  >
+    <v-card class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
+      <v-responsive>
+        <v-chip outline @click="reportTransfersDialog = false">
+          <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
+        </v-chip>
+
+        <v-card
+          :width="device === 'mobile' ? '100%' : '30%'"
+          class="my-4 mx-auto d-flex justify-center text-center pa-2"
+          color="warning"
+        >
+          <div style="font-size: 1.3em">لیست نقل و انتقالات</div>
+        </v-card>
+
+        <v-row>
+          <v-col cols="12">
+            <v-card
+              class="cart"
+              :style="{ height: windowHeight2 + 'px', overflow: 'auto' }"
+            >
+              <v-table density="compact">
+                <thead>
+                  <tr>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">ردیف</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">وضعیت</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">کارگر</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">تاریخ</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">سرویس کار</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">سرویس ها</div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="(item, i) in carpetTransfers"
+                    :key="i"
+                    class="text-center"
+                    :style="{ 'background-color': i % 2 === 0 ? '#BDBDBD' : '#FAFAFA' }"
+                  >
+                    <td class="pa-2">
+                      <div style="font-size: 1em">{{ ++i }}</div>
+                    </td>
+                    <td class="pa-2">
+                      <div style="font-size: 1em">
+                        {{ item?.status?.title }}
+                      </div>
+                    </td>
+                    <td>
+                      <div style="font-size: 1em">
+                        {{
+                          item?.worker?.first_name
+                            ? item?.worker?.first_name + " " + item?.worker?.last_name
+                            : "ثبت نشده"
+                        }}
+                      </div>
+                    </td>
+                    <td>
+                      <div style="font-size: 1em">
+                        {{
+                          convertPersianNumberToLatin(
+                            gregorian_to_jalali(
+                              Number(item?.date.substr(0, 4)),
+                              Number(item?.date.substr(5, 2)),
+                              Number(item?.date.substr(8, 2))
+                            )
+                          )
+                        }}
+                      </div>
+                    </td>
+                    <td>
+                      <div style="font-size: 1em">
+                        {{
+                          item?.serviceProvider?.first_name
+                            ? item?.serviceProvider?.first_name +
+                              " " +
+                              item?.serviceProvider?.last_name
+                            : "ثبت نشده"
+                        }}
+                      </div>
+                    </td>
+                    <td>
+                      <div v-if="item?.services.length > 0">
+                        <div
+                          v-for="(service, i) in item?.services"
+                          :key="i"
+                          style="font-size: 1em"
+                        >
+                          {{ service?.title }} <br />
+                        </div>
+                      </div>
+                      <div v-else style="font-size: 1em">ثبت نشده <br /></div>
+                    </td>
+                  </tr>
+                </tbody>
+              </v-table>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-responsive>
+    </v-card>
+  </v-dialog>
+
+  <!-- last transfer -->
+  <v-dialog
+    v-model="lastTransfersDialog"
+    persistent
+    transition="dialog-bottom-transition"
+    fullscreen
+  >
+    <v-card class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
+      <v-responsive>
+        <v-chip outline @click="lastTransfersDialog = false">
+          <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
+        </v-chip>
+
+        <v-card
+          :width="device === 'mobile' ? '100%' : '30%'"
+          class="my-4 mx-auto d-flex justify-center text-center pa-2"
+          color="warning"
+        >
+          <div style="font-size: 1.3em">آخرین انتقال</div>
+        </v-card>
+
+        <v-row>
+          <v-col cols="12">
+            <v-card
+              class="cart"
+              :style="{ height: windowHeight2 + 'px', overflow: 'auto' }"
+            >
+              <v-table density="compact">
+                <thead>
+                  <tr>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">وضعیت</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">کارگر</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">تاریخ</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">سرویس کار</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">سرویس ها</div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="text-center" :style="{ 'background-color': '#BDBDBD' }">
+                    <td class="pa-2">
+                      <div style="font-size: 1em">
+                        {{ lastTransfer?.status }}
+                      </div>
+                    </td>
+                    <td>
+                      <div style="font-size: 1em">
+                        {{
+                          lastTransfer?.worker[0]?.first_name
+                            ? lastTransfer?.worker[0]?.first_name +
+                              " " +
+                              lastTransfer?.worker[0]?.last_name
+                            : "ثبت نشده"
+                        }}
+                      </div>
+                    </td>
+                    <td>
+                      <div style="font-size: 1em">
+                        {{
+                          convertPersianNumberToLatin(
+                            gregorian_to_jalali(
+                              Number(lastTransfer?.date.substr(0, 4)),
+                              Number(lastTransfer?.date.substr(5, 2)),
+                              Number(lastTransfer?.date.substr(8, 2))
+                            )
+                          )
+                        }}
+                      </div>
+                    </td>
+                    <td>
+                      <div style="font-size: 1em">
+                        {{
+                          lastTransfer?.service_provider[0]?.first_name
+                            ? lastTransfer?.service_provider[0]?.first_name +
+                              " " +
+                              lastTransfer?.service_provider[0]?.last_name
+                            : "ثبت نشده"
+                        }}
+                      </div>
+                    </td>
+                    <td>
+                      <div v-if="lastTransfer?.services.length > 0">
+                        <div
+                          v-for="(service, i) in lastTransfer?.services"
+                          :key="i"
+                          style="font-size: 1em"
+                        >
+                          {{ service?.title }} <br />
+                        </div>
+                      </div>
+                      <div v-else style="font-size: 1em">ثبت نشده <br /></div>
+                    </td>
+                  </tr>
+                </tbody>
+              </v-table>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-responsive>
+    </v-card>
+  </v-dialog>
+
+  <!-- open carpets -->
+  <v-dialog
+    v-model="openCarpetsDialog"
+    persistent
+    transition="dialog-bottom-transition"
+    fullscreen
+  >
+    <v-card class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
+      <v-responsive>
+        <v-chip outline @click="openCarpetsDialog = false">
+          <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
+        </v-chip>
+
+        <v-card
+          :width="device === 'mobile' ? '100%' : '40%'"
+          class="my-4 mx-auto d-flex justify-center text-center pa-2"
+          color="warning"
+        >
+          <div style="font-size: 1.3em">لیست قالی های بازگشت نامشخص</div>
+        </v-card>
+
+        <v-row>
+          <v-col cols="12">
+            <v-card
+              class="cart"
+              :style="{ height: windowHeight2 + 'px', overflow: 'auto' }"
+            >
+              <v-table density="compact">
+                <thead>
+                  <tr>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">ردیف</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">بارکد</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">کارخانه</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">کد نقشه</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">اندازه</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">رنگ</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">مشتری</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">شکل هندسی</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">تعداد شانه</div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody v-for="(item, i) in openCarpets" :key="i">
+                  <tr
+                    class="text-center"
+                    :style="{
+                      'background-color': i % 2 === 0 ? '#BDBDBD' : '#FAFAFA',
+                    }"
+                  >
+                    <td class="pa-2">
+                      <div style="font-size: 1em">
+                        {{ ++i }}
+                      </div>
+                    </td>
+                    <td class="pa-2">
+                      <div style="font-size: 1em">{{ item?.barcode }}</div>
+                    </td>
+                    <td>
+                      <div style="font-size: 1em">
+                        {{ item?.factory }}
+                      </div>
+                    </td>
+                    <td>
+                      <div style="font-size: 1em">{{ item?.map_code }}</div>
+                    </td>
+                    <td>
+                      <div style="font-size: 1em">
+                        {{ item?.size }}
+                      </div>
+                    </td>
+                    <td>
+                      <div style="font-size: 1em">
+                        {{ item?.color }}
+                      </div>
+                    </td>
+                    <td class="pa-2">
+                      <div style="font-size: 1em">
+                        {{ item?.costumer_name }}
+                      </div>
+                    </td>
+                    <td class="pa-2">
+                      <div style="font-size: 1em">
+                        {{ item?.kind }}
+                      </div>
+                    </td>
+                    <td class="pa-2">
+                      <div style="font-size: 1em">
+                        {{ item?.density }}
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </v-table>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-responsive>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup>
@@ -1701,6 +2334,7 @@ import * as XLSX from "xlsx";
 import { useRouter } from "vue-router";
 import DatePicker from "vue3-persian-datetime-picker";
 onMounted(async () => {
+  // getAndShowCarpets();
   await getStatuses();
   await getServiceProviders();
   await getAllUsers();
@@ -1787,8 +2421,8 @@ function convertPersianNumberToLatin(number) {
   return str;
 }
 
-const APIUrl = "http://192.168.1.62:8000/";
-// const APIUrl = "https://carpet.iran.liara.run/";
+// const APIUrl = "http://192.168.1.62:8000/";
+const APIUrl = "https://carpet.iran.liara.run/";
 // const APIUrl = "http://localhost:8000/";
 
 const carpetFiltersDialog = ref(false);
@@ -1806,6 +2440,8 @@ const filteredFactory = ref(null);
 const filteredSize = ref(null);
 const filteredMapCode = ref(null);
 const filteredCostumer = ref(null);
+const filteredKind = ref(null);
+const filteredDensity = ref(null);
 
 const filteredWorkerStand = ref(null);
 const filteredServiceProviderStand = ref(null);
@@ -1821,6 +2457,8 @@ const filteredFactoryStand = ref(null);
 const filteredSizeStand = ref(null);
 const filteredMapCodeStand = ref(null);
 const filteredCostumerStand = ref(null);
+const filteredKindStand = ref(null);
+const filteredDensityStand = ref(null);
 
 const filterDialog = ref(false);
 
@@ -1866,7 +2504,8 @@ const carpetsFactorys = ref([]);
 const carpetsSizes = ref([]);
 const carpetsMapCodes = ref([]);
 const carpetsCostumers = ref([]);
-
+const carpetsKindes = ref([]);
+const carpetsDensities = ref([]);
 async function getCarpetList() {
   await axios.get(APIUrl + "carpet/all-carpets-list/").then((response) => {
     carpetList.value = response.data;
@@ -1888,6 +2527,12 @@ async function getCarpetList() {
       }
       if (!carpetsCostumers.value.includes(carpet.costumer_name)) {
         carpetsCostumers.value.push(carpet.costumer_name);
+      }
+      if (!carpetsKindes.value.includes(carpet.kind)) {
+        carpetsKindes.value.push(carpet.kind);
+      }
+      if (!carpetsDensities.value.includes(carpet.density)) {
+        carpetsDensities.value.push(carpet.density);
       }
     }
   });
@@ -2038,6 +2683,8 @@ async function filter() {
   filteredSizeStand.value = filteredSize.value;
   filteredMapCodeStand.value = filteredMapCode.value;
   filteredCostumerStand.value = filteredCostumer.value;
+  filteredKindStand.value = filteredKind.value;
+  filteredDensityStand.value = filteredDensity.value;
 
   if (filteredBarcode.value) {
     filterParams += "barcode=" + filteredBarcode.value + "&";
@@ -2089,6 +2736,14 @@ async function filter() {
 
   if (filteredService.value) {
     filterParams += "services=" + filteredService.value?.id + "&";
+  }
+
+  if (filteredKind.value) {
+    filterParams += "kind=" + filteredKind.value + "&";
+  }
+
+  if (filteredDensity.value) {
+    filterParams += "density=" + filteredDensity.value + "&";
   }
 
   allTransfers.value = [];
@@ -2202,6 +2857,8 @@ async function getAllTransfers() {
   filteredSize.value = null;
   filteredMapCode.value = null;
   filteredCostumer.value = null;
+  filteredKind.value = null;
+  filteredDensity.value = null;
 
   filteredWorkerStand.value = null;
   filteredServiceProviderStand.value = null;
@@ -2216,6 +2873,8 @@ async function getAllTransfers() {
   filteredSizeStand.value = null;
   filteredMapCodeStand.value = null;
   filteredCostumerStand.value = null;
+  filteredKindStand.value = null;
+  filteredDensityStand.value = null;
   allTransfers.value = [];
   let transfer = {};
   await axios
@@ -2300,7 +2959,9 @@ function switchTransferPage() {
     filteredFactory.value === null &&
     filteredSize.value === null &&
     filteredMapCode.value === null &&
-    filteredCostumer.value === null
+    filteredCostumer.value === null &&
+    filteredKind.value === null &&
+    filteredDensity.value === null
   ) {
     getAllTransfers();
   } else {
@@ -2333,6 +2994,8 @@ function cleanFilter(filter) {
     filteredSize.value = null;
     filteredMapCode.value = null;
     filteredCostumer.value = null;
+    filteredKind.value = null;
+    filteredDensity.value = null;
 
     filteredBarcodeStand.value = null;
     filteredColorStand.value = null;
@@ -2340,6 +3003,8 @@ function cleanFilter(filter) {
     filteredSizeStand.value = null;
     filteredMapCodeStand.value = null;
     filteredCostumerStand.value = null;
+    filteredKindStand.value = null;
+    filteredDensityStand.value = null;
   }
 
   switchTransferPage();
@@ -2381,6 +3046,19 @@ watch(
     if (!filteredCostumer.value) switchTransferPage();
   }
 );
+watch(
+  () => filteredKind.value,
+  () => {
+    if (!filteredKind.value) switchTransferPage();
+  }
+);
+watch(
+  () => filteredDensity.value,
+  () => {
+    if (!filteredDensity.value) switchTransferPage();
+  }
+);
+
 const detailAllTransferDialog = ref(false);
 const transfer = ref(null);
 async function showAllTransferDetail(id) {
@@ -2433,6 +3111,7 @@ function sendCarpetsToAPI() {
       color: carpets.value[i].color,
       costumer_name: carpets.value[i].costumer_name,
       kind: carpets.value[i].kind,
+      density: carpets.value[i].density,
     };
     axios.post(APIUrl + "carpet/register-from-excel/", body).then((response) => {
       console.log(response);
@@ -2553,7 +3232,11 @@ function openModal(obj) {
 
 const statisticsListDialog = ref(false);
 const statistics = ref([]);
+const totalAreaAll = ref(0);
+const totalCarpets = ref(0);
 function calculateArea() {
+  totalAreaAll.value = 0;
+  totalCarpets.value = 0;
   statisticsListDialog.value = true;
   let totalArea = 0;
   let obj = {};
@@ -2579,6 +3262,8 @@ function calculateArea() {
                     o.area += s.custom_size;
                     o.title = ss.title;
                     o.carpets.push(c);
+
+                    totalAreaAll.value += s.custom_size;
                   }
                 }
               }
@@ -2593,6 +3278,7 @@ function calculateArea() {
         let index = statistics.value.indexOf(o);
         statistics.value.splice(index, 1);
       }
+      console.log("ooooo", o);
     }
     for (const o of statistics.value) {
       if (o.area === 0) {
@@ -2602,6 +3288,11 @@ function calculateArea() {
     }
 
     console.log(totalArea, "/ ", statistics.value);
+    for (const a of statistics.value) {
+      totalCarpets.value += a.carpets.length;
+
+      console.log("aaaaaaaaa", a);
+    }
   });
 }
 
@@ -2617,7 +3308,156 @@ function getKinds() {
     kinds.value = response.data;
   });
 }
+
+const reportCarpetsDialog = ref(false);
+const reportCarpets = ref([]);
+function getAndShowCarpets() {
+  reportCarpetsDialog.value = true;
+
+  let filterParams = "&";
+
+  if (filteredBarcode.value) {
+    filterParams += "barcode=" + filteredBarcode.value + "&";
+  }
+  if (filteredColor.value) {
+    filterParams += "color=" + filteredColor.value + "&";
+  }
+  if (filteredFactory.value) {
+    filterParams += "factory=" + filteredFactory.value + "&";
+  }
+  if (filteredSize.value) {
+    filterParams += "size=" + filteredSize.value + "&";
+  }
+  if (filteredMapCode.value) {
+    filterParams += "map_code=" + filteredMapCode.value + "&";
+  }
+  if (filteredCostumer.value) {
+    filterParams += "costumer=" + filteredCostumer.value + "&";
+  }
+
+  if (filteredWorker.value) {
+    filterParams += "worker=" + filteredWorker.value?.id + "&";
+  }
+
+  if (filteredServiceProvider.value) {
+    filterParams += "service_provider=" + filteredServiceProvider.value?.id + "&";
+  }
+
+  if (filteredCarpets.value?.length > 0) {
+    filterParams += "carpets=";
+    for (const c of filteredCarpets.value) {
+      filterParams += c + ",";
+    }
+    if (filterParams.slice(-1) === ",") filterParams = filterParams.replace(/.$/, "");
+    filterParams += "&";
+  }
+
+  if (filteredStartDate.value) {
+    filterParams += "start_date=" + filteredStartDate.value + "&";
+  }
+
+  if (filteredEndDate.value) {
+    filterParams += "end_date=" + filteredEndDate.value + "&";
+  }
+
+  if (filteredStatus.value) {
+    filterParams += "status=" + filteredStatus.value?.id + "&";
+  }
+
+  if (filteredService.value) {
+    filterParams += "services=" + filteredService.value?.id + "&";
+  }
+
+  if (filteredKind.value) {
+    filterParams += "kind=" + filteredKind.value + "&";
+  }
+
+  if (filteredDensity.value) {
+    filterParams += "density=" + filteredDensity.value + "&";
+  }
+
+  reportCarpets.value = [];
+
+  let data = {};
+  let url = "";
+  if (filterParams.length > 1) {
+    url = "carpet/carpet-with-transfers/?" + filterParams;
+  } else {
+    url = "carpet/carpet-with-transfers/";
+  }
+  axios.get(APIUrl + url).then((response) => {
+    console.log(response);
+    for (const obj of response.data.results) {
+      data = {};
+      data.isSelected = false;
+      data.carpet = {};
+      data.carpet.id = obj.id;
+      data.carpet.barcode = obj.barcode;
+      data.carpet.color = obj.color;
+      data.carpet.costumer_name = obj.costumer_name;
+      data.carpet.factory = obj.factory;
+      data.carpet.density = obj.density;
+      data.carpet.kind = obj.kind;
+      data.carpet.size = obj.size;
+      data.carpet.map_code = obj.map_code;
+      data.transfers = [];
+      for (const t of allTransfers.value) {
+        for (const c of t.carpets) {
+          if (data.carpet.id === c.id) {
+            data.transfers.push(t);
+          }
+        }
+      }
+      reportCarpets.value.push(data);
+    }
+  });
+}
+const reportTransfersDialog = ref(false);
+const carpetTransfers = ref(null);
+function getCarpetTransfers(id) {
+  reportTransfersDialog.value = true;
+  carpetTransfers.value = null;
+  for (const obj of reportCarpets.value) {
+    if (obj.carpet.id === id) {
+      carpetTransfers.value = obj.transfers;
+      obj.isSelected = true;
+    } else {
+      obj.isSelected = false;
+    }
+  }
+}
+
+const lastTransfersDialog = ref(false);
+const lastTransfer = ref(null);
+async function getLastTransfer(id) {
+  lastTransfersDialog.value = true;
+  lastTransfer.value = null;
+  await axios.get(APIUrl + "carpet/last-transfers/" + id + "/").then((response) => {
+    console.log(response);
+    lastTransfer.value = response.data;
+  });
+}
+
+const openCarpetsDialog = ref(false);
+const openCarpets = ref([]);
+async function getOpenCarpets() {
+  openCarpetsDialog.value = true;
+  openCarpets.value = [];
+  for (const carpet of carpetList.value) {
+    lastTransfer.value = null;
+    await axios
+      .get(APIUrl + "carpet/last-transfers/" + carpet.id + "/")
+      .then((response) => {
+        console.log(response);
+        lastTransfer.value = response.data;
+      });
+    if (lastTransfer.value?.status === 3) {
+      openCarpets.value.push(carpet);
+    }
+  }
+}
 </script>
+
 <style>
 .cart {
   border: 1px solid rgb(237, 74, 74);

@@ -65,8 +65,8 @@ import { loginStore } from "@/stores/index";
 import axios from "axios";
 import Alert from "@/components/Alert.vue";
 
-const APIUrl = "http://192.168.1.62:8000/";
-// const APIUrl = "https://carpet.iran.liara.run/";
+// const APIUrl = "http://192.168.1.62:8000/";
+const APIUrl = "https://carpet.iran.liara.run/";
 // const APIUrl = "http://localhost:8000/";s
 
 function convertPersianNumberToLatin(number) {

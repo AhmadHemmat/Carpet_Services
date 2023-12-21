@@ -58,8 +58,8 @@ import { breakPointsStore } from "@/stores/breakPoints";
 onMounted(function () {
   getUserProfile();
 });
-const APIUrl = "http://192.168.1.62:8000/";
-// const APIUrl = "https://carpet.iran.liara.run/";
+// const APIUrl = "http://192.168.1.62:8000/";
+const APIUrl = "https://carpet.iran.liara.run/";
 // const APIUrl = "http://localhost:8000/";
 
 const breakPointsStoreVar = breakPointsStore();
