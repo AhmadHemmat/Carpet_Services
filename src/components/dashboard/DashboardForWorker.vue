@@ -36,7 +36,12 @@
                   <div class="mb-1">
                     <v-icon :color="obj.color" size="x-large">{{ obj.icon }}</v-icon>
                     <br />
-                    <v-btn class="mb-2" :color="obj.color" @click="openModal(obj)">
+                    <v-btn
+                      :disabled="openTransfer"
+                      class="mb-2"
+                      :color="obj.color"
+                      @click="openModal(obj)"
+                    >
                       {{ obj.type }}
                     </v-btn>
                   </div>
@@ -242,7 +247,7 @@
                 color="#76FF03"
                 variant="tonal"
                 :disabled="!selectedCarpet"
-                @click="sendTransfer"
+                @click="outputToServiceTransfers"
               >
                 بعدی
               </v-btn>
@@ -261,10 +266,10 @@
           <v-row align="center" justify="center">
             <v-col cols="12">
               <v-btn
+                :disabled="!openTransfer"
                 class="flex-grow-1"
                 height="48"
                 color="#FFFF00"
-                variant="tonal"
                 width="100%"
                 @click="updateIsFinishedTransfer"
               >
@@ -312,7 +317,7 @@
   </v-dialog>
 
   <v-dialog
-    v-model="inputCarpetFromFactoryDialog"
+    v-model="factoryTransfersDialog"
     persistent
     transition="dialog-bottom-transition"
     :fullscreen="device !== 'desktop' && device !== 'large'"
@@ -320,7 +325,7 @@
   >
     <v-card theme="dark" class="pa-8 d-flex justify-center flex-wrap" dir="rtl">
       <v-responsive>
-        <v-chip outline @click="inputCarpetFromFactoryDialog = false">
+        <v-chip outline @click="factoryTransfersDialog = false">
           <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
         </v-chip>
         <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
@@ -340,7 +345,7 @@
                 color="#76FF03"
                 variant="tonal"
                 :disabled="!selectedCarpet"
-                @click="carpetTransfer()"
+                @click="factoryTransfers()"
               >
                 بعدی
               </v-btn>
@@ -356,6 +361,16 @@
             rounded
           ></v-text-field>
         </v-responsive>
+        <v-btn
+          :disabled="!openTransfer"
+          class="mt-4"
+          height="48"
+          color="#FFFF00"
+          width="100%"
+          @click="updateIsFinishedTransfer"
+        >
+          ثبت نهایی
+        </v-btn>
       </v-responsive>
     </v-card>
   </v-dialog>
@@ -388,7 +403,7 @@
                 color="#76FF03"
                 variant="tonal"
                 :disabled="!selectedCarpet"
-                @click="carpetTransfer2()"
+                @click="inputFromServiceTransfers"
               >
                 بعدی
               </v-btn>
@@ -404,6 +419,16 @@
             rounded
           ></v-text-field>
         </v-responsive>
+        <v-btn
+          :disabled="!openTransfer"
+          class="mt-4"
+          height="48"
+          color="#FFFF00"
+          width="100%"
+          @click="updateIsFinishedTransfer"
+        >
+          ثبت نهایی
+        </v-btn>
       </v-responsive>
     </v-card>
   </v-dialog>
@@ -634,7 +659,7 @@ const selectCarpetDialog = ref(false);
 const selectServicesDialog = ref(false);
 const openTransfer = ref(false);
 const selectedCarpet = ref(null);
-const inputCarpetFromFactoryDialog = ref(false);
+const factoryTransfersDialog = ref(false);
 const inputCarpetFromServiceDialog = ref(false);
 const status = ref(null);
 const dialogTitle = ref("");
@@ -642,9 +667,10 @@ const outputServiceStatus = ref(null);
 const inputFactoryStatus = ref(null);
 const outputFactoryStatus = ref(null);
 const inputServiceStatus = ref(null);
-
+const statuses = ref(null);
 async function getStatuses() {
   await axios.get(APIUrl + "status/all-status-list/").then((response) => {
+    statuses.value = response.data;
     for (const s of response.data) {
       if (s.title === "ورود از کارخانه") {
         inputFactoryStatus.value = s.id;
@@ -658,20 +684,35 @@ async function getStatuses() {
     }
   });
 }
+function getDateAndTime() {
+  let currentdate = new Date();
+  let datetime =
+    currentdate.getFullYear() +
+    "-" +
+    (currentdate.getMonth() + 1) +
+    "-" +
+    currentdate.getDate() +
+    "T" +
+    currentdate.getHours() +
+    ":" +
+    currentdate.getMinutes() +
+    ":" +
+    currentdate.getSeconds() +
+    "Z";
+
+  return datetime;
+}
 function openModal(obj) {
   selectedCarpet.value = null;
-  if (openTransfer.value && obj.type === "خروج قالی به سرویس") {
-    selectCarpetDialog.value = true;
-    status.value = outputServiceStatus.value;
-  } else if (!openTransfer.value && obj.type === "خروج قالی به سرویس") {
+  if (obj.type === "خروج قالی به سرویس") {
     selectOperatorDialog.value = true;
     status.value = outputServiceStatus.value;
   } else if (obj.type === "ورود قالی از کارخانه") {
-    inputCarpetFromFactoryDialog.value = true;
+    factoryTransfersDialog.value = true;
     dialogTitle.value = obj.type;
     status.value = inputFactoryStatus.value;
   } else if (obj.type === "خروج قالی به کارخانه") {
-    inputCarpetFromFactoryDialog.value = true;
+    factoryTransfersDialog.value = true;
     dialogTitle.value = obj.type;
     status.value = outputFactoryStatus.value;
   } else if (obj.type === "ورود قالی از سرویس") {
@@ -704,8 +745,6 @@ function stepperNext() {
     selectServicesDialog.value = true;
     selectCarpetDialog.value = false;
   } else if (selectServicesDialog.value) {
-    localStorage.setItem("openTask", true);
-    sendTransfer();
     selectOperatorDialog.value = false;
     selectServicesDialog.value = false;
     selectedCarpet.value = null;
@@ -721,7 +760,7 @@ function stepperNext2() {
   if (inputSelectOperatorDialog.value) {
     inputSelectOperatorDialog.value = false;
     inputSelectServicesDialog.value = true;
-    inputCarpetFromFactoryDialog.value = false;
+    factoryTransfersDialog.value = false;
   } else if (inputSelectServicesDialog.value) {
     inputSelectOperatorDialog.value = false;
     inputSelectServicesDialog.value = false;
@@ -736,11 +775,11 @@ function stepperPrevious() {
   if (inputSelectServicesDialog.value) {
     inputSelectOperatorDialog.value = true;
     inputSelectServicesDialog.value = false;
-    inputCarpetFromFactoryDialog.value = false;
-  } else if (inputCarpetFromFactoryDialog.value) {
+    factoryTransfersDialog.value = false;
+  } else if (factoryTransfersDialog.value) {
     inputSelectOperatorDialog.value = false;
     inputSelectServicesDialog.value = true;
-    inputCarpetFromFactoryDialog.value = false;
+    factoryTransfersDialog.value = false;
   }
 }
 function stepperPrevious2() {
@@ -792,73 +831,102 @@ function checkOpenTask() {
   continueOpenTaskDialog.value = localStorage.getItem("openTask");
 }
 
-function getDateAndTime() {
-  let currentdate = new Date();
-  let datetime =
-    currentdate.getFullYear() +
-    "-" +
-    (currentdate.getMonth() + 1) +
-    "-" +
-    currentdate.getDate() +
-    "T" +
-    currentdate.getHours() +
-    ":" +
-    currentdate.getMinutes() +
-    ":" +
-    currentdate.getSeconds() +
-    "Z";
-
-  return datetime;
-}
-
 const loader = ref(false);
-async function carpetTransfer() {
+
+async function factoryTransfers() {
+  await getOpenTransfer();
   let carpet = null;
   for (const c of carpetList.value) {
-    if (c.barcode == selectedCarpet.value) {
+    if (c.barcode === selectedCarpet.value) {
       carpet = c;
     }
   }
   alertActivator.value = false;
-  inputCarpetFromFactoryDialog.value = false;
+  factoryTransfersDialog.value = false;
   loader.value = true;
+  let body = {};
 
-  const body = {};
-  body.carpets = [carpet?.id];
-  body.worker = userProfile.value?.id;
-  body.status = status.value;
-  body.service_provider = null;
-  body.services = [];
-  body.date = getDateAndTime();
-  body.is_finished = true;
-  body.admin_verify = false;
-  await axios
-    .post(APIUrl + "transfer/create-transfer2/", body)
-    .then((response) => {
-      selectedCarpet.value = null;
-      alertMsg.value = "ثبت شد";
-      alertActivator.value = true;
-      alertTimeout.value = 2000;
-      alertColor.value = "success";
-      setTimeout(() => {
-        loader.value = false;
-        inputCarpetFromFactoryDialog.value = true;
-      }, 2000);
-    })
-    .catch((error) => {
-      selectedCarpet.value = null;
-      alertMsg.value = "این قالی در لیست وجود ندارد";
-      alertActivator.value = true;
-      alertTimeout.value = 2000;
-      alertColor.value = "error";
-      setTimeout(() => {
-        loader.value = false;
-        inputCarpetFromFactoryDialog.value = true;
-      }, 2000);
-    });
+  if (!openTransfer.value) {
+    body.carpets = [carpet?.id];
+    body.worker = userProfile.value?.id;
+    body.status = status.value;
+    body.service_provider = null;
+    body.services = [];
+    body.date = getDateAndTime();
+    body.is_finished = false;
+    body.admin_verify = false;
+    await axios
+      .post(APIUrl + "transfer/create-transfer2/", body)
+      .then((response) => {
+        openTransfer.value = true;
+        localStorage.setItem("openTask", true);
+        selectedCarpet.value = null;
+        alertMsg.value = "ثبت شد";
+        alertActivator.value = true;
+        alertTimeout.value = 2000;
+        alertColor.value = "success";
+        setTimeout(() => {
+          loader.value = false;
+          factoryTransfersDialog.value = true;
+        }, 2000);
+      })
+      .catch((error) => {
+        selectedCarpet.value = null;
+        alertMsg.value = "این قالی در لیست وجود ندارد";
+        alertActivator.value = true;
+        alertTimeout.value = 2000;
+        alertColor.value = "error";
+        setTimeout(() => {
+          loader.value = false;
+          factoryTransfersDialog.value = true;
+        }, 2000);
+      });
+  } else {
+    notIsFinishedTransfer.value?.carpets?.push(carpet?.id);
+    selectCarpetDialog.value = false;
+    alertActivator.value = false;
+    loader.value = true;
+    body = {};
+    body.carpets = notIsFinishedTransfer.value.carpets;
+    body.worker = notIsFinishedTransfer.value.worker;
+    body.status = notIsFinishedTransfer.value.status;
+    body.service_provider = notIsFinishedTransfer.value.serviceProviders;
+    body.services = notIsFinishedTransfer.value.services;
+    body.date = notIsFinishedTransfer.value.date;
+    body.is_finished = false;
+    body.admin_verify = false;
+    axios
+      .put(
+        APIUrl + "transfer/update-transfer2/" + notIsFinishedTransfer.value.id + "/",
+        body
+      )
+      .then((response) => {
+        selectedCarpet.value = null;
+        alertMsg.value = "ثبت شد";
+        alertActivator.value = true;
+        alertTimeout.value = 2000;
+        alertColor.value = "success";
+        setTimeout(() => {
+          loader.value = false;
+          factoryTransfersDialog.value = true;
+        }, 2000);
+      })
+      .catch((error) => {
+        selectedCarpet.value = null;
+        alertMsg.value = "این قالی در لیست وجود ندارد";
+        alertActivator.value = true;
+        alertTimeout.value = 2000;
+        alertColor.value = "error";
+        setTimeout(() => {
+          loader.value = false;
+          factoryTransfersDialog.value = true;
+        }, 2000);
+      });
+  }
 }
 
-async function carpetTransfer2() {
+async function inputFromServiceTransfers() {
+  await getOpenTransfer();
   let carpet = null;
   for (const c of carpetList.value) {
     if (c.barcode == selectedCarpet.value) {
@@ -868,51 +936,105 @@ async function carpetTransfer2() {
   alertActivator.value = false;
   inputCarpetFromServiceDialog.value = false;
   loader.value = true;
+  let body = {};
 
-  const body = {};
-  body.carpets = [carpet?.id];
-  body.worker = userProfile.value?.id;
-  body.status = status.value;
-  body.service_provider = sP.value;
-  body.services = s.value;
-  body.date = getDateAndTime();
-  body.is_finished = true;
-  body.admin_verify = false;
-  await axios
-    .post(APIUrl + "transfer/create-transfer2/", body)
-    .then((response) => {
-      selectedCarpet.value = null;
-      alertMsg.value = "ثبت شد";
-      alertActivator.value = true;
-      alertTimeout.value = 2000;
-      alertColor.value = "success";
-      setTimeout(() => {
-        loader.value = false;
-        inputCarpetFromServiceDialog.value = true;
-      }, 2000);
-    })
-    .catch((error) => {
-      selectedCarpet.value = null;
-      alertMsg.value = "این قالی در لیست وجود ندارد";
-      alertActivator.value = true;
-      alertTimeout.value = 2000;
-      alertColor.value = "error";
-      setTimeout(() => {
-        loader.value = false;
-        inputCarpetFromServiceDialog.value = true;
-      }, 2000);
-    });
+  if (!openTransfer.value) {
+    body = {};
+    body.carpets = [carpet?.id];
+    body.worker = userProfile.value?.id;
+    body.status = inputServiceStatus.value;
+    body.service_provider = sP.value;
+    body.services = s.value;
+    body.date = getDateAndTime();
+    body.is_finished = false;
+    body.admin_verify = false;
+    await axios
+      .post(APIUrl + "transfer/create-transfer2/", body)
+      .then((response) => {
+        openTransfer.value = true;
+        localStorage.setItem("openTask", true);
+        selectedCarpet.value = null;
+        alertMsg.value = "ثبت شد";
+        alertActivator.value = true;
+        alertTimeout.value = 2000;
+        alertColor.value = "success";
+        setTimeout(() => {
+          loader.value = false;
+          inputCarpetFromServiceDialog.value = true;
+        }, 2000);
+      })
+      .catch((error) => {
+        selectedCarpet.value = null;
+        alertMsg.value = "این قالی در لیست وجود ندارد";
+        alertActivator.value = true;
+        alertTimeout.value = 2000;
+        alertColor.value = "error";
+        setTimeout(() => {
+          loader.value = false;
+          inputCarpetFromServiceDialog.value = true;
+        }, 2000);
+      });
+  } else {
+    notIsFinishedTransfer.value?.carpets?.push(carpet?.id);
+    selectCarpetDialog.value = false;
+    alertActivator.value = false;
+    loader.value = true;
+    body = {};
+    body.carpets = notIsFinishedTransfer.value.carpets;
+    body.worker = notIsFinishedTransfer.value.worker;
+    body.status = notIsFinishedTransfer.value.status;
+    body.service_provider = notIsFinishedTransfer.value.serviceProviders;
+    body.services = notIsFinishedTransfer.value.services;
+    body.date = notIsFinishedTransfer.value.date;
+    body.is_finished = false;
+    body.admin_verify = false;
+    axios
+      .put(
+        APIUrl + "transfer/update-transfer2/" + notIsFinishedTransfer.value.id + "/",
+        body
+      )
+      .then((response) => {
+        selectedCarpet.value = null;
+        alertMsg.value = "ثبت شد";
+        alertActivator.value = true;
+        alertTimeout.value = 2000;
+        alertColor.value = "success";
+        setTimeout(() => {
+          loader.value = false;
+          inputCarpetFromServiceDialog.value = true;
+        }, 2000);
+      })
+      .catch((error) => {
+        selectedCarpet.value = null;
+        alertMsg.value = "این قالی در لیست وجود ندارد";
+        alertActivator.value = true;
+        alertTimeout.value = 2000;
+        alertColor.value = "error";
+        setTimeout(() => {
+          loader.value = false;
+          inputCarpetFromServiceDialog.value = true;
+        }, 2000);
+      });
+  }
 }
-async function sendTransfer() {
+
+async function outputToServiceTransfers() {
+  await getOpenTransfer();
+  let carpet = null;
+  for (const c of carpetList.value) {
+    if (c.barcode == selectedCarpet.value) {
+      carpet = c;
+    }
+  }
   alertActivator.value = false;
   selectCarpetDialog.value = false;
   loader.value = true;
-  await getOpenTransfer();
-  const body = {};
+  let body = {};
   if (!openTransfer.value) {
-    body.carpets = [];
+    body = {};
+    body.carpets = [carpet?.id];
     body.worker = userProfile.value.id;
-    body.status = inputFactoryStatus.value;
+    body.status = outputServiceStatus.value;
     body.service_provider = selectedOperator?.value?.id;
     body.services = selectedServices.value;
     body.date = getDateAndTime();
@@ -922,6 +1044,16 @@ async function sendTransfer() {
       .post(APIUrl + "transfer/create-transfer2/", body)
       .then((response) => {
         openTransfer.value = true;
+        localStorage.setItem("openTask", true);
+        selectedCarpet.value = null;
+        alertMsg.value = "ثبت شد";
+        alertActivator.value = true;
+        alertTimeout.value = 2000;
+        alertColor.value = "success";
+        setTimeout(() => {
+          loader.value = false;
+          selectCarpetDialog.value = true;
+        }, 2000);
       })
       .catch((error) => {
         selectedCarpet.value = null;
@@ -935,17 +1067,11 @@ async function sendTransfer() {
         }, 2000);
       });
   } else {
-    let carpet = null;
-    for (const c of carpetList.value) {
-      if (c.barcode == selectedCarpet.value) {
-        carpet = c;
-      }
-    }
+    body = {};
     notIsFinishedTransfer.value?.carpets?.push(carpet?.id);
     selectCarpetDialog.value = false;
     alertActivator.value = false;
     loader.value = true;
-    const body = {};
     body.carpets = notIsFinishedTransfer.value.carpets;
     body.worker = notIsFinishedTransfer.value.worker;
     body.status = notIsFinishedTransfer.value.status;
@@ -1005,6 +1131,9 @@ async function updateIsFinishedTransfer() {
     )
     .then((response) => {
       selectCarpetDialog.value = false;
+      inputCarpetFromServiceDialog.value = false;
+      factoryTransfersDialog.value = false;
+
       openTransfer.value = false;
       loader.value = false;
 
@@ -1027,11 +1156,49 @@ async function updateIsFinishedTransfer() {
     });
 }
 
-function continueOpenTransfer() {
+async function continueOpenTransfer() {
+  await getOpenTransfer();
+
   selectedCarpet.value = null;
   continueOpenTaskDialog.value = false;
-  selectCarpetDialog.value = true;
+  let status = null;
+  for (const s of statuses.value) {
+    if (notIsFinishedTransfer.value.status === s.id) {
+      status = s.title;
+      console.log("status", status);
+    }
+  }
+  dialogTitle.value = status;
+
+  if (status === "خروج به سرویس") {
+    selectCarpetDialog.value = true;
+    status.value = outputServiceStatus.value;
+  } else if (status === "ورود از کارخانه") {
+    factoryTransfersDialog.value = true;
+    status.value = inputFactoryStatus.value;
+  } else if (status === "خروج به کارخانه") {
+    factoryTransfersDialog.value = true;
+    status.value = outputFactoryStatus.value;
+  } else if (status === "ورود از سرویس") {
+    inputCarpetFromServiceDialog.value = true;
+    status.value = inputServiceStatus.value;
+  }
 }
+
+watch(
+  () => selectedCarpet.value,
+  () => {
+    if (status.value === inputFactoryStatus.value && selectedCarpet.value) {
+      factoryTransfers();
+    } else if (status.value === outputFactoryStatus.value && selectedCarpet.value) {
+      factoryTransfers();
+    } else if (status.value === inputServiceStatus.value && selectedCarpet.value) {
+      inputFromServiceTransfers();
+    } else if (status.value === outputServiceStatus.value && selectedCarpet.value) {
+      outputToServiceTransfers();
+    }
+  }
+);
 </script>
 <style scoped>
 .cart {
