@@ -1962,6 +1962,40 @@
                     </td>
                     <td class="pa-2">
                       <div style="font-size: 1em">
+                        وضعیت:
+                        {{ item?.carpet?.lastTransfer?.status[0]?.title }}
+                        <hr />
+                        تاریخ:
+                        {{
+                          convertPersianNumberToLatin(
+                            gregorian_to_jalali(
+                              Number(item?.carpet?.lastTransfer?.date.substr(0, 4)),
+                              Number(item?.carpet?.lastTransfer?.date.substr(5, 2)),
+                              Number(item?.carpet?.lastTransfer?.date.substr(8, 2))
+                            )
+                          )
+                        }}
+                        <hr />
+                        سرویس کار:
+                        {{
+                          item?.carpet?.lastTransfer?.service_provider
+                            ? item?.carpet?.lastTransfer?.service_provider[0]?.first_name
+                              ? item?.carpet?.lastTransfer?.service_provider[0]
+                                  ?.first_name +
+                                " " +
+                                item?.carpet?.lastTransfer?.service_provider[0]?.last_name
+                              : "ثبت نشده"
+                            : "ثبت نشده"
+                        }}
+                        <hr />
+                        سرویس ها:
+                        <div
+                          v-for="(s, i) in item?.carpet?.lastTransfer?.services"
+                          :key="i"
+                        >
+                          {{ s?.title }}
+                        </div>
+                        <hr />
                         <v-icon color="#FF1744" @click="getLastTransfer(item?.carpet.id)">
                           mdi-eye
                         </v-icon>
@@ -2148,7 +2182,7 @@
                   <tr class="text-center" :style="{ 'background-color': '#BDBDBD' }">
                     <td class="pa-2">
                       <div style="font-size: 1em">
-                        {{ lastTransfer?.status }}
+                        {{ lastTransfer?.status[0]?.title }}
                       </div>
                     </td>
                     <td>
@@ -2178,10 +2212,12 @@
                     <td>
                       <div style="font-size: 1em">
                         {{
-                          lastTransfer?.service_provider[0]?.first_name
-                            ? lastTransfer?.service_provider[0]?.first_name +
-                              " " +
-                              lastTransfer?.service_provider[0]?.last_name
+                          lastTransfer?.service_provider
+                            ? lastTransfer?.service_provider[0]?.first_name
+                              ? lastTransfer?.service_provider[0]?.first_name +
+                                " " +
+                                lastTransfer?.service_provider[0]?.last_name
+                              : "ثبت نشده"
                             : "ثبت نشده"
                         }}
                       </div>
@@ -2421,8 +2457,8 @@ function convertPersianNumberToLatin(number) {
   return str;
 }
 
-// const APIUrl = "http://192.168.1.62:8000/";
-const APIUrl = "https://carpet.iran.liara.run/";
+const APIUrl = "http://192.168.1.62:8000/";
+// const APIUrl = "https://carpet.iran.liara.run/";
 // const APIUrl = "http://localhost:8000/";
 
 const carpetFiltersDialog = ref(false);
@@ -3309,9 +3345,23 @@ function getKinds() {
   });
 }
 
+const lastTransfersDialog = ref(false);
+const lastTransfer = ref(null);
+function getLastTransfer(id) {
+  lastTransfersDialog.value = true;
+  lastTransfer.value = null;
+  let data;
+  axios.get(APIUrl + "carpet/last-transfers/" + id + "/").then((response) => {
+    console.log(response);
+    lastTransfer.value = response.data;
+    data = response.data;
+  });
+  return data;
+}
+
 const reportCarpetsDialog = ref(false);
 const reportCarpets = ref([]);
-function getAndShowCarpets() {
+async function getAndShowCarpets() {
   reportCarpetsDialog.value = true;
 
   let filterParams = "&";
@@ -3385,7 +3435,7 @@ function getAndShowCarpets() {
   } else {
     url = "carpet/carpet-with-transfers/";
   }
-  axios.get(APIUrl + url).then((response) => {
+  await axios.get(APIUrl + url).then(async (response) => {
     console.log(response);
     for (const obj of response.data.results) {
       data = {};
@@ -3408,6 +3458,13 @@ function getAndShowCarpets() {
           }
         }
       }
+
+      await axios
+        .get(APIUrl + "carpet/last-transfers/" + obj.id + "/")
+        .then((response) => {
+          data.carpet.lastTransfer = response.data;
+        });
+
       reportCarpets.value.push(data);
     }
   });
@@ -3427,17 +3484,6 @@ function getCarpetTransfers(id) {
   }
 }
 
-const lastTransfersDialog = ref(false);
-const lastTransfer = ref(null);
-async function getLastTransfer(id) {
-  lastTransfersDialog.value = true;
-  lastTransfer.value = null;
-  await axios.get(APIUrl + "carpet/last-transfers/" + id + "/").then((response) => {
-    console.log(response);
-    lastTransfer.value = response.data;
-  });
-}
-
 const openCarpetsDialog = ref(false);
 const openCarpets = ref([]);
 async function getOpenCarpets() {
@@ -3451,7 +3497,7 @@ async function getOpenCarpets() {
         console.log(response);
         lastTransfer.value = response.data;
       });
-    if (lastTransfer.value?.status === 3) {
+    if (lastTransfer.value?.status[0]?.id === 3) {
       openCarpets.value.push(carpet);
     }
   }

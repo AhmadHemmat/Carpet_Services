@@ -618,8 +618,8 @@ onMounted(async () => {
   await getOpenTransfer();
 });
 
-// const APIUrl = "http://192.168.1.62:8000/";
-const APIUrl = "https://carpet.iran.liara.run/";
+const APIUrl = "http://192.168.1.62:8000/";
+// const APIUrl = "https://carpet.iran.liara.run/";
 // const APIUrl = "http://localhost:8000/";
 
 const alertMsg = ref("");
@@ -1188,13 +1188,25 @@ async function continueOpenTransfer() {
 watch(
   () => selectedCarpet.value,
   () => {
-    if (status.value === inputFactoryStatus.value && selectedCarpet.value) {
+    if (
+      (status.value === inputFactoryStatus.value || factoryTransfersDialog.value) &&
+      selectedCarpet.value
+    ) {
       factoryTransfers();
-    } else if (status.value === outputFactoryStatus.value && selectedCarpet.value) {
+    } else if (
+      (status.value === outputFactoryStatus.value || factoryTransfersDialog.value) &&
+      selectedCarpet.value
+    ) {
       factoryTransfers();
-    } else if (status.value === inputServiceStatus.value && selectedCarpet.value) {
+    } else if (
+      (status.value === inputServiceStatus.value || inputCarpetFromServiceDialog.value) &&
+      selectedCarpet.value
+    ) {
       inputFromServiceTransfers();
-    } else if (status.value === outputServiceStatus.value && selectedCarpet.value) {
+    } else if (
+      (status.value === outputServiceStatus.value || selectCarpetDialog.value) &&
+      selectedCarpet.value
+    ) {
       outputToServiceTransfers();
     }
   }
