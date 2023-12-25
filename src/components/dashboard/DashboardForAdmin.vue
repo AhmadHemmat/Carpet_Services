@@ -1725,7 +1725,7 @@
                 v-model="area"
                 class="pa-2"
                 color="primary"
-                label="مساحت"
+                label="متراژ"
                 rounded
               ></v-text-field>
             </v-locale-provider>
@@ -1769,7 +1769,7 @@
           <div style="font-size: 1.3em">آمار</div>
         </v-card>
         <v-chip class="ma-2" color="warning">
-          <div style="font-size: 1em">جمع کل مساحت: {{ totalAreaAll }}</div>
+          <div style="font-size: 1em">جمع کل متراژ: {{ totalAreaAll }}</div>
         </v-chip>
         <v-chip class="ma-2" color="warning">
           <div style="font-size: 1em">جمع کل قالی ها: {{ totalCarpets }}</div>
@@ -1791,7 +1791,7 @@
                       <div style="font-size: 1.2em">سرویس</div>
                     </th>
                     <th class="text-center">
-                      <div style="font-size: 1.2em">مساحت</div>
+                      <div style="font-size: 1.2em">متراژ</div>
                     </th>
                     <th class="text-center">
                       <div style="font-size: 1.2em">تعداد قالی ها</div>
@@ -1899,7 +1899,6 @@
                 </thead>
                 <tbody v-for="(item, i) in reportCarpets" :key="i">
                   <tr
-                    v-if="item?.transfers?.length > 0"
                     class="text-center"
                     :style="{
                       'background-color': !item?.isSelected
@@ -2843,34 +2842,29 @@ async function filter() {
 
   let transfer2 = {};
   transfersForCalculteArea.value = [];
-  await axios
-    .get(
-      APIUrl + "transfer/all-transfer-list/" + "?page_size=9000000000000" + filterParams
-    )
-    .then((response) => {
-      for (let i = 0; i < response.data.results.length; i++) {
-        transfer2 = {};
 
-        transfer2.carpets = [];
-        for (const carpet of carpetList.value) {
-          for (const c of response.data.results[i].carpets) {
-            if (carpet.id === c) {
-              transfer2.carpets.push(carpet);
-            }
-          }
-        }
-        transfer2.services = [];
-        for (const service of servicesList.value) {
-          for (const s of response.data.results[i].services) {
-            if (service.id === s) {
-              transfer2.services.push(service);
-            }
-          }
-        }
+  for (let i = 0; i < allTransfers.value.length; i++) {
+    transfer2 = {};
 
-        transfersForCalculteArea.value.push(transfer2);
+    transfer2.carpets = [];
+    for (const carpet of carpetList.value) {
+      for (const c of allTransfers.value[i].carpets) {
+        if (carpet.id === c.id) {
+          transfer2.carpets.push(carpet);
+        }
       }
-    });
+    }
+    transfer2.services = [];
+    for (const service of servicesList.value) {
+      for (const s of allTransfers.value[i].services) {
+        if (service.id === s.id) {
+          transfer2.services.push(service);
+        }
+      }
+    }
+
+    transfersForCalculteArea.value.push(transfer2);
+  }
 }
 
 function cleanNoAcceptFilters() {
@@ -2916,6 +2910,8 @@ async function getAllTransfers() {
   await axios
     .get(APIUrl + "transfer/all-transfer-list/" + "?page=" + transferPage.value)
     .then((response) => {
+      allTransfers.value = [];
+
       if (response.data.count % 10 === 0) pageCount.value = response.data.count / 10;
       else pageCount.value = response.data.count / 10 + 1;
 
@@ -3463,9 +3459,11 @@ async function getAndShowCarpets() {
         .get(APIUrl + "carpet/last-transfers/" + obj.id + "/")
         .then((response) => {
           data.carpet.lastTransfer = response.data;
+        })
+        .catch((error) => {
+          console.log(error);
         });
-
-      reportCarpets.value.push(data);
+      if (data?.transfers?.length > 0) reportCarpets.value.push(data);
     }
   });
 }
@@ -3490,16 +3488,17 @@ async function getOpenCarpets() {
   openCarpetsDialog.value = true;
   openCarpets.value = [];
   for (const carpet of carpetList.value) {
-    lastTransfer.value = null;
     await axios
       .get(APIUrl + "carpet/last-transfers/" + carpet.id + "/")
       .then((response) => {
         console.log(response);
-        lastTransfer.value = response.data;
+        if (response.data.status[0]?.title === "خروج به سرویس") {
+          openCarpets.value.push(carpet);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
       });
-    if (lastTransfer.value?.status[0]?.id === 3) {
-      openCarpets.value.push(carpet);
-    }
   }
 }
 </script>

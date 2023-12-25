@@ -67,7 +67,7 @@ import Alert from "@/components/Alert.vue";
 
 const APIUrl = "http://192.168.1.62:8000/";
 // const APIUrl = "https://carpet.iran.liara.run/";
-// const APIUrl = "http://localhost:8000/";s
+// const APIUrl = "http://localhost:8000/";
 
 function convertPersianNumberToLatin(number) {
   let numberStr = number.toString();

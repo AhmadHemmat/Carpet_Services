@@ -67,13 +67,6 @@
           <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
         </v-chip>
 
-        <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
-          <span>
-            مرحله ۱ خروج قالی
-            <br />
-            انتخاب سرویس کار
-          </span>
-        </v-card>
         <div class="text-center my-4">
           <v-row align="center" justify="center">
             <v-col>
@@ -106,7 +99,7 @@
             </v-table>
           </v-col>
           <v-col cols="12">
-            <v-card class="cart mx-2" :style="{ height: 300 + 'px', overflow: 'auto' }">
+            <v-card class="cart mx-2" :style="{ height: 200 + 'px', overflow: 'auto' }">
               <v-table>
                 <tbody>
                   <tr v-for="(item, i) in serviceProviders" :key="i" class="text-center">
@@ -144,16 +137,9 @@
           <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
         </v-chip>
 
-        <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
-          <span>
-            مرحله ۲ خروج قالی
-            <br />
-            انتخاب سرویس ها
-          </span>
-        </v-card>
         <div class="text-center my-4">
           <v-row align="center" justify="center">
-            <v-col cols="6">
+            <v-col cols="12">
               <v-btn
                 class="flex-grow-1"
                 height="48"
@@ -164,18 +150,6 @@
                 @click="stepperNext"
               >
                 بعدی
-              </v-btn>
-            </v-col>
-            <v-col cols="6">
-              <v-btn
-                class="flex-grow-1"
-                height="48"
-                width="100%"
-                color="#FF1744"
-                variant="tonal"
-                @click="stepperPrevious"
-              >
-                قبلی
               </v-btn>
             </v-col>
           </v-row>
@@ -194,7 +168,7 @@
             </v-table>
           </v-col>
           <v-col cols="12">
-            <v-card class="cart mx-2" :style="{ height: 300 + 'px', overflow: 'auto' }">
+            <v-card class="cart mx-2" :style="{ height: 200 + 'px', overflow: 'auto' }">
               <v-table>
                 <tbody>
                   <tr v-for="(item, i) in services" :key="i" class="text-center">
@@ -445,13 +419,6 @@
           <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
         </v-chip>
 
-        <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
-          <span>
-            مرحله ۱ ورود قالی
-            <br />
-            انتخاب سرویس کار
-          </span>
-        </v-card>
         <div class="text-center my-4">
           <v-row align="center" justify="center">
             <v-col>
@@ -484,7 +451,7 @@
             </v-table>
           </v-col>
           <v-col cols="12">
-            <v-card class="cart mx-2" :style="{ height: 300 + 'px', overflow: 'auto' }">
+            <v-card class="cart mx-2" :style="{ height: 200 + 'px', overflow: 'auto' }">
               <v-table>
                 <tbody>
                   <tr v-for="(item, i) in serviceProviders" :key="i" class="text-center">
@@ -522,16 +489,9 @@
           <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
         </v-chip>
 
-        <v-card class="mt-4 d-flex justify-center text-center pa-2" color="warning">
-          <span>
-            مرحله ۲ ورود قالی
-            <br />
-            انتخاب سرویس ها
-          </span>
-        </v-card>
         <div class="text-center my-4">
           <v-row align="center" justify="center">
-            <v-col cols="6">
+            <v-col cols="12">
               <v-btn
                 class="flex-grow-1"
                 height="48"
@@ -542,18 +502,6 @@
                 @click="stepperNext2"
               >
                 بعدی
-              </v-btn>
-            </v-col>
-            <v-col cols="6">
-              <v-btn
-                class="flex-grow-1"
-                height="48"
-                width="100%"
-                color="#FF1744"
-                variant="tonal"
-                @click="stepperPrevious2"
-              >
-                قبلی
               </v-btn>
             </v-col>
           </v-row>
@@ -572,7 +520,7 @@
             </v-table>
           </v-col>
           <v-col cols="12">
-            <v-card class="cart mx-2" :style="{ height: 300 + 'px', overflow: 'auto' }">
+            <v-card class="cart mx-2" :style="{ height: 200 + 'px', overflow: 'auto' }">
               <v-table>
                 <tbody>
                   <tr v-for="(item, i) in services" :key="i" class="text-center">

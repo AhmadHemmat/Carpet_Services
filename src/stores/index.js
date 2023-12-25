@@ -8,7 +8,7 @@ export const loginStore = defineStore('login', {
       isStaff: null,
       APIUrl: "http://192.168.1.62:8000/"
       // APIUrl: "https://carpet.iran.liara.run/"
-      // APIUr: "http://localhost:8000/"
+      // APIUrl: "http://localhost:8000/"
     }),
 
     actions: {
