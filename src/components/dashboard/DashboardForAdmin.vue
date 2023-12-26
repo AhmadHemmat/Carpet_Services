@@ -2456,8 +2456,8 @@ function convertPersianNumberToLatin(number) {
   return str;
 }
 
-const APIUrl = "http://192.168.1.62:8000/";
-// const APIUrl = "https://carpet.iran.liara.run/";
+// const APIUrl = "http://192.168.1.62:8000/";
+const APIUrl = "https://carpet.iran.liara.run/";
 // const APIUrl = "http://localhost:8000/";
 
 const carpetFiltersDialog = ref(false);
@@ -3360,7 +3360,7 @@ const reportCarpets = ref([]);
 async function getAndShowCarpets() {
   reportCarpetsDialog.value = true;
 
-  let filterParams = "&";
+  let filterParams = "";
 
   if (filteredBarcode.value) {
     filterParams += "barcode=" + filteredBarcode.value + "&";
@@ -3432,7 +3432,8 @@ async function getAndShowCarpets() {
     url = "carpet/carpet-with-transfers/";
   }
   await axios.get(APIUrl + url).then(async (response) => {
-    console.log(response);
+    reportCarpets.value = [];
+
     for (const obj of response.data.results) {
       data = {};
       data.isSelected = false;
@@ -3485,9 +3486,10 @@ function getCarpetTransfers(id) {
 const openCarpetsDialog = ref(false);
 const openCarpets = ref([]);
 async function getOpenCarpets() {
+  await getAndShowCarpets();
   openCarpetsDialog.value = true;
   openCarpets.value = [];
-  for (const carpet of carpetList.value) {
+  for (const carpet of reportCarpets.value) {
     await axios
       .get(APIUrl + "carpet/last-transfers/" + carpet.id + "/")
       .then((response) => {
