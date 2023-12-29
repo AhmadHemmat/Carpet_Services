@@ -124,7 +124,13 @@
                       <div style="font-size: 1.3em">وضعیت</div>
                     </th>
                     <th class="text-center">
+                      <div style="font-size: 1.3em">ویرایش</div>
+                    </th>
+                    <th class="text-center">
                       <div style="font-size: 1.3em">تایید؟</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.3em">حذف</div>
                     </th>
                   </tr>
                 </thead>
@@ -154,6 +160,11 @@
                       </v-btn>
                     </td>
                     <td>
+                      <v-icon color="#FF1744" @click="getTransferInfo(item?.id)">
+                        mdi-account-edit
+                      </v-icon>
+                    </td>
+                    <td>
                       <v-btn
                         class="flex-grow-1"
                         height="30"
@@ -163,6 +174,11 @@
                       >
                         تایید
                       </v-btn>
+                    </td>
+                    <td>
+                      <v-icon color="#FF1744" @click="deleteTransfer(item?.id)">
+                        mdi-delete-forever
+                      </v-icon>
                     </td>
                   </tr>
                 </tbody>
@@ -201,7 +217,13 @@
                       <div style="font-size: 1.2em">فرش ها</div>
                     </th>
                     <th class="text-center">
+                      <div style="font-size: 1.2em">ویرایش</div>
+                    </th>
+                    <th class="text-center">
                       <div style="font-size: 1.2em">تایید؟</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">حذف؟</div>
                     </th>
                   </tr>
                 </thead>
@@ -274,15 +296,28 @@
                       <div v-else style="font-size: 1em">ثبت نشده <br /></div>
                     </td>
                     <td>
+                      <v-icon color="#FF1744" @click="getTransferInfo(item?.id)">
+                        mdi-account-edit
+                      </v-icon>
+                    </td>
+                    <td>
                       <v-btn
                         class="ma-2"
                         height="30"
-                        width="70"
+                        width="100"
                         color="black"
                         @click="acceptTransfer(true, item?.id)"
                       >
+                        <v-icon color="success"
+                          >mdi-checkbox-marked-circle-outline</v-icon
+                        >
                         تایید
                       </v-btn>
+                    </td>
+                    <td>
+                      <v-icon color="#FF1744" @click="deleteTransfer(item?.id)">
+                        mdi-delete-forever
+                      </v-icon>
                     </td>
                   </tr>
                 </tbody>
@@ -1901,11 +1936,7 @@
                   <tr
                     class="text-center"
                     :style="{
-                      'background-color': !item?.isSelected
-                        ? i % 2 === 0
-                          ? '#BDBDBD'
-                          : '#FAFAFA'
-                        : '#B2FF59',
+                      'background-color': i % 2 === 0 ? '#BDBDBD' : '#FAFAFA',
                     }"
                   >
                     <td class="pa-2">
@@ -2300,6 +2331,12 @@
                     <th class="text-center">
                       <div style="font-size: 1.2em">تعداد شانه</div>
                     </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">نقل و انتقالات</div>
+                    </th>
+                    <th class="text-center">
+                      <div style="font-size: 1.2em">آخرین انتقال</div>
+                    </th>
                   </tr>
                 </thead>
                 <tbody v-for="(item, i) in openCarpets" :key="i">
@@ -2315,39 +2352,90 @@
                       </div>
                     </td>
                     <td class="pa-2">
-                      <div style="font-size: 1em">{{ item?.barcode }}</div>
+                      <div style="font-size: 1em">{{ item?.carpet?.barcode }}</div>
                     </td>
                     <td>
                       <div style="font-size: 1em">
-                        {{ item?.factory }}
+                        {{ item?.carpet?.factory }}
                       </div>
                     </td>
                     <td>
-                      <div style="font-size: 1em">{{ item?.map_code }}</div>
+                      <div style="font-size: 1em">{{ item?.carpet?.map_code }}</div>
                     </td>
                     <td>
                       <div style="font-size: 1em">
-                        {{ item?.size }}
+                        {{ item?.carpet?.size }}
                       </div>
                     </td>
                     <td>
                       <div style="font-size: 1em">
-                        {{ item?.color }}
+                        {{ item?.carpet?.color }}
                       </div>
                     </td>
                     <td class="pa-2">
                       <div style="font-size: 1em">
-                        {{ item?.costumer_name }}
+                        {{ item?.carpet?.costumer_name }}
                       </div>
                     </td>
                     <td class="pa-2">
                       <div style="font-size: 1em">
-                        {{ item?.kind }}
+                        {{ item?.carpet?.kind }}
                       </div>
                     </td>
                     <td class="pa-2">
                       <div style="font-size: 1em">
-                        {{ item?.density }}
+                        {{ item?.carpet?.density }}
+                      </div>
+                    </td>
+                    <td class="pa-2">
+                      <div>
+                        <v-icon
+                          color="#FF1744"
+                          @click="getCarpetTransfers(item?.carpet?.id)"
+                        >
+                          mdi-eye
+                        </v-icon>
+                      </div>
+                    </td>
+                    <td class="pa-2">
+                      <div style="font-size: 1em">
+                        وضعیت:
+                        {{ item?.carpet?.lastTransfer?.status[0]?.title }}
+                        <hr />
+                        تاریخ:
+                        {{
+                          convertPersianNumberToLatin(
+                            gregorian_to_jalali(
+                              Number(item?.carpet?.lastTransfer?.date.substr(0, 4)),
+                              Number(item?.carpet?.lastTransfer?.date.substr(5, 2)),
+                              Number(item?.carpet?.lastTransfer?.date.substr(8, 2))
+                            )
+                          )
+                        }}
+                        <hr />
+                        سرویس کار:
+                        {{
+                          item?.carpet?.lastTransfer?.service_provider
+                            ? item?.carpet?.lastTransfer?.service_provider[0]?.first_name
+                              ? item?.carpet?.lastTransfer?.service_provider[0]
+                                  ?.first_name +
+                                " " +
+                                item?.carpet?.lastTransfer?.service_provider[0]?.last_name
+                              : "ثبت نشده"
+                            : "ثبت نشده"
+                        }}
+                        <hr />
+                        سرویس ها:
+                        <div
+                          v-for="(s, i) in item?.carpet?.lastTransfer?.services"
+                          :key="i"
+                        >
+                          {{ s?.title }}
+                        </div>
+                        <hr />
+                        <v-icon color="#FF1744" @click="getLastTransfer(item?.carpet.id)">
+                          mdi-eye
+                        </v-icon>
                       </div>
                     </td>
                   </tr>
@@ -2357,6 +2445,61 @@
           </v-col>
         </v-row>
       </v-responsive>
+    </v-card>
+  </v-dialog>
+
+  <!-- edit transfer -->
+  <v-dialog
+    v-model="editTransferDialog"
+    persistent
+    transition="dialog-bottom-transition"
+    :fullscreen="device !== 'desktop' && device !== 'large'"
+    :width="device === 'desktop' || device === 'large' ? '50%' : '100%'"
+  >
+    <v-card theme="dark" class="pa-8 d-flex justify-center" dir="rtl">
+      <v-chip style="width: 50px" outline @click="editTransferDialog = false">
+        <v-icon color="red" size="large">mdi-exit-to-app</v-icon>
+      </v-chip>
+
+      <v-card class="mt-4 text-center pa-2" color="warning">
+        <span>ویرایش انتقال</span>
+      </v-card>
+      <v-card
+        class="cart my-2"
+        width="100%"
+        :style="{ height: 200 + 'px', overflow: 'auto' }"
+      >
+        <v-locale-provider rtl>
+          <v-autocomplete
+            class="mx-2"
+            v-model="selectedCarpets"
+            :items="transferCarpetsInEdit"
+            color="blue-grey-lighten-2"
+            item-title="barcode"
+            label="انتخاب فرش ها"
+            clearable
+            dir="rtl"
+            chips
+            closable-chips
+            multiple
+            rounded
+            return-object
+          >
+          </v-autocomplete>
+        </v-locale-provider>
+        <v-divider></v-divider>
+        <div align="center" justify="center">
+          <v-btn
+            :disabled="selectedCarpets.length === 0"
+            class="my-2"
+            color="success"
+            width="200"
+            @click="editTransfer"
+          >
+            <div>ذخیره</div>
+          </v-btn>
+        </div>
+      </v-card>
     </v-card>
   </v-dialog>
 </template>
@@ -2380,7 +2523,7 @@ const windowHeight = computed(() => {
   return window.innerHeight - 290;
 });
 const windowHeight2 = computed(() => {
-  return window.innerHeight - 220;
+  return window.innerHeight - 250;
 });
 const store = breakPointsStore();
 const device = ref(store.device);
@@ -2693,6 +2836,7 @@ const transferCarpets = ref(null);
 const filterHolder = ref({});
 const pageCount = ref(0);
 const statisticsBtn = ref(false);
+
 async function filter() {
   statisticsBtn.value = true;
   filterDialog.value = false;
@@ -2783,7 +2927,6 @@ async function filter() {
 
   allTransfers.value = [];
   let transfer = {};
-
   await axios
     .get(
       APIUrl +
@@ -3357,97 +3500,26 @@ function getLastTransfer(id) {
 
 const reportCarpetsDialog = ref(false);
 const reportCarpets = ref([]);
-async function getAndShowCarpets() {
-  reportCarpetsDialog.value = true;
-
-  let filterParams = "";
-
-  if (filteredBarcode.value) {
-    filterParams += "barcode=" + filteredBarcode.value + "&";
-  }
-  if (filteredColor.value) {
-    filterParams += "color=" + filteredColor.value + "&";
-  }
-  if (filteredFactory.value) {
-    filterParams += "factory=" + filteredFactory.value + "&";
-  }
-  if (filteredSize.value) {
-    filterParams += "size=" + filteredSize.value + "&";
-  }
-  if (filteredMapCode.value) {
-    filterParams += "map_code=" + filteredMapCode.value + "&";
-  }
-  if (filteredCostumer.value) {
-    filterParams += "costumer=" + filteredCostumer.value + "&";
-  }
-
-  if (filteredWorker.value) {
-    filterParams += "worker=" + filteredWorker.value?.id + "&";
-  }
-
-  if (filteredServiceProvider.value) {
-    filterParams += "service_provider=" + filteredServiceProvider.value?.id + "&";
-  }
-
-  if (filteredCarpets.value?.length > 0) {
-    filterParams += "carpets=";
-    for (const c of filteredCarpets.value) {
-      filterParams += c + ",";
-    }
-    if (filterParams.slice(-1) === ",") filterParams = filterParams.replace(/.$/, "");
-    filterParams += "&";
-  }
-
-  if (filteredStartDate.value) {
-    filterParams += "start_date=" + filteredStartDate.value + "&";
-  }
-
-  if (filteredEndDate.value) {
-    filterParams += "end_date=" + filteredEndDate.value + "&";
-  }
-
-  if (filteredStatus.value) {
-    filterParams += "status=" + filteredStatus.value?.id + "&";
-  }
-
-  if (filteredService.value) {
-    filterParams += "services=" + filteredService.value?.id + "&";
-  }
-
-  if (filteredKind.value) {
-    filterParams += "kind=" + filteredKind.value + "&";
-  }
-
-  if (filteredDensity.value) {
-    filterParams += "density=" + filteredDensity.value + "&";
-  }
-
+async function getAndShowCarpets(s = true) {
+  if (s) reportCarpetsDialog.value = true;
   reportCarpets.value = [];
-
   let data = {};
-  let url = "";
-  if (filterParams.length > 1) {
-    url = "carpet/carpet-with-transfers/?" + filterParams;
-  } else {
-    url = "carpet/carpet-with-transfers/";
-  }
-  await axios.get(APIUrl + url).then(async (response) => {
-    reportCarpets.value = [];
-
-    for (const obj of response.data.results) {
+  for (const obj of allTransfers.value) {
+    for (const item of obj.carpets) {
       data = {};
-      data.isSelected = false;
       data.carpet = {};
-      data.carpet.id = obj.id;
-      data.carpet.barcode = obj.barcode;
-      data.carpet.color = obj.color;
-      data.carpet.costumer_name = obj.costumer_name;
-      data.carpet.factory = obj.factory;
-      data.carpet.density = obj.density;
-      data.carpet.kind = obj.kind;
-      data.carpet.size = obj.size;
-      data.carpet.map_code = obj.map_code;
       data.transfers = [];
+
+      data.isSelected = false;
+      data.carpet.id = item.id;
+      data.carpet.barcode = item.barcode;
+      data.carpet.color = item.color;
+      data.carpet.costumer_name = item.costumer_name;
+      data.carpet.factory = item.factory;
+      data.carpet.density = item.density;
+      data.carpet.kind = item.kind;
+      data.carpet.size = item.size;
+      data.carpet.map_code = item.map_code;
       for (const t of allTransfers.value) {
         for (const c of t.carpets) {
           if (data.carpet.id === c.id) {
@@ -3455,18 +3527,21 @@ async function getAndShowCarpets() {
           }
         }
       }
-
       await axios
-        .get(APIUrl + "carpet/last-transfers/" + obj.id + "/")
+        .get(APIUrl + "carpet/last-transfers/" + item.id + "/")
         .then((response) => {
           data.carpet.lastTransfer = response.data;
         })
         .catch((error) => {
           console.log(error);
         });
-      if (data?.transfers?.length > 0) reportCarpets.value.push(data);
+
+      let index = reportCarpets.value.findIndex(
+        (item) => item.carpet.id === data.carpet.id
+      );
+      if (index === -1) reportCarpets.value.push(data);
     }
-  });
+  }
 }
 const reportTransfersDialog = ref(false);
 const carpetTransfers = ref(null);
@@ -3486,14 +3561,13 @@ function getCarpetTransfers(id) {
 const openCarpetsDialog = ref(false);
 const openCarpets = ref([]);
 async function getOpenCarpets() {
-  await getAndShowCarpets();
+  await getAndShowCarpets(false);
   openCarpetsDialog.value = true;
   openCarpets.value = [];
   for (const carpet of reportCarpets.value) {
     await axios
-      .get(APIUrl + "carpet/last-transfers/" + carpet.id + "/")
+      .get(APIUrl + "carpet/last-transfers/" + carpet.carpet.id + "/")
       .then((response) => {
-        console.log(response);
         if (response.data.status[0]?.title === "خروج به سرویس") {
           openCarpets.value.push(carpet);
         }
@@ -3502,6 +3576,68 @@ async function getOpenCarpets() {
         console.log(error);
       });
   }
+}
+
+const editTransferDialog = ref(false);
+const targetTransferToEdit = ref(null);
+const selectedCarpets = ref([]);
+const transferCarpetsInEdit = ref([]);
+function getTransferInfo(id) {
+  selectedCarpets.value = [];
+  editTransferDialog.value = true;
+  transferCarpetsInEdit.value = carpetList.value;
+
+  for (const transfer of openTransfers.value) {
+    if (transfer.id === id) {
+      targetTransferToEdit.value = transfer;
+      // selectedCarpets.value = transfer.carpets;
+      selectedCarpets.value = transfer.carpets;
+    }
+  }
+}
+
+async function editTransfer() {
+  let services = [];
+  for (const ser of targetTransferToEdit?.value?.services) {
+    services.push(ser.id);
+  }
+  let carpets = [];
+  for (const c of selectedCarpets.value) {
+    carpets.push(c.id);
+  }
+  const body = {};
+  body.carpets = carpets;
+  // body.worker = targetTransferToEdit.value?.worker?.id;
+  // body.status = targetTransferToEdit?.value?.status?.id;
+  // body.service_provider = targetTransferToEdit?.value?.serviceProvider?.id;
+  // body.services = services;
+  // body.date = targetTransferToEdit?.value?.date;
+  // body.is_finished = true;
+  // body.admin_verify = false;
+
+  axios
+    .patch(
+      APIUrl +
+        "transfer/update-transfer2/" +
+        targetTransferToEdit.value.id +
+        "/partial-update/",
+      body
+    )
+    .then((response) => {
+      getOpenTransfer();
+      editTransferDialog.value = false;
+    });
+}
+
+function deleteTransfer(id) {
+  axios
+    .delete(APIUrl + "transfer/delete-transfer/" + id + "/")
+    .then((response) => {
+      getOpenTransfer();
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 }
 </script>
 
